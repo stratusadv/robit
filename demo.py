@@ -15,6 +15,9 @@ rb = Robit('Epiphany Real Estate Finder')
 
 
 if __name__ == '__main__':
+
+    memory_value = 0
+
     from http.server import HTTPServer, BaseHTTPRequestHandler
     import socketserver
 
@@ -26,8 +29,6 @@ if __name__ == '__main__':
             self.send_header("Content-type", "text/html")
             self.end_headers()
 
-
-
         def do_GET(self):
 
             def encode_file(name):
@@ -37,7 +38,7 @@ if __name__ == '__main__':
             self._set_headers()
             if self.path == '/api':
                 a_dict = {
-                    'Hello World': True,
+                    'Hello World': memory_value,
                 }
                 a_json = json.dumps(a_dict, indent=4)
                 self.wfile.write(a_json.encode("utf8"))
@@ -73,6 +74,7 @@ if __name__ == '__main__':
     thread.daemon = True
     thread.start()
 
-    for i in range(10):
+    for i in range(20):
         print(i)
+        memory_value = i
         sleep(1)
