@@ -2,20 +2,28 @@
 
 <head>
     <title></title>
-    <link class="style" href="bootstrap.min.css" rel="stylesheet">
+    <link class="style" href="bootstrap.css" rel="stylesheet">
     <link class="style" href="index.css" rel="stylesheet">
 </head>
+
 <body>
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col mx-auto">
+        <div class="col-6 border border-danger border-1">
             Hello World
+        </div>
+        <div class="col-6">
+            <div v-scope="{ count: 0 }">
+                {{ count }}
+                <button @click="count++">inc</button>
+            </div>
         </div>
     </div>
 </div>
 
-<script type="application/javascript" src="bootstrap.bundle.min.js"></script>
+<script src="petite-vue.js" defer init></script>
+<script type="application/javascript" src="bootstrap.js"></script>
 <script type="application/javascript" src="index.js"></script>
 
 </body>
