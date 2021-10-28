@@ -5,19 +5,19 @@ Lightweight (no installed dependencies) Service Worker Framework
 ## Usage
 
 ```python
-from robit import Robit
+from robit import Worker
 
 from time import sleep
 
-rb = Robit('Mr Wiggles')
+wo = Worker('Test Worker')
 
 def test_function():
     sleep(10)
 
-rb.add_part('Test Function', test_function)
+wo.add_job('Test Function', test_function)
 
 if __name__ == '__main__':
-    rb.run()
+    wo.run()
 ```
 
 The server will start and host a web portal on port 8000 locally for you to view what is going on.

@@ -1,15 +1,15 @@
-from robit import Robit
+from robit import Worker
 
 from time import sleep
 
-rb = Robit('Epiphany Real Estate Finder')
+wo = Worker('Test Worker')
 
 
 def test_function():
     sleep(10)
 
 
-rb.add_part('Test Function', test_function)
+wo.add_job('Test Function', test_function)
 
 if __name__ == '__main__':
-    rb.run()
+    wo.run()

@@ -1,5 +1,5 @@
 import logging
-from robit.robit import Robit
+from robit.worker import Worker
 
 FORMAT = '[%(asctime)-15s] %(message)s'
 logging.basicConfig(format=FORMAT)
