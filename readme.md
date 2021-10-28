@@ -1,6 +1,6 @@
-# Robit - Service Worker Framework
+# Robit
 
-A robot for your bits! (Pronounced "Row-Bit")
+Lightweight (no installed dependencies) Service Worker Framework
 
 ## Usage
 
@@ -41,4 +41,6 @@ The server will start and host a web portal on port 8000 locally for you to view
 
 - Boostrap 5
 - Vue Petite
+
+A robot for your bits! (Pronounced "Row-Bit")
 

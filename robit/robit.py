@@ -7,10 +7,10 @@ from .part import Part
 
 
 class Robit:
-    def __init__(self, name, wen_server=True):
+    def __init__(self, name, web_server=True):
         self.name = name
         self.clock = Clock()
-        if wen_server:
+        if web_server:
             self.web_server = WebServer()
         self.part_list = list()
 
