@@ -6,15 +6,18 @@ Lightweight (no installed dependencies) Service Worker Framework
 
 ```python
 from robit import Worker
-
 from time import sleep
 
 wo = Worker('Test Worker')
 
-def test_function():
-    sleep(10)
+def test_function_1():
+    sleep(2)
 
-wo.add_job('Test Function', test_function)
+def test_function_2():
+    sleep(4)
+
+wo.add_job('Test Function 1', test_function_1)
+wo.add_job('Test Function 2', test_function_2)
 
 if __name__ == '__main__':
     wo.run()

@@ -7,9 +7,8 @@ import threading
 class WebServer:
     def __init__(self):
         self.api_json = dict()
-        thread = threading.Thread(target=self.httpd_serve)
-        thread.daemon = True
-        thread.start()
+        self.web_server_thread = threading.Thread(target=self.httpd_serve)
+        self.web_server_thread.daemon = True
 
     def httpd_serve(self, address="localhost", port=8000):
 
@@ -48,4 +47,5 @@ class WebServer:
         print(f"Starting httpd server on {address}:{port}")
         httpd.serve_forever()
 
-
+    def run(self):
+        self.web_server_thread.start()
