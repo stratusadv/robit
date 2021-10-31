@@ -1,48 +1,69 @@
-import threading
-import uuid
-
 from .clock import Clock
+from .group import Group
+from .health import Health
 from .id import Id
+from .name import Name
+from .status import Status
 from .web import WebServer
-from .job import Job
 
 
 class Worker:
     def __init__(self, name: str, web_server: bool = True):
         self.id = Id()
-
-        self.name = name
+        self.name = Name(name)
         self.clock = Clock()
+        self.health = Health()
+        self.status = Status()
 
         if web_server:
             self.web_server = WebServer()
-            self.web_server.run()
+        else:
+            self.web_server = None
 
-        self.job_list = list()
+        self.group_dict = dict()
 
-        self.job_list_thread = threading.Thread(target=self.run_job_list)
-        self.job_list_thread.daemon = True
+    def add_job(self, name, method, group='Default'):
+        if group not in self.group_dict:
+            self.group_dict[group] = Group(name=group)
 
-    def add_job(self, name, method):
-        self.job_list.append(Job(name, method))
+        self.group_dict[group].add_job(name, method)
 
-    def run_job_list(self):
+    def as_dict(self):
+        return {
+            'id': self.id.__str__(),
+            'name': self.name.__str__(),
+            'groups': self.calculate_groups_to_list(),
+            'health': self.health.__str__(),
+            'status': self.status.__str__(),
+            'created': self.clock.created_tz_verbose
+        }
+
+    def calculate_groups_to_list(self):
+        group_list = list()
+        self.health.reset()
+
+        for group in self.group_dict.values():
+            group_list.append(group.as_dict())
+            self.health.average(group.health.percentage)
+
+        return group_list
+
+    def restart(self):
+        pass
+
+    def start_all_groups(self):
+        for group in self.group_dict.values():
+            group.start()
+
+    def start(self):
+        if self.web_server:
+            self.web_server.start()
+
+        self.start_all_groups()
+
         while True:
-            for job in self.job_list:
-                job.run()
+            if self.web_server:
+                self.web_server.update_api_dict(self.as_dict())
 
-    def run(self):
-        self.job_list_thread.start()
-
-        while True:
-            jobs = list()
-            average_health_percentage = 1.0
-            for job in self.job_list:
-                jobs.append(job.as_dict())
-                average_health_percentage = (average_health_percentage + job.health.percentage) / 2
-
-            self.web_server.api_json['id'] = self.id.value
-            self.web_server.api_json['name'] = self.name
-            self.web_server.api_json['job_list'] = jobs
-            self.web_server.api_json['average_job_health'] = average_health_percentage
-
+    def stop(self):
+        pass

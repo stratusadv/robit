@@ -1,14 +1,11 @@
 function Container() {
     return {
-        name: '',
-        health: '',
-        job_list: [],
+        data: {
+            "groups": []
+        },
 
         get_json_data(json_data) {
-            this.name = json_data.name
-            this.health = json_data.average_job_health
-            this.job_list = json_data.job_list
-            console.log(this.job_list[1].health)
+            this.data = json_data
         },
 
         ajax_json_request() {
@@ -24,6 +21,14 @@ function Container() {
             xmlHttp.open("GET", 'api');
             xmlHttp.send();
         },
+
+        start() {
+            this.ajax_json_request()
+            setInterval(this.ajax_json_request, 2000);
+            document.getElementById("loading").classList.add("d-none");
+            document.getElementById("loading").classList.remove("d-block");
+            document.getElementById("container").classList.remove("d-none");
+        }
 
     }
 }

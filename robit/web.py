@@ -29,7 +29,7 @@ class WebServer:
 
                 if self.path == '/api':
                     self.wfile.write(json.dumps(web_json_data, indent=4).encode("utf8"))
-                elif len(self.path.split('.')) > 1:
+                elif 1 < len(self.path.split('.')) < 3:
                     if self.path[1:].split('.')[1] in ('js', 'css', 'html'):
                         self.wfile.write(encode_file(self.path[1:]))
                 else:
@@ -47,5 +47,15 @@ class WebServer:
         print(f"Starting httpd server on {address}:{port}")
         httpd.serve_forever()
 
-    def run(self):
+    def restart(self):
+        pass
+
+    def start(self):
         self.web_server_thread.start()
+
+    def stop(self):
+        pass
+
+    def update_api_dict(self, update_dict: dict):
+        for key, val in update_dict.items():
+            self.api_json[key] = val
