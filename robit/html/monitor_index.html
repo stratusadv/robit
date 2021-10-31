@@ -1,0 +1,143 @@
+<html xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <title>Robit Monitor</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link class="style" href="bootstrap.css" rel="stylesheet">
+    <link class="style" href="monitor_index.css" rel="stylesheet">
+</head>
+
+<body class="bg-layer1">
+
+<div v-scope="Container()" class="container-fluid pb-3" @mounted="start">
+    <div id="container" class="d-none">
+        <div class="row sticky-top bg-nav shadow-sm">
+            <div class="col-12 col-sm-7 col-md-10 px-3 py-2">
+                <span class="h6 text-light-muted">Monitor since {{ data.created }}</span><br/>
+                <span class="h4 text-light">{{ data.name }}</span>
+            </div>
+            <div class="col-12 col-sm-5 col-md-2 p-3 py-2 text-end">
+                <span class="h6 text-light-muted">Health</span><br/>
+                <span class="h4 text-light">{{ data.health }}%</span>
+            </div>
+        </div>
+
+        <div v-if="data.groups.length > 0" class="row">
+            <div v-for="(group, i) in data.groups" :key="i" class="col-12">
+
+                <div class="row px-2 px-md-3 pt-3">
+                    <div class="col-12 bg-layer2 shadow-sm rounded-3 p-3">
+
+                        <div class="row">
+                            <div class="col-7 col-md-10">
+                                <span class="h7 text-extra-muted">Group</span><br/>
+                                <span class="h5">{{ group.name }}</span>
+                            </div>
+                            <div class="col-5 col-md-2 text-end">
+                                <span class="h7 text-extra-muted">Health</span><br/>
+                                <span class="h5">{{ group.health }}%</span>
+                            </div>
+                        </div>
+
+                        <div v-if="group.jobs.length > 0" class="row">
+                            <div v-for="(job, i) in group.jobs" :key="i" class="col-12 px-3 pb-2">
+
+                                <div class="row px-2 px-md-3 pt-3">
+                                    <div class="col-12 bg-layer3 shadow-sm rounded-3 p-2">
+                                        <div class="row">
+                                            <div class="col-12 col-sm-4 pb-3 pb-sm-0">
+                                                <span class="h7 text-extra-muted">Job</span><br/>
+                                                <span class="h6">{{ job.name }}</span>
+                                            </div>
+                                            <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
+                                                <span class="h7 text-extra-muted">Status</span><br/>
+                                                <span v-if="job.status == 'Running'" class="h6 text-status-running">{{ job.status }}</span>
+                                                <span v-else-if="job.status == 'Error'" class="h6 text-status-error">{{ job.status }}</span>
+                                                <span v-else class="h6 text-status-waiting">{{ job.status }}</span>
+                                            </div>
+                                            <div class="col-6 text-center pb-2 pb-sm-0 d-block d-sm-none">
+                                                <span class="h7 text-extra-muted">Health</span><br/>
+                                                <span class="h6">{{ job.health }}%</span>
+                                            </div>
+                                            <div class="col-6 col-sm-2 text-center">
+                                                <span class="h7 text-extra-muted">Success</span><br/>
+                                                <span class="h6">{{ job.success_count }}</span>
+                                            </div>
+                                            <div class="col-6 col-sm-2 text-center">
+                                                <span class="h7 text-extra-muted">Failed</span><br/>
+                                                <span class="h6">{{ job.failed_count }}</span>
+                                            </div>
+                                            <div class="col-sm-2 text-center d-none d-sm-block">
+                                                <span class="h7 text-extra-muted">Health</span><br/>
+                                                <span class="h6">{{ job.health }}%</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="row pt-2">
+                                            <div class="col-sm-4 d-none d-sm-block">
+
+                                            </div>
+                                            <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
+                                                <span class="h7 text-extra-muted">Average</span><br/>
+                                                <span class="h6">{{ job.clock.timer_average_duration }}sec</span>
+                                            </div>
+                                            <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
+                                                <span class="h7 text-extra-muted">Last</span><br/>
+                                                <span class="h6">{{ job.clock.timer_last_duration }}sec</span>
+                                            </div>
+                                            <div class="col-6 col-sm-2 text-center">
+                                                <span class="h7 text-extra-muted">Shortest</span><br/>
+                                                <span class="h6">{{ job.clock.timer_shortest_duration }}sec</span>
+                                            </div>
+                                            <div class="col-6 col-sm-2 text-center">
+                                                <span class="h7 text-extra-muted">Longest</span><br/>
+                                                <span class="h6">{{ job.clock.timer_longest_duration }}sec</span>
+                                            </div>
+                                        </div>
+
+                                        <div v-if="job.failed_log.length > 0" class="row p-0 m-0">
+                                            <div class="col p-0 m-0">
+                                                <hr class="text-muted my-2"/>
+                                            </div>
+                                        </div>
+
+                                        <div v-if="job.failed_log.length > 0" class="row">
+                                            <div v-for="(message, i) in job.failed_log" :key="i" class="col-12 ps-4">
+                                                <li class="fs-7 text-muted">{{ message }}</li>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading" class="d-block">
+        <div class="row h-25">
+        </div>
+        <div class="row h-75">
+            <div class="col h-100 text-center">
+                <h1 class="text-muted align-middle h-100">Loading ... !</h1>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="application/javascript" src="petite_vue.js"></script>
+<script type="application/javascript" src="bootstrap.js"></script>
+<script type="application/javascript" src="worker_index.js"></script>
+
+</body>
+</html>

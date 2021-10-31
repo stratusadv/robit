@@ -1,9 +1,12 @@
+import uuid
+import random
+from time import sleep
+
 from robit import Worker
 
-from time import sleep
-import random
-
-wo = Worker('Robit Example Worker')
+# To connect to an active monitor use monitor_address & monitor_key
+# wo = Worker('Robit Example Worker', key='Your-Own-Unique-Worker-Key-That-Secure', monitor_address='http://127.0.0.1:8200', monitor_key='Your-Own-Unique-Monitor-Key-That-Secure')
+wo = Worker('Robit Example Worker', key='Your-Own-Unique-Worker-Key-That-Secure')
 
 
 def function_sleep_short():

@@ -1,10 +1,10 @@
 import threading
 
-from robit.health import Health
-from robit.id import Id
+from robit.core.health import Health
+from robit.core.id import Id
 from robit.job import Job
-from robit.name import Name
-from robit.status import Status
+from robit.core.name import Name
+from robit.core.status import Status
 
 
 class Group:

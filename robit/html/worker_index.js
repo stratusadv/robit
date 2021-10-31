@@ -9,7 +9,7 @@ function Container() {
         },
 
         ajax_json_request() {
-            const xmlHttp = new XMLHttpRequest();
+            const xmlHttp = new XMLHttpRequest()
             let get_json_data = this.get_json_data
 
             xmlHttp.onreadystatechange = function () {
@@ -18,16 +18,18 @@ function Container() {
                 }
             }
 
-            xmlHttp.open("GET", 'api');
+            xmlHttp.open("GET", 'api/');
             xmlHttp.send();
         },
 
         start() {
             this.ajax_json_request()
-            setInterval(this.ajax_json_request, 2000);
-            document.getElementById("loading").classList.add("d-none");
-            document.getElementById("loading").classList.remove("d-block");
-            document.getElementById("container").classList.remove("d-none");
+            setInterval(this.ajax_json_request, 2000)
+            setTimeout(function() {
+                document.getElementById("loading").classList.add("d-none");
+                document.getElementById("loading").classList.remove("d-block");
+                document.getElementById("container").classList.remove("d-none");
+            }, 500)
         }
 
     }
@@ -35,4 +37,4 @@ function Container() {
 
 PetiteVue.createApp({
     Container,
-}).mount();
+}).mount()
