@@ -3,9 +3,10 @@ import datetime
 import decimal
 import json
 
-from robit import Worker
+from robit import Worker, Monitor
 
-wo = Worker('Testy McTesterson')
+wo = Worker('Testy McWorkerson')
+mo = Monitor('Watchy McTesterson')
 
 
 class TestRobit(unittest.TestCase):
