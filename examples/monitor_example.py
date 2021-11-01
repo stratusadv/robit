@@ -1,5 +1,3 @@
-import uuid
-
 from robit import Monitor
 
 mo = Monitor('Robit Example Monitor', key='Your-Own-Unique-Monitor-Key-That-Secure')

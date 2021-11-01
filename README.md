@@ -4,14 +4,20 @@
 
 ## Usage
 
-- Code below is provided in the demo.py file of this project.
+### Worker
+
+- Code below is provided in the examples/worker_example.py file of this project.
 
 ```python
-from robit import Worker
-from time import sleep
 import random
+from time import sleep
 
-wo = Worker('Robit Example Worker')
+from robit import Worker
+
+wo = Worker('Robit Example Worker', key='Your-Own-Unique-Worker-Key-That-Secure')
+
+# To connect to an active monitor use monitor_address & monitor_key
+# wo = Worker('Robit Example Worker', key='Your-Own-Unique-Worker-Key-That-Secure', monitor_address='http://127.0.0.1:8200', monitor_key='Your-Own-Unique-Monitor-Key-That-Secure')
 
 def function_sleep_short():
     sleep(2)
@@ -44,9 +50,25 @@ wo.add_job('Lower Delay Function', function_full_speed, 'Rapid Execution')
 
 if __name__ == '__main__':
     wo.start()
+
 ```
 
-The server will start and host a web portal on port 8000 locally for you to view what is going on.
+The server will start and host a web portal on default port 8000 locally for you to view what is going on.
+
+### Monitor
+
+- Code below is provided in the examples/monitor_example.py file of this project.
+
+```python
+from robit import Monitor
+
+mo = Monitor('Robit Example Monitor', key='Your-Own-Unique-Monitor-Key-That-Secure')
+
+if __name__ == '__main__':
+    mo.start()
+```
+
+The server will start and host a web portal on default port 8200 locally for you to view what is going on.
 
 ## Features
 
