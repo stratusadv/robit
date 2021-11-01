@@ -3,8 +3,8 @@ from pathlib import Path
 import threading
 
 
-def html_encode_file(name, directory: str = '../html', replace_dict: dict = None):
-    html = Path(Path(__file__).parent.resolve(), directory, name).read_text()
+def html_encode_file(name, directory: str = 'html', replace_dict: dict = None):
+    html = Path(Path(__file__).parent.parent.resolve(), directory, name).read_text()
 
     if replace_dict:
         html_str = str(html)
