@@ -1,3 +1,5 @@
-import setuptools
+from setuptools import setup
 
-setuptools.setup()
+setup(
+    include_package_data=True
+)
