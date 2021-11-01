@@ -62,6 +62,7 @@ class WebRequestHandler(BaseHTTPRequestHandler):
 class WebServer:
     def __init__(self, address='localhost', port=8000, key=None):
         self.api_json = dict()
+        self.post_dict = dict()
 
         self.address = address
         self.port = port

@@ -1,3 +1,5 @@
+from time import sleep
+
 from robit.core.clock import Clock
 from robit.core.health import Health
 from robit.core.id import Id
@@ -16,8 +18,12 @@ class Monitor:
 
         if web_server:
             self.web_server = MonitorWebServer(port=web_server_port, key=key)
+            self.web_server.post_dict['worker_dict'] = dict()
         else:
             self.web_server = None
+
+        self.worker_dict = self.web_server.post_dict['worker_dict']
+        # self.monitor_dict = dict()
 
     def as_dict(self):
         return {
@@ -25,8 +31,20 @@ class Monitor:
             'name': self.name.__str__(),
             'health': self.health.__str__(),
             'status': self.status.__str__(),
-            'created': self.clock.created_tz_verbose
+            'created': self.clock.created_tz_verbose,
+            'workers': self.calculate_workers_to_list(),
         }
+
+    def calculate_workers_to_list(self):
+        worker_list = list()
+        self.health.reset()
+
+        for worker in self.worker_dict.values():
+            # print(worker)
+            worker_list.append(worker)
+            self.health.average(float(worker['health']) * 0.01)
+
+        return worker_list
 
     def restart(self):
         pass
@@ -38,6 +56,9 @@ class Monitor:
         while True:
             if self.web_server:
                 self.web_server.update_api_dict(self.as_dict())
+                # print(self.worker_dict)
+                sleep(1)
+
 
     def stop(self):
         pass

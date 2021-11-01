@@ -44,6 +44,14 @@ class Worker:
             'created': self.clock.created_tz_verbose
         }
 
+    def as_dict_to_monitor(self):
+        return {
+            'id': self.id.__str__(),
+            'name': self.name.__str__(),
+            'health': self.health.__str__(),
+            'created': self.clock.created_tz_verbose
+        }
+
     def calculate_groups_to_list(self):
         group_list = list()
         self.health.reset()
@@ -71,7 +79,7 @@ class Worker:
             if self.web_server:
                 self.web_server.update_api_dict(self.as_dict())
             if self.monitor_address:
-                post_worker_data_to_monitor(self.monitor_address, self.monitor_key, {'Hello': 'World', 'More': ['Information', 'and stuff']})
+                post_worker_data_to_monitor(self.monitor_address, self.monitor_key, self.as_dict_to_monitor())
             sleep(1)
 
     def stop(self):
