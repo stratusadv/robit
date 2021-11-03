@@ -19,8 +19,8 @@ class Group:
         self.thread = threading.Thread(target=self.run_job_list)
         self.thread.daemon = True
 
-    def add_job(self, name: str, method):
-        self.job_list.append(Job(name, method))
+    def add_job(self, name: str, method, **kwargs):
+        self.job_list.append(Job(name, method, **kwargs))
 
     def calculate_jobs_to_list(self):
         job_list = list()

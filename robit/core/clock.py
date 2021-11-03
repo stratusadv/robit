@@ -1,10 +1,15 @@
 from datetime import datetime, timedelta
 
+from robit.core.cron import Cron
+
 CREATED_DATE_FORMAT = '%b %d, %Y %I:%M%p'
 
 
 class Clock:
-    def __init__(self, timezone_utc_minus: int = 0, timer_duration_list_max: int = 10):
+    def __init__(self,  cron: str = '* * * * *', timezone_utc_minus: int = 0, timer_duration_list_max: int = 10):
+        self.cron = Cron(cron)
+        self.cron.get_next_datetime()
+
         self.timezone_utc_minus = timezone_utc_minus
 
         self.created_utc = datetime.utcnow()

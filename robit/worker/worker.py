@@ -28,11 +28,11 @@ class Worker:
 
         self.group_dict = dict()
 
-    def add_job(self, name, method, group='Default'):
+    def add_job(self, name, method, group='Default', **kwargs):
         if group not in self.group_dict:
             self.group_dict[group] = Group(name=group)
 
-        self.group_dict[group].add_job(name, method)
+        self.group_dict[group].add_job(name, method, **kwargs)
 
     def as_dict(self):
         return {

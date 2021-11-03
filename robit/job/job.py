@@ -9,12 +9,15 @@ from robit.core.status import Status
 
 
 class Job:
-    def __init__(self, name: str, method):
+    def __init__(self, name: str, method, **kwargs):
         self.id = Id()
 
         self.name = name
         self.method = method
-        self.clock = Clock()
+        if 'cron' in kwargs:
+            self.clock = Clock(cron=kwargs['cron'])
+        else:
+            self.clock = Clock()
 
         self.status = Status()
 
@@ -22,18 +25,21 @@ class Job:
         self.failed_count = Counter()
         self.failed_log = Log()
         self.health = Health()
+        self.result_message = str()
 
     def run(self):
         logging.warning(f'Starting: Job "{self.name}"')
         self.status.set('run')
         self.clock.start_timer()
         try:
-            self.method()
+            method_result = self.method()
             self.clock.stop_timer()
             self.status.set('wait')
             logging.warning(f'Success: Job "{self.name}" ran correctly')
             self.success_count.increase()
             self.health.add_positive()
+            if method_result:
+                self.result_message = str(method_result)
         except Exception as e:
             self.status.set('error')
             failed_message = f'Failed on Exception: {e}'
@@ -48,6 +54,7 @@ class Job:
             'name': self.name.__str__(),
             'method': self.method.__name__,
             'status': self.status.__str__(),
+            'result_message': self.result_message,
             'clock': self.clock.as_dict(),
             'success_count': self.success_count.total,
             'health': self.health.__str__(),
