@@ -5,12 +5,13 @@ STATUS_CHOICES = {
     'run': 'Running',
     'error': 'Error',
     'wait': 'Waiting',
+    'queued': 'Queued',
 }
 
 
 class Status:
     def __init__(self, value: str = 'stop'):
-        self.status = None
+        self.value = None
         self.set(value)
 
     def __repr__(self):
@@ -21,10 +22,10 @@ class Status:
 
     def set(self, value):
         if value in STATUS_CHOICES:
-            self.status = value
+            self.value = value
         else:
             raise TypeError(f'{value} is and invalid status choice. Valid choices are {STATUS_CHOICES.keys()}')
 
     @property
     def verbose(self):
-        return STATUS_CHOICES[self.status]
+        return STATUS_CHOICES[self.value]

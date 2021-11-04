@@ -1,5 +1,6 @@
 import ast
 from datetime import datetime, timedelta
+import calendar
 
 
 class Cron:
@@ -17,37 +18,56 @@ class Cron:
         self.month = CronValue(cron_list[3])
         self.day_of_week = CronValue(cron_list[4])
 
+        self.next_datetime = None
 
-    # work backwards!
-    def get_next_datetime(self):
-        now = datetime.now()
+        self.set_next_datetime()
 
-        minute = None
-        hour = None
-        day_of_month = None
-        month = None
-        day_of_week = None
 
-        if self.day_of_week.function == 'every':
-            day_of_week = now.weekday()
+    def is_past_next_datetime(self):
+        if datetime.now().replace(second=0, microsecond=0) >= self.next_datetime:
+            self.set_next_datetime()
+            return True
+        else:
+            return False
 
-        if self.month.function == 'every':
-            month = now.month
-
-        if self.day_of_month.function == 'every':
-            day_of_month = now.day
-
-        if self.hour.function == 'every':
-            hour = now.hour
+    def set_next_datetime(self):
+        ndt = datetime.now().replace(second=0, microsecond=0)
+        now = datetime.now().replace(second=0, microsecond=0)
 
         if self.minute.function == 'every':
-            minute = now.minute + 1
+            ndt += timedelta(minutes=1)
+        elif self.minute.function == 'specific':
+            ndt = ndt.replace(minute=self.minute.specific)
 
-        next_datetime = datetime.now() + timedelta(minutes=minute)
+            if now.minute >= ndt.minute:
+                ndt += timedelta(hours=1)
+        elif self.minute.function == 'step':
+            count_step_list = [0]
+            count = self.minute.step
+            while count < 60:
+                count_step_list.append(count)
+                count += self.minute.step
 
-        print(f'{minute = } {hour = } { day_of_month = } { month = } { day_of_week = }')
+            for count_step in count_step_list:
+                if count_step > now.minute:
+                    ndt = ndt.replace(minute=count_step)
+                    break
+            else:
+                ndt = ndt.replace(minute=0)
+                ndt += timedelta(hours=1)
+
+        if self.hour.function == 'specific':
+
+            if ndt.hour == self.hour.specific:               
+                if self.minute.function == 'specific':
+                    if ndt.minute >= self.minute.specific:
+                        ndt += timedelta(days=1)
+                        
+            if ndt.hour > self.hour.specific:
+                ndt += timedelta(days=1)
 
 
+        self.next_datetime = ndt
 
 class CronValue:
     def __init__(self, value: str, ):

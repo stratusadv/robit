@@ -19,7 +19,7 @@ def function_sleep_long():
     return 'Slept for 6 seconds'
 
 
-wo.add_job('Sleep for Short Period', function_sleep_short, 'Sleeping', cron='5 * * * *')
+wo.add_job('Sleep for Short Period', function_sleep_short, 'Sleeping', cron='*/30 * * * *')
 wo.add_job('Longer Sleep Period Function', function_sleep_long, 'Sleeping')
 
 

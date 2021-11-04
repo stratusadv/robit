@@ -8,7 +8,6 @@ CREATED_DATE_FORMAT = '%b %d, %Y %I:%M%p'
 class Clock:
     def __init__(self,  cron: str = '* * * * *', timezone_utc_minus: int = 0, timer_duration_list_max: int = 10):
         self.cron = Cron(cron)
-        self.cron.get_next_datetime()
 
         self.timezone_utc_minus = timezone_utc_minus
 
@@ -26,6 +25,7 @@ class Clock:
     def as_dict(self):
         return {
             'created': self.created_tz_verbose,
+            'next_run_datetime': self.next_run_datetime_verbose,
             'timer_last_duration': f'{self.timer_last_duration:.2f}',
             'timer_average_duration': f'{self.timer_average_duration:.2f}',
             'timer_shortest_duration': f'{self.timer_shortest_duration:.2f}',
@@ -46,6 +46,16 @@ class Clock:
     @property
     def created_tz_verbose(self):
         return self.created_tz.strftime(CREATED_DATE_FORMAT)
+
+    def is_past_next_run_datetime(self):
+        if self.cron.is_past_next_datetime():
+            return True
+        else:
+            return False
+
+    @property
+    def next_run_datetime_verbose(self):
+        return self.cron.next_datetime.strftime(CREATED_DATE_FORMAT)
 
     def start_timer(self):
         self.timer = datetime.utcnow()
