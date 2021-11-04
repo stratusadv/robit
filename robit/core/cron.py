@@ -30,6 +30,9 @@ class Cron:
         else:
             return False
 
+    def process_cron_value(self, value, limit, limit_threshold_time_delta_adjustment):
+        pass
+
     def set_next_datetime(self):
         ndt = datetime.now().replace(second=0, microsecond=0)
         now = datetime.now().replace(second=0, microsecond=0)
@@ -68,6 +71,7 @@ class Cron:
 
 
         self.next_datetime = ndt
+
 
 class CronValue:
     def __init__(self, value: str, ):
