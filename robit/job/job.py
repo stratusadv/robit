@@ -14,7 +14,14 @@ class Job:
         self.id = Id()
 
         self.name = name
+
         self.method = method
+
+        if 'method_kwargs' in kwargs:
+            self.method_kwargs = kwargs['method_kwargs']
+        else:
+            self.method_kwargs = None
+
         if 'cron' in kwargs:
             self.clock = Clock(cron=kwargs['cron'])
         else:
@@ -34,7 +41,10 @@ class Job:
             self.status.set('run')
             self.clock.start_timer()
             try:
-                method_result = self.method()
+                if self.method_kwargs:
+                    method_result = self.method(**self.method_kwargs)
+                else:
+                    method_result = self.method()
                 self.clock.stop_timer()
                 logging.warning(f'Success: Job "{self.name}" ran correctly')
                 self.success_count.increase()

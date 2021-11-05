@@ -61,11 +61,13 @@ class Cron:
 
         if self.hour.function == 'specific':
 
+            ndt = ndt.replace(hour=self.hour.specific)
+
             if ndt.hour == self.hour.specific:               
                 if self.minute.function == 'specific':
                     if ndt.minute >= self.minute.specific:
                         ndt += timedelta(days=1)
-                        
+
             if ndt.hour > self.hour.specific:
                 ndt += timedelta(days=1)
 
