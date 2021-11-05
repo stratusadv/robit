@@ -11,7 +11,7 @@ from robit.worker.web_server import WorkerWebServer
 
 
 class Worker:
-    def __init__(self, name: str, web_server: bool = True, web_server_port: int = 8000, key: str = None, monitor_address: str = None, monitor_key: str = None):
+    def __init__(self, name: str, web_server: bool = True, web_server_address: str = '127.0.0.1', web_server_port: int = 8000, key: str = None, monitor_address: str = None, monitor_key: str = None):
         self.id = Id()
         self.name = Name(name)
         self.clock = Clock()
@@ -19,7 +19,7 @@ class Worker:
         self.status = Status()
 
         if web_server:
-            self.web_server = WorkerWebServer(port=web_server_port, key=key)
+            self.web_server = WorkerWebServer(address=web_server_address, port=web_server_port, key=key)
         else:
             self.web_server = None
 

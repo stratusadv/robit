@@ -85,7 +85,7 @@ class WebServer:
         if self.key:
             href_link += f'/{self.key}/'
 
-        print(f'Starting httpd server an {href_link}')
+        print(f'Starting httpd server at {href_link}')
 
     def stop(self):
         pass
