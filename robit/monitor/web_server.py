@@ -10,11 +10,10 @@ from robit.core.web_server import WebServer, WebRequestHandler, html_encode_file
 class MonitorWebServer(WebServer):
     def httpd_serve(self):
         api_json_data = self.api_json
-
         post_dict = self.post_dict
-
         key = self.key
         path_root = path_root_from_key(key)
+        html_replace_dict = self.html_replace_dict
 
         class MonitorWebRequestHandler(WebRequestHandler):
             def do_GET(self):
@@ -32,7 +31,7 @@ class MonitorWebServer(WebServer):
                     pass
 
                 elif self.path == f'{path_root}/':
-                    self.wfile.write(html_encode_file('monitor_index.html'))
+                    self.wfile.write(html_encode_file('monitor_index.html', replace_dict=html_replace_dict))
 
                 else:
                     self.not_found()

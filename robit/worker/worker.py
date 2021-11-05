@@ -19,7 +19,7 @@ class Worker:
         self.status = Status()
 
         if web_server:
-            self.web_server = WorkerWebServer(address=web_server_address, port=web_server_port, key=key)
+            self.web_server = WorkerWebServer(address=web_server_address, port=web_server_port, key=key, html_replace_dict={'||title||': self.name.__str__()})
         else:
             self.web_server = None
 

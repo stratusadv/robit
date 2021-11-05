@@ -60,13 +60,15 @@ class WebRequestHandler(BaseHTTPRequestHandler):
 
 
 class WebServer:
-    def __init__(self, address='localhost', port=8000, key=None):
+    def __init__(self, address='localhost', port=8000, key=None, html_replace_dict=None):
         self.api_json = dict()
         self.post_dict = dict()
 
         self.address = address
         self.port = port
         self.key = key
+
+        self.html_replace_dict = html_replace_dict
 
         self.thread = threading.Thread(target=self.httpd_serve)
         self.thread.daemon = True

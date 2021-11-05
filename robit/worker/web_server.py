@@ -9,6 +9,7 @@ class WorkerWebServer(WebServer):
         api_json_data = self.api_json
         key = self.key
         path_root = path_root_from_key(key)
+        html_replace_dict = self.html_replace_dict
 
         class WorkerWebRequestHandler(WebRequestHandler):
             def do_GET(self):
@@ -21,7 +22,7 @@ class WorkerWebServer(WebServer):
                     pass
 
                 elif self.path == f'{path_root}/':
-                    self.wfile.write(html_encode_file('worker_index.html'))
+                    self.wfile.write(html_encode_file('worker_index.html', replace_dict=html_replace_dict))
 
                 else:
                     self.not_found()
