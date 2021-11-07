@@ -30,12 +30,11 @@ class Cron:
         else:
             return False
 
-    def process_cron_value(self, value, limit, limit_threshold_time_delta_adjustment):
-        pass
-
     def set_next_datetime(self):
         ndt = datetime.now().replace(second=0, microsecond=0)
         now = datetime.now().replace(second=0, microsecond=0)
+
+        # Minute
 
         if self.minute.function == 'every':
             ndt += timedelta(minutes=1)
@@ -59,21 +58,82 @@ class Cron:
                 ndt = ndt.replace(minute=0)
                 ndt += timedelta(hours=1)
 
-        if self.hour.function == 'specific':
+        # Hour
 
+        if self.hour.function == 'every':
+            pass
+
+        if self.hour.function == 'specific':
             ndt = ndt.replace(hour=self.hour.specific)
 
             if ndt.hour == self.hour.specific:               
                 if self.minute.function == 'specific':
-                    if ndt.minute >= self.minute.specific:
+                    if now.minute >= ndt.minute:
                         ndt += timedelta(days=1)
 
             if ndt.hour > self.hour.specific:
                 ndt += timedelta(days=1)
 
+        elif self.hour.function == 'step':
+            count_step_list = [0]
+            count = self.hour.step
+            while count < 24:
+                count_step_list.append(count)
+                count += self.hour.step
+
+            for count_step in count_step_list:
+                if count_step > now.hour:
+                    ndt = ndt.replace(hour=count_step)
+                    break
+            else:
+                ndt = ndt.replace(hour=0)
+                ndt += timedelta(days=1)
+
+        # Day of Month
+
+        if self.day_of_month.function == 'every':
+            pass
+
+        elif self.day_of_month.function == 'specific':
+            ndt = ndt.replace(day=self.day_of_month.specific)
+
+            if ndt.month == 12:
+                next_month = 1
+            else:
+                next_month = ndt.month + 1
+
+            if ndt.day == self.day_of_month.specific:
+
+                if self.hour.function == 'specific':
+                    if now.hour >= ndt.hour:
+                        ndt = ndt.replace(month=next_month)
+
+            if ndt.day > self.day_of_month.specific:
+                ndt = ndt.replace(month=next_month)
+
+        # Month
+
+        if self.month.function == 'every':
+            pass
+
+        elif self.month.function == 'specific':
+            ndt = ndt.replace(month=self.month.specific)
+
+            if ndt.month == self.month.specific:
+
+                if self.day_of_month.function == 'specific':
+                    if now.day >= ndt.day:
+                        ndt = ndt.replace(year=(ndt.year + 1))
+
+            if ndt.month > self.month.specific:
+                ndt = ndt.replace(year=(ndt.year + 1))
+
+        # Day of Week
+
+        if self.day_of_week.function == 'every':
+            pass
 
         self.next_datetime = ndt
-
 
 class CronValue:
     def __init__(self, value: str, ):
