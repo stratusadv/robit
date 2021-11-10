@@ -1,15 +1,21 @@
 import unittest
-import datetime
-import decimal
-import json
 
 from robit import Worker, Monitor
 
-wo = Worker('Testy McWorkerson')
-mo = Monitor('Watchy McTesterson')
 
+class TestCore(unittest.TestCase):
+    def test_worker(self):
+        try:
+            wo = Worker('Testy McWorkerson')
+            self.assertTrue(True)
+        except:
+            self.assertTrue(False)
 
-class TestRobit(unittest.TestCase):
-    def test_robit(self):
-        self.assertTrue(True)
+    def test_monitor(self):
+        try:
+            mo = Monitor('Watchy McTesterson')
+            self.assertTrue(True)
+        except:
+            self.assertTrue(False)
+
 
