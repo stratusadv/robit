@@ -73,6 +73,17 @@ class Job:
         return {
             'id': self.id.__str__(),
             'name': self.name.__str__(),
+            'status': self.status.__str__(),
+            'next_run_datetime': self.clock.next_run_datetime_verbose,
+            'success_count': self.success_count.total,
+            'health': self.health.__str__(),
+            'failed_count': self.failed_count.total,
+        }
+
+    def as_dict_full(self):
+        return {
+            'id': self.id.__str__(),
+            'name': self.name.__str__(),
             'method': self.method.__name__,
             'status': self.status.__str__(),
             'result_message': self.result_message,

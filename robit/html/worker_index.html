@@ -50,11 +50,11 @@
                         <div v-if="group.jobs.length > 0" class="row">
                             <div v-for="(job, i) in group.jobs" :key="i" class="col-12 px-3 pb-2">
 
-                                <div class="row px-2 px-md-3 pt-3">
+                                <div v-on:click="get_job_details(job.id)" class="row px-2 px-md-3 pt-3">
                                     <div class="col-12 bg-layer3 shadow-sm rounded-3 p-2">
                                         <div class="row">
                                             <div class="col-12 col-sm-4 pb-3 pb-sm-0">
-                                                <span class="h7 text-extra-muted fw-bold">Job <span class="text-muted fw-normal">next run at {{ job.clock.next_run_datetime }}</span></span> <br/>
+                                                <span class="h7 text-extra-muted fw-bold">Job <span class="text-muted fw-normal">next run at {{ job.next_run_datetime }}</span></span> <br/>
                                                 <span class="h6">{{ job.name }}</span>
                                             </div>
                                             <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
@@ -81,43 +81,43 @@
                                             </div>
                                         </div>
 
-                                        <div class="row pt-2">
-                                            <div class="col-sm-4 d-none d-sm-block">
-                                                <span v-if="job.result_message" class="h7 text-extra-muted">Last Result</span><br/>
-                                                <span class="fs-6 text-muted">{{ job.result_message }}</span>
-                                            </div>
-                                            <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
-                                                <span class="h7 text-extra-muted">Average</span><br/>
-                                                <span class="h6">{{ job.clock.timer_average_duration }}sec</span>
-                                            </div>
-                                            <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
-                                                <span class="h7 text-extra-muted">Last</span><br/>
-                                                <span class="h6">{{ job.clock.timer_last_duration }}sec</span>
-                                            </div>
-                                            <div class="col-6 col-sm-2 text-center">
-                                                <span class="h7 text-extra-muted">Shortest</span><br/>
-                                                <span class="h6">{{ job.clock.timer_shortest_duration }}sec</span>
-                                            </div>
-                                            <div class="col-6 col-sm-2 text-center">
-                                                <span class="h7 text-extra-muted">Longest</span><br/>
-                                                <span class="h6">{{ job.clock.timer_longest_duration }}sec</span>
-                                            </div>
-                                        </div>
+<!--                                        <div class="row pt-2">-->
+<!--                                            <div class="col-sm-4 d-none d-sm-block">-->
+<!--                                                <span v-if="job.result_message" class="h7 text-extra-muted">Last Result</span><br/>-->
+<!--                                                <span class="fs-6 text-muted">{{ job.result_message }}</span>-->
+<!--                                            </div>-->
+<!--                                            <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">-->
+<!--                                                <span class="h7 text-extra-muted">Average</span><br/>-->
+<!--                                                <span class="h6">{{ job.clock.timer_average_duration }}sec</span>-->
+<!--                                            </div>-->
+<!--                                            <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">-->
+<!--                                                <span class="h7 text-extra-muted">Last</span><br/>-->
+<!--                                                <span class="h6">{{ job.clock.timer_last_duration }}sec</span>-->
+<!--                                            </div>-->
+<!--                                            <div class="col-6 col-sm-2 text-center">-->
+<!--                                                <span class="h7 text-extra-muted">Shortest</span><br/>-->
+<!--                                                <span class="h6">{{ job.clock.timer_shortest_duration }}sec</span>-->
+<!--                                            </div>-->
+<!--                                            <div class="col-6 col-sm-2 text-center">-->
+<!--                                                <span class="h7 text-extra-muted">Longest</span><br/>-->
+<!--                                                <span class="h6">{{ job.clock.timer_longest_duration }}sec</span>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
 
-                                        <div v-if="job.failed_log.length > 0" class="row p-0 m-0">
-                                            <div class="col p-0 m-0">
-                                                <hr class="text-muted my-2"/>
-                                            </div>
-                                        </div>
+<!--                                        <div v-if="job.failed_log.length > 0" class="row p-0 m-0">-->
+<!--                                            <div class="col p-0 m-0">-->
+<!--                                                <hr class="text-muted my-2"/>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
 
-                                        <div v-if="job.failed_log.length > 0" class="row">
-                                            <div class="col-12">
-                                                <span class="h7 text-extra-muted">Exceptions</span>
-                                            </div>
-                                            <div v-for="(message, i) in job.failed_log" :key="i" class="col-12 ps-4">
-                                                <li class="fs-7 text-muted">{{ message }}</li>
-                                            </div>
-                                        </div>
+<!--                                        <div v-if="job.failed_log.length > 0" class="row">-->
+<!--                                            <div class="col-12">-->
+<!--                                                <span class="h7 text-extra-muted">Exceptions</span>-->
+<!--                                            </div>-->
+<!--                                            <div v-for="(message, i) in job.failed_log" :key="i" class="col-12 ps-4">-->
+<!--                                                <li class="fs-7 text-muted">{{ message }}</li>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
 
                                     </div>
                                 </div>

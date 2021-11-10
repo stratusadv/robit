@@ -1,7 +1,7 @@
 function Container() {
     return {
         data: {
-            "groups": []
+            "groups": [],
         },
 
         get_json_data(json_data) {
@@ -18,7 +18,7 @@ function Container() {
                 }
             }
 
-            xmlHttp.open("GET", 'api/');
+            xmlHttp.open("GET", 'worker_api/');
             xmlHttp.send();
         },
 
@@ -30,6 +30,13 @@ function Container() {
                 document.getElementById("loading").classList.remove("d-block");
                 document.getElementById("container").classList.remove("d-none");
             }, 500)
+        },
+
+        async get_job_details(id) {
+          let response = await fetch("job_api/"+id);
+          let responseText = await response.text();
+          console.log(responseText)
+          // this.totalVuePackages = data.total;
         }
 
     }

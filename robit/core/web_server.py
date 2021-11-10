@@ -18,16 +18,34 @@ def html_encode_file(name, directory: str = 'html', replace_dict: dict = None):
         return html.encode("utf8")
 
 
-def path_root_from_key(key):
-    if key:
-        return f'/{key}'
-    else:
-        return ''
-
-
 class WebRequestHandler(BaseHTTPRequestHandler):
     def not_found(self):
         self.wfile.write('Nothing to See Here'.encode("utf8"))
+
+    @property
+    def path_list(self):
+        temp_path_list = self.path.split('/')
+        path_list = list()
+
+        for path in temp_path_list:
+            if len(path) > 0:
+                path_list.append(path)
+
+        return path_list
+
+    def is_in_path_list(self, path_list: list):
+        if len(path_list) >= 1:
+            if path_list[0] is None:
+                del path_list[0]
+
+        if len(path_list) <= len(self.path_list):
+            for i in range(len(path_list)):
+                if path_list[i] != self.path_list[i]:
+                    return False
+            else:
+                return True
+        else:
+            return False
 
     def served_css_js(self):
         if 1 < len(self.path.split('.')) < 3:
@@ -61,7 +79,7 @@ class WebRequestHandler(BaseHTTPRequestHandler):
 
 class WebServer:
     def __init__(self, address='localhost', port=8000, key=None, html_replace_dict=None):
-        self.api_json = dict()
+        self.api_dict = dict()
         self.post_dict = dict()
 
         self.address = address
@@ -94,4 +112,4 @@ class WebServer:
 
     def update_api_dict(self, update_dict: dict):
         for key, val in update_dict.items():
-            self.api_json[key] = val
+            self.api_dict[key] = val

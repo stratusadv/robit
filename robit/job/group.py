@@ -38,6 +38,12 @@ class Group:
 
         return job_list
 
+    def job_list_as_dict_full(self):
+        job_dict_full = dict()
+        for job in self.job_list:
+            job_dict_full[job.id.__str__()] = job.as_dict_full()
+        return job_dict_full
+
     def run_job_list(self):
         while True:
             for job in self.job_list:

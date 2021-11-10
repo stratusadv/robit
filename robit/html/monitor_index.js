@@ -18,7 +18,7 @@ function Container() {
                 }
             }
 
-            xmlHttp.open("GET", 'api/');
+            xmlHttp.open("GET", 'monitor_api/');
             xmlHttp.send();
         },
 

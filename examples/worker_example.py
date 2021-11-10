@@ -5,7 +5,7 @@ from robit import Worker
 
 wo = Worker(
     name='Robit Example Worker',
-    key='Your-Own-Unique-Worker-Key-That-Secure',
+    # key='Your-Own-Unique-Worker-Key-That-Secure',
     # web_server=False,
     # web_server_address='127.0.0.1',
     # web_server_port=8000,

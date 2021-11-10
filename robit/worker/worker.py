@@ -59,6 +59,7 @@ class Worker:
             'health': self.health.__str__(),
             'status': self.status.__str__(),
             'clock': self.clock.as_dict(),
+            'job_details': self.job_detail_dict()
         }
 
     def as_dict_to_monitor(self):
@@ -78,6 +79,14 @@ class Worker:
             self.health.average(group.health.percentage)
 
         return group_list
+
+    def job_detail_dict(self):
+        job_detail_dict = dict()
+
+        for group in self.group_dict.values():
+            job_detail_dict = {**job_detail_dict, **group.job_list_as_dict_full()}
+
+        return job_detail_dict
 
     def restart(self):
         pass
