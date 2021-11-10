@@ -65,7 +65,7 @@ class WebServer:
         self.post_dict = dict()
 
         self.address = address
-        self.port = port
+        self.port = int(port)
         self.key = key
 
         self.html_replace_dict = html_replace_dict

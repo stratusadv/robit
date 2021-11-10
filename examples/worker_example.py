@@ -3,10 +3,16 @@ from time import sleep
 
 from robit import Worker
 
-# To connect to an active monitor use monitor_address & monitor_key
-# wo = Worker('Robit Example Worker', key='Your-Own-Unique-Worker-Key-That-Secure', monitor_address='http://127.0.0.1:8200', monitor_key='Your-Own-Unique-Monitor-Key-That-Secure')
-wo = Worker('Robit Example Worker', web_server_address='127.0.0.1', key='Your-Own-Unique-Worker-Key-That-Secure')
-# wo = Worker('Robit Example Worker', key='Your-Own-Unique-Worker-Key-That-Secure', web_server=False)
+wo = Worker(
+    name='Robit Example Worker',
+    key='Your-Own-Unique-Worker-Key-That-Secure',
+    # web_server=False,
+    # web_server_address='127.0.0.1',
+    # web_server_port=8000,
+    # monitor_address='http://127.0.0.1:8200',
+    # monitor_key='Your-Own-Unique-Monitor-Key-That-Secure',
+    utc_offset=-7,
+)
 
 
 def function_sleep_short():
@@ -19,7 +25,7 @@ def function_sleep_for_time(sleep_time: int):
     return 'Slept for 6 seconds'
 
 
-wo.add_job('Sleep for Short Period', function_sleep_short, group='Sleeping', cron='10 23 2 * *')
+wo.add_job('Sleep for Short Period', function_sleep_short, group='Sleeping', cron='0 6 * * 1')
 wo.add_job('Specific Sleep Period Function', function_sleep_for_time, method_kwargs={'sleep_time': 6}, group='Sleeping')
 
 

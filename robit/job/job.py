@@ -10,7 +10,13 @@ from robit.core.status import Status
 
 
 class Job:
-    def __init__(self, name: str, method, **kwargs):
+    def __init__(
+            self,
+            name: str,
+            method,
+            utc_offset: int = 0,
+            **kwargs
+    ):
         self.id = Id()
 
         self.name = name
@@ -23,9 +29,9 @@ class Job:
             self.method_kwargs = None
 
         if 'cron' in kwargs:
-            self.clock = Clock(cron=kwargs['cron'])
+            self.clock = Clock(cron=kwargs['cron'], utc_offset=utc_offset)
         else:
-            self.clock = Clock()
+            self.clock = Clock(utc_offset=utc_offset)
 
         self.status = Status()
 

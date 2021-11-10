@@ -1,5 +1,6 @@
 import threading
 
+from robit.core.clock import Clock
 from robit.core.health import Health
 from robit.core.id import Id
 from robit.job import Job
@@ -8,11 +9,16 @@ from robit.core.status import Status
 
 
 class Group:
-    def __init__(self, name: str):
+    def __init__(
+            self,
+            name: str = 'default',
+            utc_offset: int = 0
+    ):
         self.id = Id()
         self.name = Name(name)
         self.health = Health()
         self.status = Status()
+        self.clock = Clock(utc_offset=utc_offset)
 
         self.job_list = list()
 
@@ -20,7 +26,7 @@ class Group:
         self.thread.daemon = True
 
     def add_job(self, name: str, method, **kwargs):
-        self.job_list.append(Job(name, method, **kwargs))
+        self.job_list.append(Job(name=name, method=method, utc_offset=self.clock.utc_offset, **kwargs))
 
     def calculate_jobs_to_list(self):
         job_list = list()

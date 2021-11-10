@@ -4,8 +4,13 @@ import calendar
 
 
 class Cron:
-    def __init__(self, value: str):
+    def __init__(
+            self,
+            value: str,
+            utc_offset: int = 0,
+    ):
         self.value = value
+        self.utc_offset = utc_offset
 
         cron_list = self.value.split(' ')
 
@@ -22,7 +27,6 @@ class Cron:
 
         self.set_next_datetime()
 
-
     def is_past_next_datetime(self):
         if datetime.now().replace(second=0, microsecond=0) >= self.next_datetime:
             self.set_next_datetime()
@@ -31,8 +35,8 @@ class Cron:
             return False
 
     def set_next_datetime(self):
-        ndt = datetime.now().replace(second=0, microsecond=0)
-        now = datetime.now().replace(second=0, microsecond=0)
+        ndt = datetime.utcnow().replace(second=0, microsecond=0) + timedelta(hours=self.utc_offset)
+        now = datetime.utcnow().replace(second=0, microsecond=0) + timedelta(hours=self.utc_offset)
 
         # Minute
 
@@ -125,7 +129,7 @@ class Cron:
                     if now.day >= ndt.day:
                         ndt = ndt.replace(year=(ndt.year + 1))
 
-            if ndt.month > self.month.specific:
+            if now.month > ndt.month:
                 ndt = ndt.replace(year=(ndt.year + 1))
 
         # Day of Week
@@ -133,7 +137,25 @@ class Cron:
         if self.day_of_week.function == 'every':
             pass
 
+        if self.day_of_week.function == 'specific':
+            if self.day_of_week.specific == 0:
+                self.day_of_week.specific = 7
+
+            if ndt.isoweekday() == self.day_of_week.specific:
+                pass
+                # print(f'{now.isoweekday() = } {ndt.isoweekday() = } {self.day_of_week.specific = }')
+                # if self.hour.function == 'specific':
+                #     if now.hour >= ndt.hour:
+                #         ndt += timedelta(days=7)
+
+            elif ndt.isoweekday() > self.day_of_week.specific:
+                ndt += timedelta(days=(7 - (ndt.isoweekday() - self.day_of_week.specific)))
+
+            else:
+                ndt += timedelta(days=(self.day_of_week.specific - ndt.isoweekday()))
+
         self.next_datetime = ndt
+
 
 class CronValue:
     def __init__(self, value: str, ):
@@ -155,6 +177,9 @@ class CronValue:
 
     def process(self):
         range_list = self.value.split('-')
+
+        value_error = 'Invalid cron string used.'
+
         if len(range_list) == 2:
             self.function = 'range'
             self.range_start = int(range_list[0])
@@ -164,12 +189,16 @@ class CronValue:
                 self.function = 'step'
                 self.step_start = step_list[0]
                 self.step = int(step_list[1])
+            else:
+                raise ValueError(value_error)
         else:
             if range_list[0] == '*':
                 self.function = 'every'
             elif isinstance(ast.literal_eval(range_list[0]), int):
                 self.function = 'specific'
                 self.specific = int(range_list[0])
+            else:
+                raise ValueError(value_error)
 
 
 

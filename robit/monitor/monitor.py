@@ -9,15 +9,28 @@ from robit.monitor.web_server import MonitorWebServer
 
 
 class Monitor:
-    def __init__(self, name: str, web_server: bool = True,  web_server_address: str = '127.0.0.1', web_server_port: int = 8200, key: str = None):
+    def __init__(
+            self,
+            name: str,
+            web_server: bool = True,
+            web_server_address: str = '127.0.0.1',
+            web_server_port: int = 8200,
+            key: str = None,
+            utc_offset: int = 0,
+    ):
         self.id = Id()
         self.name = Name(name)
-        self.clock = Clock()
+        self.clock = Clock(utc_offset=utc_offset)
         self.health = Health()
         self.status = Status()
 
         if web_server:
-            self.web_server = MonitorWebServer(address=web_server_address, port=web_server_port, key=key, html_replace_dict={'||title||': self.name.__str__()})
+            self.web_server = MonitorWebServer(
+                address=web_server_address,
+                port=web_server_port,
+                key=key,
+                html_replace_dict={'||title||': self.name.__str__()}
+            )
             self.web_server.post_dict['worker_dict'] = dict()
         else:
             self.web_server = None

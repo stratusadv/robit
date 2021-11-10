@@ -6,13 +6,18 @@ CREATED_DATE_FORMAT = '%b %d, %Y %I:%M%p'
 
 
 class Clock:
-    def __init__(self,  cron: str = '* * * * *', timezone_utc_minus: int = 0, timer_duration_list_max: int = 10):
-        self.cron = Cron(cron)
+    def __init__(
+            self,
+            cron: str = '* * * * *',
+            utc_offset: int = 0,
+            timer_duration_list_max: int = 10
+    ):
+        self.cron = Cron(value=cron, utc_offset=utc_offset)
 
-        self.timezone_utc_minus = timezone_utc_minus
+        self.utc_offset = utc_offset
 
         self.created_utc = datetime.utcnow()
-        self.created_tz = datetime.utcnow() - timedelta(hours=timezone_utc_minus)
+        self.created_tz = datetime.utcnow() + timedelta(hours=utc_offset)
 
         self.timer_duration_list_max = timer_duration_list_max
         self.timer_duration_list = []
