@@ -1,5 +1,9 @@
 class Log:
-    def __init__(self, max_messages: int = 5):
+    def __init__(
+            self,
+            max_messages: int = 5,
+            utc_offset: int = 0,
+    ):
         self.max_messages = max_messages
         self.message_list = list()
 

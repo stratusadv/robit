@@ -30,6 +30,7 @@ class Clock:
     def as_dict(self):
         return {
             'created': self.created_tz_verbose,
+            'now': self.now_tz_verbose,
             'next_run_datetime': self.next_run_datetime_verbose,
             'timer_last_duration': f'{self.timer_last_duration:.2f}',
             'timer_average_duration': f'{self.timer_average_duration:.2f}',
@@ -51,6 +52,10 @@ class Clock:
     @property
     def created_tz_verbose(self):
         return self.created_tz.strftime(CREATED_DATE_FORMAT)
+
+    @property
+    def now_tz_verbose(self):
+        return (datetime.utcnow() + timedelta(hours=self.utc_offset)).strftime(CREATED_DATE_FORMAT)
 
     def is_past_next_run_datetime(self):
         if self.cron.is_past_next_datetime():

@@ -58,7 +58,7 @@ class Worker:
             'groups': self.calculate_groups_to_list(),
             'health': self.health.__str__(),
             'status': self.status.__str__(),
-            'created': self.clock.created_tz_verbose
+            'clock': self.clock.as_dict(),
         }
 
     def as_dict_to_monitor(self):
@@ -66,7 +66,7 @@ class Worker:
             'id': self.id.__str__(),
             'name': self.name.__str__(),
             'health': self.health.__str__(),
-            'created': self.clock.created_tz_verbose
+            'clock': self.clock.as_dict(),
         }
 
     def calculate_groups_to_list(self):

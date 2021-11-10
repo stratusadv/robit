@@ -44,7 +44,7 @@ class Monitor:
             'name': self.name.__str__(),
             'health': self.health.__str__(),
             'status': self.status.__str__(),
-            'created': self.clock.created_tz_verbose,
+            'clock': self.clock.as_dict(),
             'workers': self.calculate_workers_to_list(),
         }
 
