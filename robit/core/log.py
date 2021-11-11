@@ -1,3 +1,6 @@
+from robit.core.clock import Clock
+
+
 class Log:
     def __init__(
             self,
@@ -7,8 +10,10 @@ class Log:
         self.max_messages = max_messages
         self.message_list = list()
 
+        self.clock = Clock(utc_offset=utc_offset)
+
     def add_message(self, message: str):
-        self.message_list.insert(0, message)
+        self.message_list.insert(0, f'{message} on {self.clock.now_tz_verbose}')
         self.trim()
 
     def trim(self):

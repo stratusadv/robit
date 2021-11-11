@@ -25,7 +25,7 @@ function Container() {
         start() {
             this.ajax_json_request()
             setInterval(this.ajax_json_request, 2000)
-            setTimeout(function() {
+            setTimeout(function () {
                 document.getElementById("loading").classList.add("d-none");
                 document.getElementById("loading").classList.remove("d-block");
                 document.getElementById("container").classList.remove("d-none");
@@ -33,10 +33,15 @@ function Container() {
         },
 
         async get_job_details(id) {
-          let response = await fetch("job_api/"+id);
-          let responseText = await response.text();
-          console.log(responseText)
-          // this.totalVuePackages = data.total;
+            let response = await fetch("job_api/" + id);
+            let job_list = document.getElementsByClassName("job-details")
+            for (i = 0; i < job_list.length; i++) {
+                job_list[i].style.display = 'none'
+            }
+            document.getElementById("job-" + id).style.display = 'block';
+            let responseText = await response.text();
+            // console.log(responseText)
+            // this.totalVuePackages = data.total;
         }
 
     }

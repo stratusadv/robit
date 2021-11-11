@@ -38,8 +38,10 @@ class Job:
         self.success_count = Counter()
         self.failed_count = Counter()
         self.failed_log = Log()
+
         self.health = Health()
-        self.result_message = str()
+
+        self.result_log = Log()
 
     def run(self):
         if self.clock.is_past_next_run_datetime():
@@ -86,7 +88,7 @@ class Job:
             'name': self.name.__str__(),
             'method': self.method.__name__,
             'status': self.status.__str__(),
-            'result_message': self.result_message,
+            'result_log': self.result_log.message_list,
             'clock': self.clock.as_dict(),
             'success_count': self.success_count.total,
             'health': self.health.__str__(),
