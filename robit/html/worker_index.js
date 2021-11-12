@@ -4,6 +4,10 @@ function Container() {
             "groups": [],
         },
 
+        job_details: {
+
+        },
+
         get_json_data(json_data) {
             this.data = json_data
         },
@@ -34,14 +38,16 @@ function Container() {
 
         async get_job_details(id) {
             let response = await fetch("job_api/" + id);
-            let job_list = document.getElementsByClassName("job-details")
-            for (i = 0; i < job_list.length; i++) {
-                job_list[i].style.display = 'none'
+            let job = document.getElementById("job-" + id)
+            if (job.style.display === 'block') {
+                job.style.display = 'none'
+            } else {
+                job.style.display = 'block'
             }
-            document.getElementById("job-" + id).style.display = 'block';
             let responseText = await response.text();
-            // console.log(responseText)
-            // this.totalVuePackages = data.total;
+            let json_data = JSON.parse(responseText)
+            this.job_details[json_data.job_detail.id] = json_data.job_detail
+            // console.log(JSON.stringify(this.job_details))
         }
 
     }

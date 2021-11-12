@@ -54,7 +54,9 @@
                                     <div class="col-12 bg-layer3 shadow-sm rounded-3 p-2">
                                         <div class="row">
                                             <div class="col-12 col-sm-4 pb-3 pb-sm-0">
-                                                <span class="h7 text-extra-muted fw-bold">Job <span class="text-muted fw-normal">next run at {{ job.next_run_datetime }}</span></span> <br/>
+                                                <span class="h7 text-extra-muted fw-bold">Job <span
+                                                        class="text-muted fw-normal">next run at {{ job.next_run_datetime }}</span></span>
+                                                <br/>
                                                 <span class="h6">{{ job.name }}</span>
                                             </div>
                                             <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
@@ -81,48 +83,70 @@
                                             </div>
                                         </div>
 
-                                        <div :id="'job-' + job.id" class="job-details row" style="display: none;">
-                                            <div class="col">
-                                                Hello There !
+                                        <div :id="'job-' + job.id" class="row" style="display: none;">
+                                            <div v-if="job_details[job.id]" class="col">
+
+                                                <div class="row p-0 m-0">
+                                                    <div class="col p-0 m-0">
+                                                        <hr class="text-muted my-2"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row pb-2">
+                                                    <div class="col-sm-4 d-none d-sm-block">
+                                                        <span class="h7 text-extra-muted">Method</span><br/>
+                                                        <span class="h6">{{ job_details[job.id].method }}</span>
+                                                    </div>
+                                                    <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
+                                                        <span class="h7 text-extra-muted">Average Runtime</span><br/>
+                                                        <span class="h6">{{ job_details[job.id].clock.timer_average_duration }}sec</span>
+                                                    </div>
+                                                    <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
+                                                        <span class="h7 text-extra-muted">Last Runtime</span><br/>
+                                                        <span class="h6">{{ job_details[job.id].clock.timer_last_duration }}sec</span>
+                                                    </div>
+                                                    <div class="col-6 col-sm-2 text-center">
+                                                        <span class="h7 text-extra-muted">Shortest Runtime</span><br/>
+                                                        <span class="h6">{{ job_details[job.id].clock.timer_shortest_duration }}sec</span>
+                                                    </div>
+                                                    <div class="col-6 col-sm-2 text-center">
+                                                        <span class="h7 text-extra-muted">Longest Runtime</span><br/>
+                                                        <span class="h6">{{ job_details[job.id].clock.timer_longest_duration }}sec</span>
+                                                    </div>
+                                                    <div class="col-12 d-block d-sm-none pt-2">
+                                                        <span class="h7 text-extra-muted">Method</span><br/>
+                                                        <span class="h6">{{ job_details[job.id].method }}</span>
+                                                    </div>
+                                                </div>
+
+                                                <div v-if="job_details[job.id].failed_log.length > 0" class="row mb-1">
+                                                    <div class="col-12">
+                                                        <span class="h7 text-extra-muted">Exceptions</span>
+                                                    </div>
+                                                </div>
+
+                                                <div v-if="job_details[job.id].failed_log.length > 0" class="row mb-1 me-1 overflow-auto" style="max-height: 700px;">
+                                                    <div v-for="(message, i) in job_details[job.id].failed_log" :key="i"
+                                                         class="col-12 px-4">
+                                                        <li class="fs-7 text-muted">{{ message }}</li>
+                                                    </div>
+                                                </div>
+
+                                                <div v-if="job_details[job.id].result_log.length > 0" class="row mb-1">
+                                                    <div class="col-12">
+                                                        <span class="h7 text-extra-muted">Results</span>
+                                                    </div>
+                                                </div>
+
+                                                <div v-if="job_details[job.id].result_log.length > 0" class="row mb-1 me-1 overflow-auto" style="max-height: 700px;">
+                                                    <div v-for="(message, i) in job_details[job.id].result_log" :key="i"
+                                                         class="col-12 px-4">
+                                                        <li class="fs-7 text-muted">{{ message }}</li>
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </div>
-<!--                                        <div class="row pt-2">-->
-<!--                                            <div class="col-sm-4 d-none d-sm-block">-->
-<!--                                                <span v-if="job.result_message" class="h7 text-extra-muted">Last Result</span><br/>-->
-<!--                                                <span class="fs-6 text-muted">{{ job.result_message }}</span>-->
-<!--                                            </div>-->
-<!--                                            <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">-->
-<!--                                                <span class="h7 text-extra-muted">Average</span><br/>-->
-<!--                                                <span class="h6">{{ job.clock.timer_average_duration }}sec</span>-->
-<!--                                            </div>-->
-<!--                                            <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">-->
-<!--                                                <span class="h7 text-extra-muted">Last</span><br/>-->
-<!--                                                <span class="h6">{{ job.clock.timer_last_duration }}sec</span>-->
-<!--                                            </div>-->
-<!--                                            <div class="col-6 col-sm-2 text-center">-->
-<!--                                                <span class="h7 text-extra-muted">Shortest</span><br/>-->
-<!--                                                <span class="h6">{{ job.clock.timer_shortest_duration }}sec</span>-->
-<!--                                            </div>-->
-<!--                                            <div class="col-6 col-sm-2 text-center">-->
-<!--                                                <span class="h7 text-extra-muted">Longest</span><br/>-->
-<!--                                                <span class="h6">{{ job.clock.timer_longest_duration }}sec</span>-->
-<!--                                            </div>-->
-<!--                                        </div>-->
-
-<!--                                        <div v-if="job.failed_log.length > 0" class="row p-0 m-0">-->
-<!--                                            <div class="col p-0 m-0">-->
-<!--                                                <hr class="text-muted my-2"/>-->
-<!--                                            </div>-->
-<!--                                        </div>-->
-
-<!--                                        <div v-if="job.failed_log.length > 0" class="row">-->
-<!--                                            <div class="col-12">-->
-<!--                                                <span class="h7 text-extra-muted">Exceptions</span>-->
-<!--                                            </div>-->
-<!--                                            <div v-for="(message, i) in job.failed_log" :key="i" class="col-12 ps-4">-->
-<!--                                                <li class="fs-7 text-muted">{{ message }}</li>-->
-<!--                                            </div>-->
-<!--                                        </div>-->
 
                                     </div>
                                 </div>

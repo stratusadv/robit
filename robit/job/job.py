@@ -37,11 +37,18 @@ class Job:
 
         self.success_count = Counter()
         self.failed_count = Counter()
-        self.failed_log = Log()
+        self.failed_log = Log(max_messages=20)
 
         self.health = Health()
 
-        self.result_log = Log()
+        self.result_log = Log(max_messages=200)
+
+    @property
+    def method_verbose(self):
+        if self.method_kwargs:
+            return f'{self.method.__name__}(kwargs={self.method_kwargs})'
+        else:
+            return f'{ self.method.__name__ }()'
 
     def run(self):
         if self.clock.is_past_next_run_datetime():
@@ -58,7 +65,7 @@ class Job:
                 self.success_count.increase()
                 self.health.add_positive()
                 if method_result:
-                    self.result_message = str(method_result)
+                    self.result_log.add_message(str(method_result))
             except Exception as e:
                 self.status.set('error')
                 failed_message = f'Failed on Exception: {e}'
@@ -86,7 +93,7 @@ class Job:
         return {
             'id': self.id.__str__(),
             'name': self.name.__str__(),
-            'method': self.method.__name__,
+            'method': self.method_verbose,
             'status': self.status.__str__(),
             'result_log': self.result_log.message_list,
             'clock': self.clock.as_dict(),

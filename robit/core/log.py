@@ -13,7 +13,7 @@ class Log:
         self.clock = Clock(utc_offset=utc_offset)
 
     def add_message(self, message: str):
-        self.message_list.insert(0, f'{message} on {self.clock.now_tz_verbose}')
+        self.message_list.insert(0, f'[{self.clock.now_tz_verbose}] {message}')
         self.trim()
 
     def trim(self):
