@@ -36,7 +36,7 @@
                 <div class="row px-2 px-md-3 pt-3">
                     <div class="col-12 bg-layer2 shadow-sm rounded-3 p-3">
 
-                        <div class="row">
+                        <div class="row pb-2">
                             <div class="col-7 col-md-10">
                                 <span class="h7 text-extra-muted  fw-bold">Group</span><br/>
                                 <span class="h5">{{ group.name }}</span>
@@ -50,7 +50,7 @@
                         <div v-if="group.jobs.length > 0" class="row">
                             <div v-for="(job, i) in group.jobs" :key="i" class="col-12 px-3 pb-2">
 
-                                <div v-on:click="get_job_details(job.id)" class="row px-2 px-md-3 pt-3">
+                                <div v-on:click="get_job_details(job.id)" class="row px-2 px-md-3 pt-2">
                                     <div class="col-12 bg-layer3 shadow-sm rounded-3 p-2">
                                         <div class="row">
                                             <div class="col-12 col-sm-4 pb-3 pb-sm-0">
@@ -125,7 +125,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div v-if="job_details[job.id].failed_log.length > 0" class="row mb-1 me-1 overflow-auto" style="max-height: 700px;">
+                                                <div v-if="job_details[job.id].failed_log.length > 0" class="row mb-1 me-1 overflow-auto" style="max-height: 500px;">
                                                     <div v-for="(message, i) in job_details[job.id].failed_log" :key="i"
                                                          class="col-12 px-4">
                                                         <li class="fs-7 text-muted">{{ message }}</li>
@@ -138,7 +138,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div v-if="job_details[job.id].result_log.length > 0" class="row mb-1 me-1 overflow-auto" style="max-height: 700px;">
+                                                <div v-if="job_details[job.id].result_log.length > 0" class="row mb-1 me-1 overflow-auto" style="max-height: 500px;">
                                                     <div v-for="(message, i) in job_details[job.id].result_log" :key="i"
                                                          class="col-12 px-4">
                                                         <li class="fs-7 text-muted">{{ message }}</li>

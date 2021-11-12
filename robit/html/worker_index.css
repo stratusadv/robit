@@ -8,10 +8,12 @@
 
 .bg-layer2 {
     background: #ffffff !important;
+    border: 1px solid #d5d5d5 !important;
 }
 
 .bg-layer3 {
     background: #f5f5ff !important;
+    border: 1px solid #dfdfff !important;
 }
 
 .bg-layer3:hover {

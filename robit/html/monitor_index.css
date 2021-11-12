@@ -8,6 +8,7 @@
 
 .bg-layer2 {
     background: #ffffff !important;
+    border: 1px solid #d5d5d5 !important;
 }
 
 .bg-layer3 {
@@ -16,6 +17,12 @@
 
 .bg-layer4 {
     background: #efffef !important;
+    border: 1px solid #bfffbf !important;
+}
+
+.bg-layer4:hover {
+    background: #e6ffe6 !important;
+    cursor: pointer;
 }
 
 .fs-7 {
