@@ -8,23 +8,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link class="style" href="bootstrap.css" rel="stylesheet">
-    <link class="style" href="worker_index.css" rel="stylesheet">
+    <link class="style" href="index.css" rel="stylesheet">
 </head>
 
-<body class="bg-layer1">
+<body class="bg-layer">
 
 <div v-scope="Container()" class="container-fluid pb-3" @mounted="start">
     <div id="container" class="d-none">
-        <div class="row sticky-top bg-nav shadow-sm">
-            <div class="col-6 col-md-5 px-3 py-2">
+        <div class="row sticky-top bg-worker-nav shadow-sm">
+            <div class="col-6 col-md-4 px-3 py-2">
                 <span class="h6 text-light-muted">Worker</span><br/>
                 <span class="h4 text-light">{{ data.name }}</span>
             </div>
-            <div class="col-6 col-md-5 px-3 py-2 text-end text-md-center">
+            <div class="col-6 col-md-4 px-3 py-2 text-end text-md-center">
                 <span class="h6 text-light-muted">Date & Time</span><br/>
                 <span class="h4 text-light">{{ data.clock.now }}</span>
             </div>
-            <div class="col-12 col-md-2 p-3 py-2 text-end">
+            <div class="col-12 col-md-4 p-3 py-2 text-end">
                 <span class="h6 text-light-muted">Health</span><br/>
                 <span class="h4 text-light">{{ data.health }}%</span>
             </div>
@@ -34,15 +34,15 @@
             <div v-for="(group, i) in data.groups" :key="i" class="col-12">
 
                 <div class="row px-2 px-md-3 pt-3">
-                    <div class="col-12 bg-layer2 shadow-sm rounded-3 p-3">
+                    <div class="col-12 bg-group-layer shadow-sm rounded-3 p-3">
 
                         <div class="row pb-2">
                             <div class="col-7 col-md-10">
-                                <span class="h7 text-extra-muted  fw-bold">Group</span><br/>
+                                <span class="fs-7 text-worker-muted  fw-bold">Group</span><br/>
                                 <span class="h5">{{ group.name }}</span>
                             </div>
                             <div class="col-5 col-md-2 text-end">
-                                <span class="h7 text-extra-muted">Health</span><br/>
+                                <span class="fs-7 text-worker-muted">Health</span><br/>
                                 <span class="h5">{{ group.health }}%</span>
                             </div>
                         </div>
@@ -51,34 +51,34 @@
                             <div v-for="(job, i) in group.jobs" :key="i" class="col-12 px-3 pb-2">
 
                                 <div v-on:click="get_job_details(job.id)" class="row px-2 px-md-3 pt-2">
-                                    <div class="col-12 bg-layer3 shadow-sm rounded-3 p-2">
+                                    <div class="col-12 bg-job-layer shadow-sm rounded-3 p-2">
                                         <div class="row">
                                             <div class="col-12 col-sm-4 pb-3 pb-sm-0">
-                                                <span class="h7 text-extra-muted fw-bold">Job <span
+                                                <span class="fs-7 text-worker-muted fw-bold">Job <span
                                                         class="text-muted fw-normal">next run at {{ job.next_run_datetime }}</span></span>
                                                 <br/>
                                                 <span class="h6">{{ job.name }}</span>
                                             </div>
                                             <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
-                                                <span class="h7 text-extra-muted">Status</span><br/>
+                                                <span class="fs-7 text-worker-muted">Status</span><br/>
                                                 <span v-if="job.status == 'Running'" class="h6 text-status-running">{{ job.status }}</span>
                                                 <span v-else-if="job.status == 'Error'" class="h6 text-status-error">{{ job.status }}</span>
                                                 <span v-else class="h6 text-status-waiting">{{ job.status }}</span>
                                             </div>
                                             <div class="col-6 text-center pb-2 pb-sm-0 d-block d-sm-none">
-                                                <span class="h7 text-extra-muted">Health</span><br/>
+                                                <span class="fs-7 text-worker-muted">Health</span><br/>
                                                 <span class="h6">{{ job.health }}%</span>
                                             </div>
                                             <div class="col-6 col-sm-2 text-center">
-                                                <span class="h7 text-extra-muted">Success</span><br/>
+                                                <span class="fs-7 text-worker-muted">Success</span><br/>
                                                 <span class="h6">{{ job.success_count }}</span>
                                             </div>
                                             <div class="col-6 col-sm-2 text-center">
-                                                <span class="h7 text-extra-muted">Failed</span><br/>
+                                                <span class="fs-7 text-worker-muted">Failed</span><br/>
                                                 <span class="h6">{{ job.failed_count }}</span>
                                             </div>
                                             <div class="col-sm-2 text-center d-none d-sm-block">
-                                                <span class="h7 text-extra-muted">Health</span><br/>
+                                                <span class="fs-7 text-worker-muted">Health</span><br/>
                                                 <span class="h6">{{ job.health }}%</span>
                                             </div>
                                         </div>
@@ -94,38 +94,39 @@
 
                                                 <div class="row pb-2">
                                                     <div class="col-sm-4 d-none d-sm-block">
-                                                        <span class="h7 text-extra-muted">Method</span><br/>
-                                                        <span class="h6">{{ job_details[job.id].method }}</span>
+                                                        <span class="fs-7 text-worker-muted">Method</span><br/>
+                                                        <span class="fs-7 ps-2">{{ job_details[job.id].method }}</span>
                                                     </div>
                                                     <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
-                                                        <span class="h7 text-extra-muted">Average Runtime</span><br/>
+                                                        <span class="fs-7 text-worker-muted">Average Runtime</span><br/>
                                                         <span class="h6">{{ job_details[job.id].clock.timer_average_duration }}sec</span>
                                                     </div>
                                                     <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
-                                                        <span class="h7 text-extra-muted">Last Runtime</span><br/>
+                                                        <span class="fs-7 text-worker-muted">Last Runtime</span><br/>
                                                         <span class="h6">{{ job_details[job.id].clock.timer_last_duration }}sec</span>
                                                     </div>
                                                     <div class="col-6 col-sm-2 text-center">
-                                                        <span class="h7 text-extra-muted">Shortest Runtime</span><br/>
+                                                        <span class="fs-7 text-worker-muted">Shortest Runtime</span><br/>
                                                         <span class="h6">{{ job_details[job.id].clock.timer_shortest_duration }}sec</span>
                                                     </div>
                                                     <div class="col-6 col-sm-2 text-center">
-                                                        <span class="h7 text-extra-muted">Longest Runtime</span><br/>
+                                                        <span class="fs-7 text-worker-muted">Longest Runtime</span><br/>
                                                         <span class="h6">{{ job_details[job.id].clock.timer_longest_duration }}sec</span>
                                                     </div>
                                                     <div class="col-12 d-block d-sm-none pt-2">
-                                                        <span class="h7 text-extra-muted">Method</span><br/>
+                                                        <span class="fs-7 text-worker-muted">Method</span><br/>
                                                         <span class="h6">{{ job_details[job.id].method }}</span>
                                                     </div>
                                                 </div>
 
                                                 <div v-if="job_details[job.id].failed_log.length > 0" class="row mb-1">
                                                     <div class="col-12">
-                                                        <span class="h7 text-extra-muted">Exceptions</span>
+                                                        <span class="fs-7 text-worker-muted">Exceptions</span>
                                                     </div>
                                                 </div>
 
-                                                <div v-if="job_details[job.id].failed_log.length > 0" class="row mb-1 me-1 overflow-auto" style="max-height: 500px;">
+                                                <div v-if="job_details[job.id].failed_log.length > 0"
+                                                     class="row mb-1 me-1 overflow-auto" style="max-height: 300px;">
                                                     <div v-for="(message, i) in job_details[job.id].failed_log" :key="i"
                                                          class="col-12 px-4">
                                                         <li class="fs-7 text-muted">{{ message }}</li>
@@ -134,11 +135,12 @@
 
                                                 <div v-if="job_details[job.id].result_log.length > 0" class="row mb-1">
                                                     <div class="col-12">
-                                                        <span class="h7 text-extra-muted">Results</span>
+                                                        <span class="fs-7 text-worker-muted">Results</span>
                                                     </div>
                                                 </div>
 
-                                                <div v-if="job_details[job.id].result_log.length > 0" class="row mb-1 me-1 overflow-auto" style="max-height: 500px;">
+                                                <div v-if="job_details[job.id].result_log.length > 0"
+                                                     class="row mb-1 me-1 overflow-auto" style="max-height: 300px;">
                                                     <div v-for="(message, i) in job_details[job.id].result_log" :key="i"
                                                          class="col-12 px-4">
                                                         <li class="fs-7 text-muted">{{ message }}</li>
@@ -174,7 +176,7 @@
 
 <script type="application/javascript" src="petite_vue.js"></script>
 <script type="application/javascript" src="bootstrap.js"></script>
-<script type="application/javascript" src="worker_index.js"></script>
+<script type="application/javascript" src="worker.js"></script>
 
 </body>
 </html>

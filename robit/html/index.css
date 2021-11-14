@@ -1,28 +1,38 @@
-.bg-nav {
+.bg-worker-nav {
     background: #6666dd !important;
 }
 
-.bg-layer1 {
+.bg-monitor-nav {
+    background: #339933 !important;
+}
+
+.bg-layer {
     background: #e5e5e5 !important;
 }
 
-.bg-layer2 {
+.bg-group-layer {
     background: #ffffff !important;
     border: 1px solid #d5d5d5 !important;
 }
 
-.bg-layer3 {
+.bg-job-layer {
     background: #f5f5ff !important;
     border: 1px solid #dfdfff !important;
 }
 
-.bg-layer3:hover {
+.bg-job-layer:hover {
     background: #ebebff !important;
     cursor: pointer;
 }
 
-.bg-layer4 {
-    background: #efffff !important;
+.bg-worker-layer {
+    background: #efffef !important;
+    border: 1px solid #bfffbf !important;
+}
+
+.bg-worker-layer:hover {
+    background: #e6ffe6 !important;
+    cursor: pointer;
 }
 
 .fs-7 {
@@ -31,10 +41,16 @@
 
 .h7 {
     font-size: 0.7rem;
+    font-weight: 600;
 }
 
-.text-extra-muted {
+
+.text-worker-muted {
     color: #6666dd !important;
+}
+
+.text-monitor-muted {
+    color: #339933 !important;
 }
 
 .text-light-muted {
