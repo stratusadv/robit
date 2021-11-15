@@ -10,7 +10,7 @@ def html_encode_file(name, directory: str = 'html', replace_dict: dict = None):
         html_str = str(html)
 
         for key, val in replace_dict.items():
-            html_str = html_str.replace(key, val)
+            html_str = html_str.replace(f'||{key}||', val)
 
         return html_str.encode("utf8")
 

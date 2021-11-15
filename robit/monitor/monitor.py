@@ -29,14 +29,13 @@ class Monitor:
                 address=web_server_address,
                 port=web_server_port,
                 key=key,
-                html_replace_dict={'||title||': self.name.__str__()}
+                html_replace_dict={'title': self.name.__str__()}
             )
             self.web_server.post_dict['worker_dict'] = dict()
         else:
             self.web_server = None
 
         self.worker_dict = self.web_server.post_dict['worker_dict']
-        # self.monitor_dict = dict()
 
     def as_dict(self):
         return {
@@ -53,7 +52,6 @@ class Monitor:
         self.health.reset()
 
         for worker in self.worker_dict.values():
-            # print(worker)
             worker_list.append(worker)
             self.health.average(float(worker['health']) * 0.01)
 
@@ -69,9 +67,7 @@ class Monitor:
         while True:
             if self.web_server:
                 self.web_server.update_api_dict(self.as_dict())
-                # print(self.worker_dict)
                 sleep(1)
-
 
     def stop(self):
         pass

@@ -23,9 +23,6 @@ class MonitorWebServer(WebServer):
                 if self.is_in_path_list([key, 'monitor_api']):
                     self.wfile.write(json.dumps(api_dict, indent=4).encode("utf8"))
 
-                elif self.is_in_path_list([key, 'worker_update']):
-                    self.wfile.write('Try Posting to This Path'.encode("utf8"))
-
                 elif self.served_css_js():
                     pass
 

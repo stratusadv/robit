@@ -34,7 +34,7 @@ class Worker:
                 address=web_server_address,
                 port=web_server_port,
                 key=key,
-                html_replace_dict={'||title||': self.name.__str__()}
+                html_replace_dict={'title': self.name.__str__()}
             )
         else:
             self.web_server = None

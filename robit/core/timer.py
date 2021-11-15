@@ -1,25 +1,58 @@
+from datetime import datetime
+
+
 class Timer:
-    def __init__(self):
+    def __init__(
+            self,
+            duration_decimal_places: int = 2,
+            duration_list_max: int = 20,
+    ):
         self.start_time: float = 0.0
-        self.stop_time: float = 0.0
 
-        self.average: float = 0.0
-        self.current: float = 0.0
-        self.fastest: float = 0.0
-        self.previous: float = 0.0
-        self.slowest: float = 0.0
+        self.duration_decimal_places = duration_decimal_places
 
-    def start(self):
-        pass
+        self.duration_list_max = duration_list_max
+        self.duration_list = []
 
-    def stop(self):
-        pass
+        self.average_duration = 0.0
+        self.last_duration = 0.0
+        self.shortest_duration = 0.0
+        self.longest_duration = 0.0
 
     def as_dict(self):
         return {
-            'average': self.average,
-            'current': self.current,
-            'fastest': self.fastest,
-            'previous': self.previous,
-            'slowest': self.slowest,
+            'average_duration': f'{self.average_duration:,.{self.duration_decimal_places}f}',
+            'last_duration': f'{self.last_duration:,.{self.duration_decimal_places}f}',
+            'shortest_duration': f'{self.shortest_duration:,.{self.duration_decimal_places}f}',
+            'longest_duration': f'{self.longest_duration:,.{self.duration_decimal_places}f}',
         }
+
+    def calculate_average_duration(self):
+        total_duration = 0.0
+        if len(self.duration_list) > 0:
+            for duration in self.duration_list:
+                total_duration += duration
+            self.average_duration = total_duration / len(self.duration_list)
+
+    def start(self):
+        self.timer = datetime.utcnow()
+
+    def stop(self):
+        duration = (datetime.utcnow() - self.timer).total_seconds()
+
+        self.last_duration = duration
+        self.duration_list.insert(0, duration)
+
+        if self.shortest_duration == 0 or duration < self.shortest_duration:
+            self.shortest_duration = duration
+
+        if self.longest_duration < duration:
+            self.longest_duration = duration
+
+        self.calculate_average_duration()
+        self.trim_duration_list()
+
+    def trim_duration_list(self):
+        if len(self.duration_list) > self.duration_list_max:
+            del self.duration_list[self.duration_list_max:]
+

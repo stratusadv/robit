@@ -7,6 +7,7 @@ from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.log import Log
 from robit.core.status import Status
+from robit.core.timer import Timer
 
 
 class Job:
@@ -14,24 +15,21 @@ class Job:
             self,
             name: str,
             method,
+            method_kwargs: dict = {},
             utc_offset: int = 0,
-            **kwargs
+            **kwargs,
     ):
         self.id = Id()
-
         self.name = name
-
         self.method = method
-
-        if 'method_kwargs' in kwargs:
-            self.method_kwargs = kwargs['method_kwargs']
-        else:
-            self.method_kwargs = None
+        self.method_kwargs = method_kwargs
 
         if 'cron' in kwargs:
             self.clock = Clock(cron=kwargs['cron'], utc_offset=utc_offset)
         else:
             self.clock = Clock(utc_offset=utc_offset)
+
+        self.timer = Timer()
 
         self.status = Status()
 
@@ -54,13 +52,13 @@ class Job:
         if self.clock.is_past_next_run_datetime():
             logging.warning(f'Starting: Job "{self.name}"')
             self.status.set('run')
-            self.clock.start_timer()
+            self.timer.start()
             try:
                 if self.method_kwargs:
                     method_result = self.method(**self.method_kwargs)
                 else:
                     method_result = self.method()
-                self.clock.stop_timer()
+                self.timer.stop()
                 logging.warning(f'Success: Job "{self.name}" ran correctly')
                 self.success_count.increase()
                 self.health.add_positive()
@@ -97,6 +95,7 @@ class Job:
             'status': self.status.__str__(),
             'result_log': self.result_log.message_list,
             'clock': self.clock.as_dict(),
+            'timer': self.timer.as_dict(),
             'success_count': self.success_count.total,
             'health': self.health.__str__(),
             'failed_count': self.failed_count.total,
