@@ -35,11 +35,11 @@ class Job:
 
         self.success_count = Counter()
         self.failed_count = Counter()
-        self.failed_log = Log(max_messages=20)
+        self.failed_log = Log(max_messages=20, utc_offset=utc_offset)
 
         self.health = Health()
 
-        self.result_log = Log(max_messages=200)
+        self.result_log = Log(max_messages=200, utc_offset=utc_offset)
 
     @property
     def method_verbose(self):
