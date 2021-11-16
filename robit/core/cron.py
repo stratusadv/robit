@@ -28,7 +28,7 @@ class Cron:
         self.set_next_datetime()
 
     def is_past_next_datetime(self):
-        if datetime.now().replace(second=0, microsecond=0) >= self.next_datetime:
+        if (datetime.utcnow().replace(second=0, microsecond=0) + timedelta(hours=self.utc_offset)) >= self.next_datetime:
             self.set_next_datetime()
             return True
         else:
