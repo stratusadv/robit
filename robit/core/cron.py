@@ -1,6 +1,7 @@
 import ast
 from datetime import datetime, timedelta
 import calendar
+from robit.core.clock import CREATED_DATE_FORMAT
 
 
 class Cron:
@@ -27,12 +28,27 @@ class Cron:
 
         self.set_next_datetime()
 
+    def as_dict(self):
+        return {
+            'next_run_datetime': self.next_run_datetime_verbose,
+        }
+
     def is_past_next_datetime(self):
         if (datetime.utcnow().replace(second=0, microsecond=0) + timedelta(hours=self.utc_offset)) >= self.next_datetime:
             self.set_next_datetime()
             return True
         else:
             return False
+
+    def is_past_next_run_datetime(self):
+        if self.is_past_next_datetime():
+            return True
+        else:
+            return False
+
+    @property
+    def next_run_datetime_verbose(self):
+        return self.next_datetime.strftime(CREATED_DATE_FORMAT)
 
     def set_next_datetime(self):
         ndt = datetime.utcnow().replace(second=0, microsecond=0) + timedelta(hours=self.utc_offset)

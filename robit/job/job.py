@@ -3,6 +3,7 @@ from time import sleep
 
 from robit.core.clock import Clock
 from robit.core.counter import Counter
+from robit.core.cron import Cron
 from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.log import Log
@@ -25,9 +26,11 @@ class Job:
         self.method_kwargs = method_kwargs
 
         if 'cron' in kwargs:
-            self.clock = Clock(cron=kwargs['cron'], utc_offset=utc_offset)
+            self.cron = Cron(value=kwargs['cron'], utc_offset=utc_offset)
         else:
-            self.clock = Clock(utc_offset=utc_offset)
+            self.cron = Cron(value='* * * * *', utc_offset=utc_offset)
+
+        self.clock = Clock(utc_offset=utc_offset)
 
         self.timer = Timer()
 
@@ -49,7 +52,7 @@ class Job:
             return f'{ self.method.__name__ }()'
 
     def run(self):
-        if self.clock.is_past_next_run_datetime():
+        if self.cron.is_past_next_run_datetime():
             logging.warning(f'Starting: Job "{self.name}"')
             self.status.set('run')
             self.timer.start()
@@ -81,7 +84,7 @@ class Job:
             'id': self.id.__str__(),
             'name': self.name.__str__(),
             'status': self.status.__str__(),
-            'next_run_datetime': self.clock.next_run_datetime_verbose,
+            'next_run_datetime': self.cron.next_run_datetime_verbose,
             'success_count': self.success_count.total,
             'health': self.health.__str__(),
             'failed_count': self.failed_count.total,

@@ -18,8 +18,6 @@ class MonitorWebServer(WebServer):
             def do_GET(self):
                 self._set_headers()
 
-                print(self.path)
-
                 if self.is_in_path_list([key, 'monitor_api']):
                     self.wfile.write(json.dumps(api_dict, indent=4).encode("utf8"))
 
