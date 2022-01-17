@@ -3,6 +3,11 @@ from time import sleep
 
 from robit import Worker
 
+
+def function_to_alert_me(**kwargs):
+    print(f"{kwargs['alert_message']}")
+
+
 wo = Worker(
     name='Robit Example Worker',
     key='Your-Own-Unique-Worker-Key-That-Secure',
@@ -12,6 +17,8 @@ wo = Worker(
     monitor_address='http://127.0.0.1:8200',
     monitor_key='Your-Own-Unique-Monitor-Key-That-Secure',
     utc_offset=-7,
+    # alert_method=function_to_alert_me,
+    # alert_health_threshold=99.0,
 )
 
 
@@ -30,18 +37,20 @@ wo.add_job('Specific Sleep Period Function', function_sleep_for_time, method_kwa
 
 
 def function_random_fail_often():
-    if 1 == random.randint(1,3):
+    if 1 == random.randint(1,2):
         division_by_zero = 5 / 0
     sleep(4)
     return 'No Error'
 
 
 def function_random_fail_rare():
-    if 1 == random.randint(1,30):
+    if 1 == random.randint(1,20):
         division_by_zero = 5 / 0
     sleep(4)
     return 'No Error'
 
+
+wo.add_group('Failing', alert_method=function_to_alert_me, alert_health_threshold=99.0)
 
 wo.add_job('A Function that Fails Often', function_random_fail_often, group='Failing')
 wo.add_job('Might Fail Some Times', function_random_fail_rare, group='Failing')

@@ -2,6 +2,7 @@ class Health:
     def __init__(self, max_count: int = 500):
         self.max_count: int = max_count
         self.percentage: float = 1.00
+        self.average_reset: bool = False
         self.positive_count: int = 0
         self.negative_count: int = 0
 
@@ -12,8 +13,9 @@ class Health:
         return self.percentage_verbose
 
     def average(self, value: float):
-        if self.percentage == 0.0:
+        if self.average_reset:
             self.percentage = value
+            self.average_reset = False
         else:
             self.percentage = (self.percentage + value) / 2
 
@@ -44,11 +46,16 @@ class Health:
         self.calculate()
 
     @property
+    def percentage_hundreds(self):
+        return self.percentage * 100
+
+    @property
     def percentage_verbose(self):
         return f'{self.percentage * 100:,.2f}'
 
     def reset(self):
         self.percentage = 0.0
+        self.average_reset = True
 
     def set_percentage(self, value: float):
         if value > 100.0:

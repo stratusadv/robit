@@ -1,6 +1,7 @@
 import logging
 from time import sleep
 
+from robit.core.alert import Alert
 from robit.core.clock import Clock
 from robit.core.counter import Counter
 from robit.core.cron import Cron
@@ -29,6 +30,11 @@ class Job:
             self.cron = Cron(value=kwargs['cron'], utc_offset=utc_offset)
         else:
             self.cron = Cron(value='* * * * *', utc_offset=utc_offset)
+
+        if 'alert_method' in kwargs:
+            self.alert = Alert(**kwargs)
+        else:
+            self.alert = None
 
         self.clock = Clock(utc_offset=utc_offset)
 
@@ -74,6 +80,8 @@ class Job:
                 self.failed_log.add_message(failed_message)
                 self.failed_count.increase()
                 self.health.add_negative()
+            if self.alert:
+                self.alert.check_health_threshold(f'Job "{self.name}"', self.health)
         else:
             if self.status.value != 'error':
                 self.status.set('queued')

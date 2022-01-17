@@ -1,5 +1,6 @@
 from time import sleep
 
+from robit.core.alert import Alert
 from robit.core.clock import Clock
 from robit.core.health import Health
 from robit.core.id import Id
@@ -17,6 +18,7 @@ class Monitor:
             web_server_port: int = 8200,
             key: str = None,
             utc_offset: int = 0,
+            **kwargs,
     ):
         self.id = Id()
         self.name = Name(name)
@@ -35,6 +37,11 @@ class Monitor:
         else:
             self.web_server = None
 
+        if 'alert_method' in kwargs:
+            self.alert = Alert(**kwargs)
+        else:
+            self.alert = None
+
         self.worker_dict = self.web_server.post_dict['worker_dict']
 
     def as_dict(self):
@@ -47,13 +54,17 @@ class Monitor:
             'workers': self.calculate_workers_to_list(),
         }
 
-    def calculate_workers_to_list(self):
-        worker_list = list()
+    def calculate_health(self):
         self.health.reset()
 
         for worker in self.worker_dict.values():
-            worker_list.append(worker)
             self.health.average(float(worker['health']) * 0.01)
+
+    def calculate_workers_to_list(self):
+        worker_list = list()
+
+        for worker in self.worker_dict.values():
+            worker_list.append(worker)
 
         return worker_list
 
@@ -65,9 +76,16 @@ class Monitor:
             self.web_server.start()
 
         while True:
+            self.calculate_health()
+
+            if self.alert:
+                self.alert.check_health_threshold(f'Monitor "{self.name}"', self.health)
+
             if self.web_server:
                 self.web_server.update_api_dict(self.as_dict())
-                sleep(1)
+
+            sleep(1)
+
 
     def stop(self):
         pass

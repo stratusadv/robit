@@ -1,5 +1,6 @@
 from time import sleep
 
+from robit.core.alert import Alert
 from robit.core.clock import Clock
 from robit.core.web_client import post_worker_data_to_monitor
 from robit.job.group import Group
@@ -21,7 +22,8 @@ class Worker:
             monitor_address: str = None,
             monitor_port: int = 8200,
             monitor_key: str = None,
-            utc_offset: int = 0
+            utc_offset: int = 0,
+            **kwargs,
     ):
         self.id = Id()
         self.name = Name(name)
@@ -43,12 +45,19 @@ class Worker:
         self.monitor_port = monitor_port
         self.monitor_key = monitor_key
 
+        if 'alert_method' in kwargs:
+            self.alert = Alert(**kwargs)
+        else:
+            self.alert = None
+
         self.group_dict = dict()
 
-    def add_job(self, name, method, group='Default', **kwargs):
-        if group not in self.group_dict:
-            self.group_dict[group] = Group(name=group, utc_offset=self.clock.utc_offset)
+    def add_group(self, name, **kwargs):
+        if name not in self.group_dict:
+            self.group_dict[name] = Group(name=name, utc_offset=self.clock.utc_offset, **kwargs)
 
+    def add_job(self, name, method, group='Default', **kwargs):
+        self.add_group(group)
         self.group_dict[group].add_job(name, method, **kwargs)
 
     def as_dict(self):
@@ -72,13 +81,17 @@ class Worker:
 
     def calculate_groups_to_list(self):
         group_list = list()
-        self.health.reset()
 
         for group in self.group_dict.values():
             group_list.append(group.as_dict())
-            self.health.average(group.health.percentage)
 
         return group_list
+
+    def calculate_health(self):
+        self.health.reset()
+
+        for group in self.group_dict.values():
+            self.health.average(group.health.percentage)
 
     def job_detail_dict(self):
         job_detail_dict = dict()
@@ -91,7 +104,7 @@ class Worker:
     def restart(self):
         pass
 
-    def start_all_groups(self):
+    def run_group_dict(self):
         for group in self.group_dict.values():
             group.start()
 
@@ -99,11 +112,17 @@ class Worker:
         if self.web_server:
             self.web_server.start()
 
-        self.start_all_groups()
+        self.run_group_dict()
 
         while True:
+            self.calculate_health()
+
+            if self.alert:
+                self.alert.check_health_threshold(f'Worker "{self.name}"', self.health)
+
             if self.web_server:
                 self.web_server.update_api_dict(self.as_dict())
+
             if self.monitor_address:
                 post_worker_data_to_monitor(self.monitor_address, self.monitor_key, self.as_dict_to_monitor())
             sleep(1)

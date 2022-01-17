@@ -1,5 +1,6 @@
 import threading
 
+from robit.core.alert import Alert
 from robit.core.clock import Clock
 from robit.core.health import Health
 from robit.core.id import Id
@@ -12,7 +13,8 @@ class Group:
     def __init__(
             self,
             name: str = 'default',
-            utc_offset: int = 0
+            utc_offset: int = 0,
+            **kwargs,
     ):
         self.id = Id()
         self.name = Name(name)
@@ -22,19 +24,27 @@ class Group:
 
         self.job_list = list()
 
+        if 'alert_method' in kwargs:
+            self.alert = Alert(**kwargs)
+        else:
+            self.alert = None
+
         self.thread = threading.Thread(target=self.run_job_list)
         self.thread.daemon = True
 
     def add_job(self, name: str, method, **kwargs):
         self.job_list.append(Job(name=name, method=method, utc_offset=self.clock.utc_offset, **kwargs))
 
+    def calculate_health(self):
+        self.health.reset()
+        for job in self.job_list:
+            self.health.average(job.health.percentage)
+
     def calculate_jobs_to_list(self):
         job_list = list()
-        self.health.reset()
 
         for job in self.job_list:
             job_list.append(job.as_dict())
-            self.health.average(job.health.percentage)
 
         return job_list
 
@@ -48,6 +58,9 @@ class Group:
         while True:
             for job in self.job_list:
                 job.run()
+            self.calculate_health()
+            if self.alert:
+                self.alert.check_health_threshold(f'Group "{self.name}"', self.health)
 
     def restart(self):
         pass
