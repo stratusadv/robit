@@ -11,7 +11,7 @@ def function_to_alert_me(**kwargs):
 wo = Worker(
     name='Robit Example Worker',
     key='Your-Own-Unique-Worker-Key-That-Secure',
-    # web_server=False,
+    web_server=True,
     # web_server_address='127.0.0.1',
     # web_server_port=8000,
     monitor_address='http://127.0.0.1:8200',

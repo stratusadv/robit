@@ -15,9 +15,9 @@ class Worker:
     def __init__(
             self,
             name: str,
-            web_server: bool = True,
+            web_server: bool = False,
             web_server_address: str = '127.0.0.1',
-            web_server_port: int = 8000,
+            web_server_port: int = 8100,
             key: str = None,
             monitor_address: str = None,
             monitor_port: int = 8200,

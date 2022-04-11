@@ -1,3 +1,4 @@
+import logging
 from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 import threading
@@ -91,7 +92,6 @@ class WebServer:
         self.thread = threading.Thread(target=self.httpd_serve)
         self.thread.daemon = True
 
-    # Override this Function to customize the webserver
     def httpd_serve(self):
         pass
 
@@ -106,6 +106,9 @@ class WebServer:
             href_link += f'/{self.key}/'
 
         print(f'Starting httpd server at {href_link}')
+
+        if self.key is None:
+            print(f'We do not reccomend running servers with out keys!')
 
     def stop(self):
         pass
