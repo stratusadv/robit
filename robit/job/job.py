@@ -59,7 +59,7 @@ class Job:
 
     def run(self):
         if self.cron.is_past_next_run_datetime():
-            logging.warning(f'Starting: Job "{self.name}"')
+            logging.warning(f'STARTING: Job "{self.name}"')
             self.status.set('run')
             self.timer.start()
             try:
@@ -68,14 +68,14 @@ class Job:
                 else:
                     method_result = self.method()
                 self.timer.stop()
-                logging.warning(f'Success: Job "{self.name}" ran correctly')
+                logging.warning(f'SUCCESS: Job "{self.name}" completed')
                 self.success_count.increase()
                 self.health.add_positive()
                 if method_result:
                     self.result_log.add_message(str(method_result))
             except Exception as e:
                 self.status.set('error')
-                failed_message = f'Failed on Exception: {e}'
+                failed_message = f'ERROR: Job "{self.name}" failed on exception "{e}"'
                 logging.warning(failed_message)
                 self.failed_log.add_message(failed_message)
                 self.failed_count.increase()

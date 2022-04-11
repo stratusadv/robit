@@ -33,11 +33,12 @@ class Alert:
     def check_health_threshold(self, name, health: Health):
         if datetime.now() >= self.last_message_datetime + timedelta(hours=self.hours_between_messages):
             if health.percentage_hundreds <= self.health_threshold:
-                alert_message = f'{name} dropped below the {self.health_threshold} health threshold.'
+                alert_message = f'ALERT: Group "{name}" dropped below the {self.health_threshold} percentage health threshold.'
                 self.method_kwargs['alert_message'] = alert_message
                 try:
                     self.method(**self.method_kwargs)
                     self.last_message_datetime = datetime.now()
+                    logging.warning(alert_message)
                 except Exception as e:
-                    failed_message = f'Failed on Exception: {e}'
+                    failed_message = f'ERROR: Alert method failed on exception "{e}"'
                     logging.warning(failed_message)
