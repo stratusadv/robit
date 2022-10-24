@@ -12,9 +12,9 @@ class WorkerWebServer(WebServer):
 
         class WorkerWebRequestHandler(WebRequestHandler):
             def do_GET(self):
-                self._set_headers()
 
                 if self.is_in_path_list([key, 'worker_api']):
+                    self._set_headers()
                     worker_dict = {
                         'id': api_dict['id'],
                         'name': api_dict['name'],
@@ -26,6 +26,7 @@ class WorkerWebServer(WebServer):
                     self.wfile.write(json.dumps(worker_dict, indent=4).encode("utf8"))
 
                 elif self.is_in_path_list([key, 'job_api']):
+                    self._set_headers()
                     if len(self.path_list) == 3:
                         job_key = self.path_list[2]
                     elif len(self.path_list) == 2:
@@ -46,9 +47,11 @@ class WorkerWebServer(WebServer):
                     pass
 
                 elif self.is_in_path_list([key]):
+                    self._set_headers()
                     self.wfile.write(html_encode_file('worker.html', replace_dict=html_replace_dict))
 
                 else:
+                    self._set_headers()
                     self.not_found()
 
         httpd = HTTPServer((self.address, self.port), WorkerWebRequestHandler)

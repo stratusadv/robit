@@ -62,10 +62,12 @@ class WebRequestHandler(BaseHTTPRequestHandler):
                     file_name = self.path[1:]
 
                 if extension == 'png':
+                    self._set_headers('png')
                     file_path = Path(Path(__file__).parent.parent.resolve(), 'html', file_name)
                     with open(file_path, "rb") as imageFile:
                         self.wfile.write(imageFile.read())
                 else:
+                    self._set_headers()
                     self.wfile.write(html_encode_file(file_name))
 
                 return True
