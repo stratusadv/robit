@@ -42,7 +42,7 @@ class WorkerWebServer(WebServer):
                         except KeyError:
                             pass
 
-                elif self.served_css_js():
+                elif self.served_static():
                     pass
 
                 elif self.is_in_path_list([key]):

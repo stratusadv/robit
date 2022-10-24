@@ -21,7 +21,7 @@ class MonitorWebServer(WebServer):
                 if self.is_in_path_list([key, 'monitor_api']):
                     self.wfile.write(json.dumps(api_dict, indent=4).encode("utf8"))
 
-                elif self.served_css_js():
+                elif self.served_static():
                     pass
 
                 elif self.is_in_path_list([key]):
