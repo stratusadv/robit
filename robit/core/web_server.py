@@ -50,7 +50,8 @@ class WebRequestHandler(BaseHTTPRequestHandler):
 
     def served_css_js(self):
         if 1 < len(self.path.split('.')) < 3:
-            if self.path[1:].split('.')[1] in ('js', 'css', 'html'):
+            extension = self.path[1:].split('.')[1]
+            if extension in ('js', 'css', 'html'):
                 if len(self.path.split('/')) > 2:
                     file_name = self.path.split('/')[2]
                 else:
