@@ -25,7 +25,7 @@ class MonitorWebServer(WebServer):
                     pass
 
                 elif self.is_in_path_list([key]):
-                    self.wfile.write(html_encode_file('monitor_index.html', replace_dict=html_replace_dict))
+                    self.wfile.write(html_encode_file('monitor.html', replace_dict=html_replace_dict))
 
                 else:
                     self.not_found()

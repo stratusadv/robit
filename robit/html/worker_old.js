@@ -1,5 +1,5 @@
-document.addEventListener('alpine:init', () => {
-    Alpine.data('worker', () => ({
+function Container() {
+    return {
         data: {
             "groups": [],
             "clock": {}
@@ -16,15 +16,13 @@ document.addEventListener('alpine:init', () => {
                 document.getElementById("loading").classList.add("d-none");
                 document.getElementById("loading").classList.remove("d-block");
                 document.getElementById("container").classList.remove("d-none");
-            }, 1000)
+            }, 500)
         },
 
         async get_worker_data() {
             let response = await fetch("worker_api/");
             let responseText = await response.text();
-            let json_response = JSON.parse(responseText)
-            this.data = json_response
-            this.data['groups'] = json_response['groups']
+            this.data = JSON.parse(responseText)
         },
 
         async get_job_details(id) {
@@ -40,5 +38,9 @@ document.addEventListener('alpine:init', () => {
             this.job_details[json_data.job_detail.id] = json_data.job_detail
         }
 
-    }))
-})
+    }
+}
+
+PetiteVue.createApp({
+    Container,
+}).mount()

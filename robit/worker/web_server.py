@@ -46,7 +46,7 @@ class WorkerWebServer(WebServer):
                     pass
 
                 elif self.is_in_path_list([key]):
-                    self.wfile.write(html_encode_file('worker_index.html', replace_dict=html_replace_dict))
+                    self.wfile.write(html_encode_file('worker.html', replace_dict=html_replace_dict))
 
                 else:
                     self.not_found()

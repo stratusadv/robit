@@ -1,9 +1,10 @@
-document.addEventListener('alpine:init', () => {
-    Alpine.data('monitor', () => ({
+function Container() {
+    return {
         data: {
             "workers": [],
             "clock": {}
         },
+
         start() {
             this.get_monitor_data()
             setInterval(this.get_monitor_data, 2000)
@@ -18,7 +19,11 @@ document.addEventListener('alpine:init', () => {
             let response = await fetch("monitor_api/");
             let responseText = await response.text();
             this.data = JSON.parse(responseText)
-            console.log(this.data)
         },
-    }))
-})
+
+    }
+}
+
+PetiteVue.createApp({
+    Container,
+}).mount();
