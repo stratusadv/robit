@@ -1,17 +1,12 @@
 document.addEventListener('alpine:init', () => {
     Alpine.data('monitor', () => ({
         data: {
-            "workers": [],
-            "clock": {}
         },
         start() {
             this.get_monitor_data()
-            setInterval(this.get_monitor_data, 2000)
-            setTimeout(function () {
-                document.getElementById("loading").classList.add("d-none");
-                document.getElementById("loading").classList.remove("d-block");
-                document.getElementById("container").classList.remove("d-none");
-            }, 500)
+            setInterval(() => {
+                this.get_monitor_data()
+            }, 2000)
         },
 
         async get_monitor_data() {
