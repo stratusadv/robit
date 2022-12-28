@@ -19,6 +19,7 @@ class Job:
             method,
             method_kwargs: dict = {},
             utc_offset: int = 0,
+            cron: str = '* * * * * *',
             **kwargs,
     ):
         self.id = Id()
@@ -26,10 +27,7 @@ class Job:
         self.method = method
         self.method_kwargs = method_kwargs
 
-        if 'cron' in kwargs:
-            self.cron = Cron(value=kwargs['cron'], utc_offset=utc_offset)
-        else:
-            self.cron = Cron(value='* * * * *', utc_offset=utc_offset)
+        self.cron = Cron(value=cron, utc_offset=utc_offset)
 
         if 'alert_method' in kwargs:
             self.alert = Alert(**kwargs)

@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta
+from typing import Callable
 
 from robit.core.health import Health
 
@@ -7,26 +8,16 @@ from robit.core.health import Health
 class Alert:
     def __init__(
             self,
-            **kwargs,
+            method: Callable,
+            method_kwargs: dict = None,
+            health_threshold: float = 95.0,
+            hours_between_messages: int = 24,
     ):
 
-        if 'alert_method' in kwargs:
-            self.method = kwargs['alert_method']
-
-        if 'alert_method_kwargs' in kwargs:
-            self.method_kwargs = kwargs['alert_method_kwargs']
-        else:
-            self.method_kwargs = dict()
-
-        if 'alert_health_threshold' in kwargs:
-            self.health_threshold = kwargs['alert_health_threshold']
-        else:
-            self.health_threshold = 95.0
-
-        if 'alert_hours_between_messages' in kwargs:
-            self.hours_between_messages = kwargs['alert_hours_between_messages']
-        else:
-            self.hours_between_messages = 24
+        self.method = method
+        self.method_kwargs = method_kwargs
+        self.health_threshold = health_threshold
+        self.hours_between_messages = hours_between_messages
 
         self.last_message_datetime = datetime.now() - timedelta(hours=self.hours_between_messages)
 

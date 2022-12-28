@@ -1,4 +1,5 @@
 from time import sleep
+from typing import Callable
 
 from robit.core.alert import Alert
 from robit.core.clock import Clock
@@ -52,11 +53,20 @@ class Worker:
 
         self.group_dict = dict()
 
-    def add_group(self, name, **kwargs):
+    def add_group(
+            self,
+            name: str,
+            **kwargs):
         if name not in self.group_dict:
             self.group_dict[name] = Group(name=name, utc_offset=self.clock.utc_offset, **kwargs)
 
-    def add_job(self, name, method, group='Default', **kwargs):
+    def add_job(
+            self,
+            name: str,
+            method: Callable,
+            group: str = 'Default',
+            **kwargs
+    ):
         self.add_group(group)
         self.group_dict[group].add_job(name, method, **kwargs)
 

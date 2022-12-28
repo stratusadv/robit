@@ -1,4 +1,5 @@
 import threading
+from typing import Callable
 
 from robit.core.alert import Alert
 from robit.core.clock import Clock
@@ -14,6 +15,8 @@ class Group:
             self,
             name: str = 'default',
             utc_offset: int = 0,
+            alert_method: Callable = None,
+            alert_method_kwargs: dict = None,
             **kwargs,
     ):
         self.id = Id()
@@ -24,8 +27,11 @@ class Group:
 
         self.job_list = list()
 
-        if 'alert_method' in kwargs:
-            self.alert = Alert(**kwargs)
+        if 'alert_method' is not None:
+            self.alert = Alert(
+                method=alert_method,
+                method_kwargs=alert_method_kwargs
+            )
         else:
             self.alert = None
 
