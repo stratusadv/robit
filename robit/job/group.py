@@ -17,7 +17,6 @@ class Group:
             utc_offset: int = 0,
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
-            **kwargs,
     ):
         self.id = Id()
         self.name = Name(name)

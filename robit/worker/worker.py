@@ -24,7 +24,8 @@ class Worker:
             monitor_port: int = 8200,
             monitor_key: str = None,
             utc_offset: int = 0,
-            **kwargs,
+            alert_method: Callable = None,
+            alert_method_kwargs: dict = None,
     ):
         self.id = Id()
         self.name = Name(name)
@@ -46,12 +47,13 @@ class Worker:
         self.monitor_port = monitor_port
         self.monitor_key = monitor_key
 
-        if 'alert_method' in kwargs:
-            self.alert = Alert(**kwargs)
+        if 'alert_method' is not None:
+            self.alert = Alert(
+                method=alert_method,
+                method_kwargs=alert_method_kwargs
+            )
         else:
             self.alert = None
-
-        self.group_dict = dict()
 
     def add_group(
             self,

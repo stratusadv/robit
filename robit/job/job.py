@@ -1,5 +1,6 @@
 import logging
 from time import sleep
+from typing import Callable
 
 from robit.core.alert import Alert
 from robit.core.clock import Clock
@@ -20,7 +21,8 @@ class Job:
             method_kwargs: dict = {},
             utc_offset: int = 0,
             cron: str = '* * * * * *',
-            **kwargs,
+            alert_method: Callable = None,
+            alert_method_kwargs: dict = None,
     ):
         self.id = Id()
         self.name = name
@@ -29,8 +31,11 @@ class Job:
 
         self.cron = Cron(value=cron, utc_offset=utc_offset)
 
-        if 'alert_method' in kwargs:
-            self.alert = Alert(**kwargs)
+        if 'alert_method' is not None:
+            self.alert = Alert(
+                method=alert_method,
+                method_kwargs=alert_method_kwargs
+            )
         else:
             self.alert = None
 

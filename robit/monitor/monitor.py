@@ -1,4 +1,5 @@
 from time import sleep
+from typing import Callable
 
 from robit.core.alert import Alert
 from robit.core.clock import Clock
@@ -18,7 +19,8 @@ class Monitor:
             web_server_port: int = 8200,
             key: str = None,
             utc_offset: int = 0,
-            **kwargs,
+            alert_method: Callable = None,
+            alert_method_kwargs: dict = None,
     ):
         self.id = Id()
         self.name = Name(name)
@@ -37,8 +39,11 @@ class Monitor:
         else:
             self.web_server = None
 
-        if 'alert_method' in kwargs:
-            self.alert = Alert(**kwargs)
+        if 'alert_method' is not None:
+            self.alert = Alert(
+                method=alert_method,
+                method_kwargs=alert_method_kwargs
+            )
         else:
             self.alert = None
 
