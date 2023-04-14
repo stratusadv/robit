@@ -1,4 +1,5 @@
 import threading
+from typing import Callable
 
 from robit.core.alert import Alert
 from robit.core.clock import Clock
@@ -14,7 +15,9 @@ class Group:
             self,
             name: str = 'default',
             utc_offset: int = 0,
-            **kwargs,
+            alert_method: Callable = None,
+            alert_method_kwargs: dict = None,
+            alert_health_threshold: float = 95.0,
     ):
         self.id = Id()
         self.name = Name(name)
@@ -24,8 +27,12 @@ class Group:
 
         self.job_list = list()
 
-        if 'alert_method' in kwargs:
-            self.alert = Alert(**kwargs)
+        if 'alert_method' is not None:
+            self.alert = Alert(
+                method=alert_method,
+                method_kwargs=alert_method_kwargs,
+                health_threshold=alert_health_threshold
+            )
         else:
             self.alert = None
 
@@ -37,28 +44,28 @@ class Group:
 
     def calculate_health(self):
         self.health.reset()
+
         for job in self.job_list:
             self.health.average(job.health.percentage)
 
-    def calculate_jobs_to_list(self):
-        job_list = list()
-
-        for job in self.job_list:
-            job_list.append(job.as_dict())
-
-        return job_list
+    def convert_jobs_to_dict_list(self):
+        return [job.as_dict() for job in self.job_list]
 
     def job_list_as_dict_full(self):
         job_dict_full = dict()
+
         for job in self.job_list:
             job_dict_full[job.id.__str__()] = job.as_dict_full()
+
         return job_dict_full
 
     def run_job_list(self):
         while True:
             for job in self.job_list:
                 job.run()
+
             self.calculate_health()
+
             if self.alert:
                 self.alert.check_health_threshold(f'Group "{self.name}"', self.health)
 
@@ -76,6 +83,6 @@ class Group:
             'id': self.id.__str__(),
             'name': self.name.__str__(),
             'health': self.health.__str__(),
-            'jobs': self.calculate_jobs_to_list(),
+            'jobs': self.convert_jobs_to_dict_list(),
             'status': self.status.__str__(),
         }

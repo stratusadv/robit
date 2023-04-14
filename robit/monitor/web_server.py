@@ -16,18 +16,20 @@ class MonitorWebServer(WebServer):
 
         class MonitorWebRequestHandler(WebRequestHandler):
             def do_GET(self):
-                self._set_headers()
 
                 if self.is_in_path_list([key, 'monitor_api']):
+                    self._set_headers()
                     self.wfile.write(json.dumps(api_dict, indent=4).encode("utf8"))
 
-                elif self.served_css_js():
+                elif self.served_static():
                     pass
 
                 elif self.is_in_path_list([key]):
-                    self.wfile.write(html_encode_file('monitor_index.html', replace_dict=html_replace_dict))
+                    self._set_headers()
+                    self.wfile.write(html_encode_file('monitor.html', replace_dict=html_replace_dict))
 
                 else:
+                    self._set_headers()
                     self.not_found()
 
             def do_POST(self):

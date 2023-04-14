@@ -1,0 +1,97 @@
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+
+<head>
+
+    <title>||title||</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="icon" type="image/x-icon" href="icon.png">
+
+    <link class="style" href="bootstrap.css" rel="stylesheet">
+    <link class="style" href="index.css" rel="stylesheet">
+
+    <script defer type="application/javascript" src="alpine.js"></script>
+    <script type="application/javascript" src="core.js"></script>
+    <script type="application/javascript" src="monitor.js"></script>
+
+</head>
+
+<body class="bg-layer">
+
+<div x-data="monitor" class="container-fluid pb-3">
+
+    <div x-init="start()"  id="container" class="d-none">
+        <div class="row sticky-top bg-monitor-nav shadow-sm">
+            <div class="col-6 col-md-4 px-3 py-2">
+                <span class="h7 text-light-muted">Monitor</span><br/>
+                <span class="h5 text-light" x-text="data.name"></span>
+            </div>
+            <div class="col-6 col-md-4 px-3 py-2 text-end text-md-center">
+                <span class="h7 text-light-muted">Date & Time</span><br/>
+                <span class="h5 text-light" x-text="data.clock.now"></span>
+            </div>
+            <div class="col-12 col-md-4 p-3 py-2 text-end">
+                <span class="h7 text-light-muted">Health</span><br/>
+                <span class="h5 text-light" x-text="data.health"></span>
+            </div>
+        </div>
+
+        <template x-if="data.workers.length > 0">
+
+            <div class="row">
+
+                <template x-for="(worker, i) in data.workers">
+
+                    <div :key="i" class="col-12">
+                        <div class="row px-2 px-md-3 pt-3">
+                            <div class="col-12 bg-worker-layer shadow-sm rounded-3 p-3">
+
+                                <div class="row">
+                                    <div class="col-7 col-md-10">
+                                    <span class="fs-7 text-monitor-muted"
+                                          x-text="'Worker ' + worker.clock.now"></span><br/>
+                                        <span class="h5" x-text="worker.name"></span>
+                                    </div>
+                                    <div class="col-5 col-md-2 text-end">
+                                        <span class="fs-7 text-monitor-muted">Health</span><br/>
+                                        <span class="h5" x-text="worker.health + '%'"></span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </template>
+
+            </div>
+
+        </template>
+
+    </div>
+
+    <div id="loading" class="d-block">
+        <div class="row h-25">
+        </div>
+        <div class="row h-75">
+            <div class="col h-100 text-center">
+                <h1 class="text-muted align-middle h-100">Loading ... !</h1>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="application/javascript">
+    hide_loading()
+</script>
+
+<script type="application/javascript" src="bootstrap.js"></script>
+
+</body>
+
+</html>

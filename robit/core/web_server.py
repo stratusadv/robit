@@ -4,8 +4,12 @@ from pathlib import Path
 import threading
 
 
-def html_encode_file(name, directory: str = 'html', replace_dict: dict = None):
-    html = Path(Path(__file__).parent.parent.resolve(), directory, name).read_text()
+def get_text_from_file(name):
+    return Path(Path(__file__).parent.parent.resolve(), 'html', name).read_text()
+
+
+def html_encode_file(name, replace_dict: dict = None):
+    html = get_text_from_file(name)
 
     if replace_dict:
         html_str = str(html)
@@ -48,23 +52,31 @@ class WebRequestHandler(BaseHTTPRequestHandler):
         else:
             return False
 
-    def served_css_js(self):
+    def served_static(self):
         if 1 < len(self.path.split('.')) < 3:
-            if self.path[1:].split('.')[1] in ('js', 'css', 'html'):
+            extension = self.path[1:].split('.')[1]
+            if extension in ('js', 'css', 'html', 'png'):
                 if len(self.path.split('/')) > 2:
                     file_name = self.path.split('/')[2]
                 else:
                     file_name = self.path[1:]
 
-                self.wfile.write(html_encode_file(file_name))
+                if extension == 'png':
+                    self._set_headers('png')
+                    file_path = Path(Path(__file__).parent.parent.resolve(), 'html', file_name)
+                    with open(file_path, "rb") as imageFile:
+                        self.wfile.write(imageFile.read())
+                else:
+                    self._set_headers()
+                    self.wfile.write(html_encode_file(file_name))
 
                 return True
 
         return False
 
-    def _set_headers(self):
+    def _set_headers(self, content_type='text/html'):
         self.send_response(200)
-        self.send_header("Content-type", "text/html")
+        self.send_header("Content-type", content_type)
         self.end_headers()
 
     def do_GET(self):

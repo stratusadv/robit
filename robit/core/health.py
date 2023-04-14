@@ -1,5 +1,8 @@
 class Health:
-    def __init__(self, max_count: int = 500):
+    def __init__(
+            self,
+            max_count: int = 100
+    ):
         self.max_count: int = max_count
         self.percentage: float = 1.00
         self.average_reset: bool = False

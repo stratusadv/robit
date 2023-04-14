@@ -1,4 +1,5 @@
 from time import sleep
+from typing import Callable
 
 from robit.core.alert import Alert
 from robit.core.clock import Clock
@@ -23,7 +24,8 @@ class Worker:
             monitor_port: int = 8200,
             monitor_key: str = None,
             utc_offset: int = 0,
-            **kwargs,
+            alert_method: Callable = None,
+            alert_method_kwargs: dict = None,
     ):
         self.id = Id()
         self.name = Name(name)
@@ -45,18 +47,31 @@ class Worker:
         self.monitor_port = monitor_port
         self.monitor_key = monitor_key
 
-        if 'alert_method' in kwargs:
-            self.alert = Alert(**kwargs)
+        if 'alert_method' is not None:
+            self.alert = Alert(
+                method=alert_method,
+                method_kwargs=alert_method_kwargs
+            )
         else:
             self.alert = None
 
         self.group_dict = dict()
 
-    def add_group(self, name, **kwargs):
+    def add_group(
+            self,
+            name: str,
+            **kwargs
+    ):
         if name not in self.group_dict:
             self.group_dict[name] = Group(name=name, utc_offset=self.clock.utc_offset, **kwargs)
 
-    def add_job(self, name, method, group='Default', **kwargs):
+    def add_job(
+            self,
+            name: str,
+            method: Callable,
+            group: str = 'Default',
+            **kwargs
+    ):
         self.add_group(group)
         self.group_dict[group].add_job(name, method, **kwargs)
 
@@ -64,7 +79,7 @@ class Worker:
         return {
             'id': self.id.__str__(),
             'name': self.name.__str__(),
-            'groups': self.calculate_groups_to_list(),
+            'groups': self.convert_groups_to_dict_list(),
             'health': self.health.__str__(),
             'status': self.status.__str__(),
             'clock': self.clock.as_dict(),
@@ -79,19 +94,14 @@ class Worker:
             'clock': self.clock.as_dict(),
         }
 
-    def calculate_groups_to_list(self):
-        group_list = list()
-
-        for group in self.group_dict.values():
-            group_list.append(group.as_dict())
-
-        return group_list
-
     def calculate_health(self):
         self.health.reset()
 
         for group in self.group_dict.values():
             self.health.average(group.health.percentage)
+
+    def convert_groups_to_dict_list(self):
+        return [group.as_dict() for group in self.group_dict.values()]
 
     def job_detail_dict(self):
         job_detail_dict = dict()

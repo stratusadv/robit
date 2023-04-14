@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-CREATED_DATE_FORMAT = '%b %d, %Y %I:%M%p'
+CREATED_DATE_FORMAT = '%b %d, %Y %I:%M:%S %p'
 
 
 class Clock:

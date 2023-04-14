@@ -1,5 +1,6 @@
 import logging
 from time import sleep
+from typing import Callable
 
 from robit.core.alert import Alert
 from robit.core.clock import Clock
@@ -8,6 +9,7 @@ from robit.core.cron import Cron
 from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.log import Log
+from robit.core.name import Name
 from robit.core.status import Status
 from robit.core.timer import Timer
 
@@ -19,20 +21,22 @@ class Job:
             method,
             method_kwargs: dict = {},
             utc_offset: int = 0,
-            **kwargs,
+            cron: str = '* * * * * *',
+            alert_method: Callable = None,
+            alert_method_kwargs: dict = None,
     ):
         self.id = Id()
-        self.name = name
+        self.name = Name(name)
         self.method = method
         self.method_kwargs = method_kwargs
 
-        if 'cron' in kwargs:
-            self.cron = Cron(value=kwargs['cron'], utc_offset=utc_offset)
-        else:
-            self.cron = Cron(value='* * * * *', utc_offset=utc_offset)
+        self.cron = Cron(value=cron, utc_offset=utc_offset)
 
-        if 'alert_method' in kwargs:
-            self.alert = Alert(**kwargs)
+        if 'alert_method' is not None:
+            self.alert = Alert(
+                method=alert_method,
+                method_kwargs=alert_method_kwargs
+            )
         else:
             self.alert = None
 
@@ -60,8 +64,10 @@ class Job:
     def run(self):
         if self.cron.is_past_next_run_datetime():
             logging.warning(f'STARTING: Job "{self.name}"')
+
             self.status.set('run')
             self.timer.start()
+
             try:
                 if self.method_kwargs:
                     method_result = self.method(**self.method_kwargs)
@@ -80,11 +86,13 @@ class Job:
                 self.failed_log.add_message(failed_message)
                 self.failed_count.increase()
                 self.health.add_negative()
+
             if self.alert:
                 self.alert.check_health_threshold(f'Job "{self.name}"', self.health)
         else:
             if self.status.value != 'error':
                 self.status.set('queued')
+
             sleep(1)
 
     def as_dict(self):
