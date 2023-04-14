@@ -14,19 +14,18 @@ class Cron:
         self.utc_offset = utc_offset
 
         cron_segment_list = self.value.split(' ')
-
         if 5 > len(cron_segment_list) > 6:
             value_error = f'Cron string {self.value} is not the correct length.\n'
             value_error += f'Should be 5 elements in a string "* * * * *"]\n'
             value_error += f'or 6 elements in a string if your working with seconds "* * * * * *"'
             raise ValueError(value_error)
 
-        cron_segment = 0
-        self.second = None
-
         if len(cron_segment_list) == 6:
-            self.second = SecondCronValue(cron_segment_list[cron_segment])
+            self.second = SecondCronValue(cron_segment_list[0])
             cron_segment = 1
+        else:
+            cron_segment = 0
+            self.second = SecondCronValue('00')
 
         self.minute = MinuteCronValue(cron_segment_list[cron_segment])
         self.hour = HourCronValue(cron_segment_list[cron_segment + 1])
@@ -70,9 +69,7 @@ class Cron:
         ndt = datetime.utcnow().replace(microsecond=0) + timedelta(hours=self.utc_offset)
         now = datetime.utcnow().replace(microsecond=0) + timedelta(hours=self.utc_offset)
 
-        if self.second is not None:
-            ndt = self.second.get_next_date_time(ndt, now)
-
+        ndt = self.second.get_next_date_time(ndt, now)
         ndt = self.minute.get_next_date_time(ndt, now, second=self.second)
         ndt = self.hour.get_next_date_time(ndt, now, minute=self.minute)
         ndt = self.day_of_month.get_next_date_time(ndt, now, hour=self.hour)
@@ -134,8 +131,9 @@ class SecondCronValue(CronValue):
         elif self.function == 'specific':
             ndt = ndt.replace(second=self.specific)
 
-            if now.minute >= ndt.minute:
+            if now.second >= self.specific:
                 ndt += timedelta(minutes=1)
+
         elif self.function == 'step':
             count_step_list = [0]
             count = self.step
@@ -157,21 +155,14 @@ class SecondCronValue(CronValue):
 class MinuteCronValue(CronValue):
     def get_next_date_time(self, ndt: datetime, now: datetime, **kwargs) -> datetime:
         if self.function == 'every':
-            if kwargs['second'] is not None:
-                pass
-            else:
-                ndt += timedelta(minutes=1)
-
+            pass
         elif self.function == 'specific':
             ndt = ndt.replace(minute=self.specific)
+            # if kwargs['second'].function == 'specific':
+            #     if now.second >= ndt.second:
+            #         ndt += timedelta(minutes=1)
 
-            if kwargs['second'] is not None:
-                if ndt.minute == self.specific:
-                    if kwargs['second'].function == 'specific':
-                        if now.second >= ndt.second:
-                            ndt += timedelta(hours=1)
-
-            if now.minute > ndt.minute:
+            if now.minute >= self.specific:
                 ndt += timedelta(hours=1)
 
         elif self.function == 'step':
@@ -200,12 +191,12 @@ class HourCronValue(CronValue):
         if self.function == 'specific':
             ndt = ndt.replace(hour=self.specific)
 
-            if ndt.hour == self.specific:
-                if kwargs['minute'].function == 'specific':
-                    if now.minute >= ndt.minute:
-                        ndt += timedelta(days=1)
+            # if ndt.hour == self.specific:
+            #     if kwargs['minute'].function == 'specific':
+            #         if now.minute >= ndt.minute:
+            #             ndt += timedelta(days=1)
 
-            if ndt.hour > self.specific:
+            if now.hour >= self.specific:
                 ndt += timedelta(days=1)
 
         elif self.function == 'step':
@@ -245,7 +236,7 @@ class DayOfMonthCronValue(CronValue):
                     if now.hour >= ndt.hour:
                         ndt = ndt.replace(month=next_month)
 
-            if ndt.day > self.specific:
+            if now.day > self.specific:
                 ndt = ndt.replace(month=next_month)
 
         return ndt
