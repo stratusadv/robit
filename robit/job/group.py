@@ -48,13 +48,8 @@ class Group:
         for job in self.job_list:
             self.health.average(job.health.percentage)
 
-    def calculate_jobs_to_list(self):
-        job_list = list()
-
-        for job in self.job_list:
-            job_list.append(job.as_dict())
-
-        return job_list
+    def convert_jobs_to_dict_list(self):
+        return [job.as_dict() for job in self.job_list]
 
     def job_list_as_dict_full(self):
         job_dict_full = dict()
@@ -88,6 +83,6 @@ class Group:
             'id': self.id.__str__(),
             'name': self.name.__str__(),
             'health': self.health.__str__(),
-            'jobs': self.calculate_jobs_to_list(),
+            'jobs': self.convert_jobs_to_dict_list(),
             'status': self.status.__str__(),
         }

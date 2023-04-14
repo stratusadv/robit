@@ -60,7 +60,8 @@ class Worker:
     def add_group(
             self,
             name: str,
-            **kwargs):
+            **kwargs
+    ):
         if name not in self.group_dict:
             self.group_dict[name] = Group(name=name, utc_offset=self.clock.utc_offset, **kwargs)
 

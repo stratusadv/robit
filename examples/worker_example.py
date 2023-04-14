@@ -32,7 +32,7 @@ def function_sleep_for_time(sleep_time: int):
     return 'Slept for 6 seconds'
 
 
-wo.add_job('Sleep for Short Period', function_sleep_short, group='Sleeping', cron='* 0 6 * * 1')
+wo.add_job('Sleep for Short Period', function_sleep_short, group='Sleeping', cron='50 23 * * *')
 wo.add_job('Specific Sleep Period Function', function_sleep_for_time, method_kwargs={'sleep_time': 6}, group='Sleeping', cron='20 * * * * *')
 
 
