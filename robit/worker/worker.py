@@ -101,7 +101,7 @@ class Worker:
             self.health.average(group.health.percentage)
 
     def convert_groups_to_dict_list(self):
-        return [group.as_dict for group in self.group_dict.values()]
+        return [group.as_dict() for group in self.group_dict.values()]
 
     def job_detail_dict(self):
         job_detail_dict = dict()
