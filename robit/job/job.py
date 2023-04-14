@@ -9,6 +9,7 @@ from robit.core.cron import Cron
 from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.log import Log
+from robit.core.name import Name
 from robit.core.status import Status
 from robit.core.timer import Timer
 
@@ -25,7 +26,7 @@ class Job:
             alert_method_kwargs: dict = None,
     ):
         self.id = Id()
-        self.name = name
+        self.name = Name(name)
         self.method = method
         self.method_kwargs = method_kwargs
 

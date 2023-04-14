@@ -79,7 +79,7 @@ class Worker:
         return {
             'id': self.id.__str__(),
             'name': self.name.__str__(),
-            'groups': self.calculate_groups_to_list(),
+            'groups': self.convert_groups_to_dict_list(),
             'health': self.health.__str__(),
             'status': self.status.__str__(),
             'clock': self.clock.as_dict(),
@@ -94,19 +94,14 @@ class Worker:
             'clock': self.clock.as_dict(),
         }
 
-    def calculate_groups_to_list(self):
-        group_list = list()
-
-        for group in self.group_dict.values():
-            group_list.append(group.as_dict())
-
-        return group_list
-
     def calculate_health(self):
         self.health.reset()
 
         for group in self.group_dict.values():
             self.health.average(group.health.percentage)
+
+    def convert_groups_to_dict_list(self):
+        return [group.as_dict for group in self.group_dict.values()]
 
     def job_detail_dict(self):
         job_detail_dict = dict()
