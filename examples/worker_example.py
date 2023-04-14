@@ -32,8 +32,8 @@ def function_sleep_for_time(sleep_time: int):
     return 'Slept for 6 seconds'
 
 
-wo.add_job('Sleep for Short Period', function_sleep_short, group='Sleeping', cron='0 6 * * 1')
-wo.add_job('Specific Sleep Period Function', function_sleep_for_time, method_kwargs={'sleep_time': 6}, group='Sleeping')
+wo.add_job('Sleep for Short Period', function_sleep_short, group='Sleeping', cron='* 0 6 * * 1')
+wo.add_job('Specific Sleep Period Function', function_sleep_for_time, method_kwargs={'sleep_time': 6}, group='Sleeping', cron='20 * * * * *')
 
 
 def function_random_fail_often():
@@ -52,8 +52,8 @@ def function_random_fail_rare():
 
 wo.add_group('Failing', alert_method=function_to_alert_me, alert_health_threshold=99.0)
 
-wo.add_job('A Function that Fails Often', function_random_fail_often, group='Failing')
-wo.add_job('Might Fail Some Times', function_random_fail_rare, group='Failing')
+wo.add_job('A Function that Fails Often', function_random_fail_often, group='Failing', cron='10 * * * * *')
+wo.add_job('Might Fail Some Times', function_random_fail_rare, group='Failing', cron='5 * * * * *')
 
 
 def function_full_speed():
@@ -64,7 +64,7 @@ def function_full_speed():
     return f'Max multiplication result of {x:,}'
 
 
-wo.add_job('Lower Delay Function', function_full_speed, group='Rapid Execution')
+wo.add_job('Lower Delay Function', function_full_speed, group='Rapid Execution', cron='30 * * * * *')
 
 
 if __name__ == '__main__':

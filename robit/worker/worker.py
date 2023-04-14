@@ -55,6 +55,8 @@ class Worker:
         else:
             self.alert = None
 
+        self.group_dict = dict()
+
     def add_group(
             self,
             name: str,

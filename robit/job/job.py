@@ -63,8 +63,10 @@ class Job:
     def run(self):
         if self.cron.is_past_next_run_datetime():
             logging.warning(f'STARTING: Job "{self.name}"')
+
             self.status.set('run')
             self.timer.start()
+
             try:
                 if self.method_kwargs:
                     method_result = self.method(**self.method_kwargs)
@@ -83,11 +85,13 @@ class Job:
                 self.failed_log.add_message(failed_message)
                 self.failed_count.increase()
                 self.health.add_negative()
+
             if self.alert:
                 self.alert.check_health_threshold(f'Job "{self.name}"', self.health)
         else:
             if self.status.value != 'error':
                 self.status.set('queued')
+
             sleep(1)
 
     def as_dict(self):
