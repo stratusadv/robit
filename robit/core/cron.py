@@ -1,4 +1,5 @@
 import ast
+from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 import calendar
 from robit.core.clock import CREATED_DATE_FORMAT
@@ -7,35 +8,30 @@ from robit.core.clock import CREATED_DATE_FORMAT
 class Cron:
     def __init__(
             self,
-            value: str,
+            cron_syntax: str,
             utc_offset: int = 0,
     ):
-        self.value = value
+        self.cron_syntax = self.set_cron_syntax(cron_syntax)
         self.utc_offset = utc_offset
 
-        cron_segment_list = self.value.split(' ')
-        if 5 > len(cron_segment_list) > 6:
-            value_error = f'Cron string {self.value} is not the correct length.\n'
-            value_error += f'Should be 5 elements in a string "* * * * *"]\n'
-            value_error += f'or 6 elements in a string if your working with seconds "* * * * * *"'
-            raise ValueError(value_error)
+        cron_segment_list = self.cron_syntax.split(' ')
 
         if len(cron_segment_list) == 6:
-            self.second = SecondCronValue(cron_segment_list[0])
+            self.second = SecondCronField(cron_segment_list[0])
             cron_segment = 1
         else:
             cron_segment = 0
-            self.second = SecondCronValue('00')
+            self.second = SecondCronField('00')
 
-        self.minute = MinuteCronValue(cron_segment_list[cron_segment])
-        self.hour = HourCronValue(cron_segment_list[cron_segment + 1])
-        self.day_of_month = DayOfMonthCronValue(cron_segment_list[cron_segment + 2])
-        self.month = MonthCronValue(cron_segment_list[cron_segment + 3])
-        self.day_of_week = DayOfWeekCronValue(cron_segment_list[cron_segment + 4])
+        self.minute = MinuteCronField(cron_segment_list[cron_segment])
+        self.hour = HourCronField(cron_segment_list[cron_segment + 1])
+        self.day_of_month = DayOfMonthCronField(cron_segment_list[cron_segment + 2])
+        self.month = MonthCronField(cron_segment_list[cron_segment + 3])
+        self.day_of_week = DayOfWeekCronField(cron_segment_list[cron_segment + 4])
 
-        self.next_datetime = None
+        self.next_run_datetime = None
 
-        self.set_next_datetime()
+        self.set_next_run_time()
 
     def as_dict(self):
         return {
@@ -43,29 +39,29 @@ class Cron:
         }
 
     def is_past_a_datetime(self, a_datetime):
-        if a_datetime >= self.next_datetime:
-            return True
-        else:
-            return False
-
-    def is_past_next_datetime(self):
-        if self.is_past_a_datetime((datetime.utcnow().replace(microsecond=0) + timedelta(hours=self.utc_offset))):
-            self.set_next_datetime()
-            return True
-        else:
-            return False
+        return a_datetime >= self.next_run_datetime
 
     def is_past_next_run_datetime(self):
-        if self.is_past_next_datetime():
-            return True
-        else:
-            return False
+        return self.now() >= self.next_run_datetime
 
     @property
     def next_run_datetime_verbose(self):
-        return self.next_datetime.strftime(CREATED_DATE_FORMAT)
+        return self.next_run_datetime.strftime(CREATED_DATE_FORMAT)
 
-    def set_next_datetime(self):
+    def now(self):
+        return datetime.utcnow().replace(microsecond=0) + timedelta(hours=self.utc_offset)
+
+    def set_cron_syntax(self, cron_syntax):
+        cron_segment_list = self.cron_syntax.split(' ')
+        if 5 > len(cron_segment_list) > 6:
+            raise ValueError(f'Cron syntax must by 5 or 6 values in the format "* * * * * *"')
+
+        if cron_syntax == 5:
+            cron_segment_list = ['00'] + cron_segment_list
+
+        return " ".join(cron_segment_list)
+
+    def set_next_run_time(self):
         ndt = datetime.utcnow().replace(microsecond=0) + timedelta(hours=self.utc_offset)
         now = datetime.utcnow().replace(microsecond=0) + timedelta(hours=self.utc_offset)
 
@@ -76,12 +72,12 @@ class Cron:
         ndt = self.month.get_next_date_time(ndt, now, day_of_month=self.day_of_month)
         ndt = self.day_of_week.get_next_date_time(ndt, now)
 
-        self.next_datetime = ndt
+        self.next_run_datetime = ndt
 
 
-class CronValue:
-    def __init__(self, value: str, ):
-        self.value = value
+class CronField:
+    def __init__(self, field: str, ):
+        self.field = field
 
         self.function = None
 
@@ -99,7 +95,7 @@ class CronValue:
         pass
 
     def process(self):
-        range_list = self.value.split('-')
+        range_list = self.field.split('-')
 
         value_error = 'Invalid cron string used.'
 
@@ -107,7 +103,7 @@ class CronValue:
             self.function = 'range'
             self.range_start = int(range_list[0])
             self.range_stop = int(range_list[1])
-        elif len(step_list := self.value.split('/')) == 2:
+        elif len(step_list := self.field.split('/')) == 2:
             if step_list[0] == '*':
                 self.function = 'step'
                 self.step_start = step_list[0]
@@ -124,7 +120,49 @@ class CronValue:
                 raise ValueError(value_error)
 
 
-class SecondCronValue(CronValue):
+class CronEveryField(ABC):
+    def __init__(self, value: str):
+        self.value: int = self.set_value(value)
+
+    @abstractmethod
+    def next_value(self):
+        pass
+
+    @abstractmethod
+    def set_value(self, value):
+        pass
+
+
+class CronSecondEveryField(CronEveryField):
+    def next_value(self):
+        # Todo increase datetime seconds by whatever the value is.
+        return self.value
+
+    def set_value(self, value) -> int:
+        value_error = 'Field value must be between 0-59 seconds'
+        value_int = int(value)
+        if value_int > 0 or value_int >= 60:
+            raise ValueError(value_error)
+
+        return value_int
+
+
+
+
+
+class CronMultipleField(CronField):
+    pass
+
+
+class CronRangeField(CronField):
+    pass
+
+
+class CronStepField(CronField):
+    pass
+
+
+class SecondCronField(CronField):
     def get_next_date_time(self, ndt: datetime, now: datetime, **kwargs) -> datetime:
         if self.function == 'every':
             ndt += timedelta(seconds=1)
@@ -152,7 +190,7 @@ class SecondCronValue(CronValue):
         return ndt
 
 
-class MinuteCronValue(CronValue):
+class MinuteCronField(CronField):
     def get_next_date_time(self, ndt: datetime, now: datetime, **kwargs) -> datetime:
         if self.function == 'every':
             pass
@@ -183,7 +221,7 @@ class MinuteCronValue(CronValue):
         return ndt
 
 
-class HourCronValue(CronValue):
+class HourCronField(CronField):
     def get_next_date_time(self, ndt: datetime, now: datetime, **kwargs) -> datetime:
         if self.function == 'every':
             pass
@@ -217,7 +255,7 @@ class HourCronValue(CronValue):
         return ndt
 
 
-class DayOfMonthCronValue(CronValue):
+class DayOfMonthCronField(CronField):
     def get_next_date_time(self, ndt: datetime, now: datetime, **kwargs) -> datetime:
         if self.function == 'every':
             pass
@@ -242,7 +280,7 @@ class DayOfMonthCronValue(CronValue):
         return ndt
 
 
-class MonthCronValue(CronValue):
+class MonthCronField(CronField):
     def get_next_date_time(self, ndt: datetime, now: datetime, **kwargs) -> datetime:
         if self.function == 'every':
             pass
@@ -262,7 +300,7 @@ class MonthCronValue(CronValue):
         return ndt
 
 
-class DayOfWeekCronValue(CronValue):
+class DayOfWeekCronField(CronField):
     def get_next_date_time(self, ndt: datetime, now: datetime, **kwargs) -> datetime:
         if self.function == 'every':
             pass

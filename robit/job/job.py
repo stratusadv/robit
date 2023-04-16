@@ -63,6 +63,8 @@ class Job:
 
     def run(self):
         if self.cron.is_past_next_run_datetime():
+            self.cron.set_next_run_time()
+
             logging.warning(f'STARTING: Job "{self.name}"')
 
             self.status.set('run')
