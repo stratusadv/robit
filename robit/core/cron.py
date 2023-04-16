@@ -52,13 +52,13 @@ class Cron:
         return datetime.utcnow().replace(microsecond=0) + timedelta(hours=self.utc_offset)
 
     def set_cron_syntax(self, cron_syntax):
-        cron_segment_list = self.cron_syntax.split(' ')
-        if 5 > len(cron_segment_list) > 6:
+        cron_segment_list = cron_syntax.split(' ')
+        if len(cron_segment_list) < 5 or len(cron_segment_list) > 6:
             raise ValueError(f'Cron syntax must by 5 or 6 values in the format "* * * * * *"')
 
         if cron_syntax == 5:
             cron_segment_list = ['00'] + cron_segment_list
-
+        self.cron_syntax = " ".join(cron_segment_list)
         return " ".join(cron_segment_list)
 
     def set_next_run_time(self):
@@ -77,7 +77,7 @@ class Cron:
 
 class CronField:
     def __init__(self, field: str, ):
-        self.field = field
+        self.value = field
 
         self.function = None
 
@@ -95,7 +95,7 @@ class CronField:
         pass
 
     def process(self):
-        range_list = self.field.split('-')
+        range_list = self.value.split('-')
 
         value_error = 'Invalid cron string used.'
 
@@ -103,7 +103,7 @@ class CronField:
             self.function = 'range'
             self.range_start = int(range_list[0])
             self.range_stop = int(range_list[1])
-        elif len(step_list := self.field.split('/')) == 2:
+        elif len(step_list := self.value.split('/')) == 2:
             if step_list[0] == '*':
                 self.function = 'step'
                 self.step_start = step_list[0]
@@ -120,33 +120,102 @@ class CronField:
                 raise ValueError(value_error)
 
 
-class CronEveryField(ABC):
-    def __init__(self, value: str):
-        self.value: int = self.set_value(value)
+class CronAnyField(ABC):
+    def __init__(self, value: str, start_datetime: datetime):
+        self.value = value
+        self.start_datetime = start_datetime
 
-    @abstractmethod
-    def next_value(self):
-        pass
-
-    @abstractmethod
-    def set_value(self, value):
-        pass
-
-
-class CronSecondEveryField(CronEveryField):
-    def next_value(self):
-        # Todo increase datetime seconds by whatever the value is.
-        return self.value
-
-    def set_value(self, value) -> int:
-        value_error = 'Field value must be between 0-59 seconds'
-        value_int = int(value)
-        if value_int > 0 or value_int >= 60:
+    def check_range(self, value_range):
+        value_error = 'Value not in range'
+        if int(self.value) not in range:
             raise ValueError(value_error)
 
+    def check_value_type(self):
+        if self.value == '*':
+            return True
+
+        try:
+            value_int = int(self.value)
+            return True
+        except ValueError:
+            raise ValueError('Value must be * or a string that can be converted to int in range.')
+
+    @abstractmethod
+    def validate_value(self):
+        pass
+
+    @abstractmethod
+    def next_value(self):
+        pass
+
+
+class CronAnySecondField(CronAnyField):
+    def next_value(self):
+        return (self.start_datetime + timedelta(seconds=int(self.value))).second
+
+    def validate_value(self) -> None:
+        self.check_value_type()
+        self.check_range(range(1, 59))
+
+
+class CronAnyMinuteField(CronAnySecondField):
+    def next_value(self):
+        """
+            Returns the next minute the cron is scheduled.
+        """
+        return (self.start_datetime + timedelta(minutes=self.value)).minute
+
+    def set_value(self, value) -> int:
+        value_error = 'Field value must be between 0-59 minutes'
+        try:
+            value_int = int(value)
+        except ValueError:
+            raise ValueError(value_error)
+
+        if value_int < 0 or value_int > 59:
+            raise ValueError(value_error)
         return value_int
 
 
+class CronAnyHourField(CronAnySecondField):
+    def next_value(self):
+        """
+            Returns the next hour the cron is scheduled.
+        """
+        return (self.start_datetime + timedelta(hours=self.value)).hour
+
+    def set_value(self, value) -> int:
+        value_error = 'Field value must be between 0-23 hours'
+        try:
+            value_int = int(value)
+        except ValueError:
+            raise ValueError(value_error)
+
+        if value_int < 0 or value_int > 23:
+            raise ValueError(value_error)
+        return value_int
+
+
+class CronAnyDayField(CronAnySecondField):
+    def next_value(self):
+        """
+            Returns the next month the cron is scheduled for.
+            Check to see if day has passed in current month.
+            Find next month that has that day number.
+        """
+
+        return (self.start_datetime + timedelta(minutes=self.value)).minute
+
+    def set_value(self, value) -> int:
+        value_error = 'Field value must be between 1-31 days'
+        try:
+            value_int = int(value)
+        except ValueError:
+            raise ValueError(value_error)
+
+        if value_int < 1 or value_int >= 31:
+            raise ValueError(value_error)
+        return value_int
 
 
 
