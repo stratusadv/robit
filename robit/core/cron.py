@@ -122,12 +122,17 @@ class CronField:
 
 class CronAnyField(ABC):
     def __init__(self, value: str, start_datetime: datetime):
-        self.value = value
-        self.start_datetime = start_datetime
+        # Todo: need to set the value...
+        self.value: str = value
+        self.start_datetime: datetime = start_datetime
 
-    def check_range(self, value_range):
+    def check_range(self, value_range: range):
         value_error = 'Value not in range'
-        if int(self.value) not in range:
+        print()
+        print(int(self.value))
+        print(value_range)
+        print(int(self.value) not in value_range)
+        if int(self.value) not in value_range:
             raise ValueError(value_error)
 
     def check_value_type(self):
@@ -141,62 +146,60 @@ class CronAnyField(ABC):
             raise ValueError('Value must be * or a string that can be converted to int in range.')
 
     @abstractmethod
-    def validate_value(self):
+    def next_value(self):
         pass
 
     @abstractmethod
-    def next_value(self):
+    def value_to_int(self) -> int:
         pass
 
 
 class CronAnySecondField(CronAnyField):
     def next_value(self):
-        return (self.start_datetime + timedelta(seconds=int(self.value))).second
+        return (self.start_datetime + timedelta(seconds=int(self.value_to_int()))).second
 
-    def validate_value(self) -> None:
-        self.check_value_type()
-        self.check_range(range(1, 59))
+    def value_to_int(self) -> int:
+        if self.value == '*':
+            return 1
+        else:
+            self.check_value_type()
+            self.check_range(range(1, 59))
+            return int(self.value)
 
 
-class CronAnyMinuteField(CronAnySecondField):
+class CronAnyMinuteField(CronAnyField):
     def next_value(self):
         """
             Returns the next minute the cron is scheduled.
         """
-        return (self.start_datetime + timedelta(minutes=self.value)).minute
+        return (self.start_datetime + timedelta(minutes=self.value_to_int())).minute
 
-    def set_value(self, value) -> int:
-        value_error = 'Field value must be between 0-59 minutes'
-        try:
-            value_int = int(value)
-        except ValueError:
-            raise ValueError(value_error)
-
-        if value_int < 0 or value_int > 59:
-            raise ValueError(value_error)
-        return value_int
+    def value_to_int(self) -> int:
+        if self.value == '*':
+            return 1
+        else:
+            self.check_value_type()
+            self.check_range(range(1, 59))
+            return int(self.value)
 
 
-class CronAnyHourField(CronAnySecondField):
+class CronAnyHourField(CronAnyField):
     def next_value(self):
         """
             Returns the next hour the cron is scheduled.
         """
-        return (self.start_datetime + timedelta(hours=self.value)).hour
+        return (self.start_datetime + timedelta(hours=self.value_to_int())).hour
 
-    def set_value(self, value) -> int:
-        value_error = 'Field value must be between 0-23 hours'
-        try:
-            value_int = int(value)
-        except ValueError:
-            raise ValueError(value_error)
-
-        if value_int < 0 or value_int > 23:
-            raise ValueError(value_error)
-        return value_int
+    def value_to_int(self):
+        if self.value == '*':
+            return 1
+        else:
+            self.check_value_type()
+            self.check_range(range(1, 23))
+            return int(self.value)
 
 
-class CronAnyDayField(CronAnySecondField):
+class CronAnyDayField(CronAnyField):
     def next_value(self):
         """
             Returns the next month the cron is scheduled for.
@@ -204,19 +207,15 @@ class CronAnyDayField(CronAnySecondField):
             Find next month that has that day number.
         """
 
-        return (self.start_datetime + timedelta(minutes=self.value)).minute
+        return (self.start_datetime + timedelta(days=self.value_to_int())).day
 
-    def set_value(self, value) -> int:
-        value_error = 'Field value must be between 1-31 days'
-        try:
-            value_int = int(value)
-        except ValueError:
-            raise ValueError(value_error)
-
-        if value_int < 1 or value_int >= 31:
-            raise ValueError(value_error)
-        return value_int
-
+    def value_to_int(self):
+        if self.value == '*':
+            return 1
+        else:
+            self.check_value_type()
+            self.check_range(range(1, 31))
+            return int(self.value)
 
 
 class CronMultipleField(CronField):
