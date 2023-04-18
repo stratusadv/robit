@@ -30,7 +30,7 @@ class Job:
         self.method = method
         self.method_kwargs = method_kwargs
 
-        self.cron = Cron(value=cron, utc_offset=utc_offset)
+        self.cron = Cron(cron_syntax=cron, utc_offset=utc_offset)
 
         if 'alert_method' is not None:
             self.alert = Alert(
