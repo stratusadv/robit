@@ -1,2 +1,5 @@
+venv/
+vscode/
+robit.egg-info/
 __pycache__/
 *.pyc
