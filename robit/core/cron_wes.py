@@ -22,50 +22,29 @@ class Cron:
             "day_of_week": CronDayOfWeekField(fields[4])
         }
 
-    def next_datetime(self, dt: datetime) -> datetime:
+    def next_datetime(self) -> datetime:
         now = datetime.now()
         next_dt = now.replace(second=0, microsecond=0)
 
         while True:
+            """
+                Loop through each field and increment the datetime until the next valid datetime is found.
+            """
             for key, cron_field in self.field_dict.items():
-                if cron_field.is_valid_dt(next_dt):
+                if not cron_field.is_valid_dt(next_dt):
                     next_dt = cron_field.increment_datetime(next_dt)
                     break
             else:
-                return next_dt
-
-            if next_dt <= now:
-                next_dt = self.field_dict['minute'].increment_datetime(next_dt)
-
-
-class CronIdentifier:
-    def __init__(self, value):
-        self.value = value
-        self._identifiers = [self._is_every, self._is_range, self._is_step, self._is_list, self._is_specific]
-
-    def identify(self):
-        for identifier in self._identifiers:
-            if identifier():
-                return identifier.__name__.split('_')[-1]
-
-        raise ValueError('Invalid cron string used.')
-
-    def _is_every(self):
-        return self.value == '*'
-
-    def _is_range(self):
-        pattern = r'^\d+-\d+$'
-        return bool(re.match(pattern, self.value))
-
-    def _is_step(self):
-        return '/' in self.value
-
-    def _is_list(self):
-        return ',' in self.value
-
-    def _is_specific(self):
-        pattern = re.compile(r'^\d+$')
-        return bool(pattern.match(self.value))
+                """
+                 Once all fields are valid, check if the datetime is greater than the current datetime.
+                """
+                if next_dt > now:
+                    return next_dt
+                else:
+                    """
+                        If the datetime is not greater than the current datetime, increment the minute field and try again.
+                    """
+                    next_dt = self.field_dict['minute'].increment_datetime(next_dt)
 
 
 class CronField(ABC):
@@ -77,8 +56,8 @@ class CronField(ABC):
         # self._validate()
 
     def _get_possible_values(self) -> list:
-        cron_range_finder = CronRangeFinder(self)
-        return cron_range_finder.value_range()
+        range_finder = CronRangeFinder(self)
+        return range_finder.value_range()
 
     @abstractmethod
     def increment_datetime(self, dt) -> datetime:
@@ -90,7 +69,7 @@ class CronField(ABC):
 
     # Todo: validate values
     def type(self):
-        return CronIdentifier(self.value).identify()
+        return CronIdentifier(self).identify()
 
 
 class CronMinuteField(CronField):
@@ -143,12 +122,44 @@ class CronDayOfWeekField(CronField):
         return dt.weekday() in self.possible_values
 
 
+class CronIdentifier:
+    def __init__(self, cron_field: CronField):
+        self.cron_field: CronField = cron_field
+        self._identifiers = [self._is_every, self._is_range, self._is_step, self._is_list, self._is_specific]
+
+    def identify(self):
+        for identifier in self._identifiers:
+            if identifier():
+                return identifier.__name__.split('_')[-1]
+
+        raise ValueError('Invalid cron string used.')
+
+    def _is_every(self):
+        return self.cron_field.value == '*'
+
+    def _is_range(self):
+        pattern = r'^\d+-\d+$'
+        return bool(re.match(pattern, self.cron_field.value))
+
+    def _is_step(self):
+        return '/' in self.cron_field.value
+
+    def _is_list(self):
+        return ',' in self.cron_field.value
+
+    def _is_specific(self):
+        pattern = re.compile(r'^\d+$')
+        return bool(pattern.match(self.cron_field.value))
+
+
 class CronRangeFinder:
+    # Todo all range error checking should be in cron field.
     def __init__(self, cron_field: CronField):
         self.cron_field = cron_field
         self.possible_values = []
 
     def value_range(self):
+        self.possible_values = []
         cron_type = self.cron_field.type()
         if cron_type == 'every':
             self._every()
@@ -161,12 +172,15 @@ class CronRangeFinder:
         elif cron_type == 'range':
             self._range()
 
-        return self.possible_values
+        return [int(value) for value in self.possible_values]
 
     def _every(self):
         self.possible_values = list(range(self.cron_field.value_range.start, self.cron_field.value_range.stop + 1))
 
     def _specific(self):
+        if int(self.cron_field.value) not in self.cron_field.value_range:
+            raise ValueError(f'Value {self.cron_field.value} is not withing the range {self.cron_field.value_range}')
+
         self.possible_values.append(self.cron_field.value)
 
     def _step(self):
@@ -174,7 +188,9 @@ class CronRangeFinder:
         step_value = int(cron_segment[-1])
         cron_field_value = cron_segment[0]
 
-        # Todo: have to find correct field
+        # Todo: Copy class instance and use it to get the possible values?
+        # Todo: Better error handling
+
         temp_cron_field = CronMinuteField(cron_field_value)
         temp_cron_range_finder = CronRangeFinder(temp_cron_field)
         possible_values = temp_cron_range_finder.value_range()
@@ -182,7 +198,7 @@ class CronRangeFinder:
 
     def _list(self):
         for value in self.cron_field.value.split(','):
-            if int(value) < self.cron_field.value_range.start or int(value) > self.cron_field.value_range.stop:
+            if int(value) not in self.cron_field.value_range:
                 raise ValueError(f'Value {value} is not withing the range {self.cron_field.value_range.start} to {self.cron_field.value_range.stop}.')
             self.possible_values.append(int(value))
 
@@ -191,20 +207,16 @@ class CronRangeFinder:
         start_value = int(value_list[0])
         end_value = int(value_list[1])
 
-        if self.cron_field.value_range.start > start_value or start_value > self.cron_field.value_range.stop:
-            raise ValueError(f'Start value is not withing the range {self.cron_field.value_range.start} to {self.cron_field.value_range.stop}.')
+        if start_value not in self.cron_field.value_range:
+            raise ValueError(
+                f'Start value is not withing the range {self.cron_field.value_range.start} to {self.cron_field.value_range.stop}.')
 
-        print(start_value, end_value)
-        print(self.cron_field.value_range.start, self.cron_field.value_range.stop)
-
-        if self.cron_field.value_range.start > end_value or end_value > self.cron_field.value_range.stop:
+        if end_value not in self.cron_field.value_range:
             raise ValueError(f'End value is not withing the range {self.cron_field.value_range.start} to {self.cron_field.value_range.stop}.')
 
         for value in range(int(start_value), int(end_value) + 1):
             self.possible_values.append(value)
 
 
-cron_min = CronDayOfMonthField('*/2')
-print(cron_min.type())
-cron_range_finder = CronRangeFinder(cron_min)
-print(cron_range_finder.value_range())
+cron = Cron('24 * * * *')
+print(cron.next_datetime())
