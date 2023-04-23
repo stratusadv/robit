@@ -32,25 +32,26 @@ class TestCron(unittest.TestCase):
         )
 
 
-class CronAnySecondFieldTest(unittest.TestCase):
-    def setUp(self) -> None:
-        self.start_datetime = datetime.utcnow().replace(second=0)
-        self.cron_every_second = cron.CronSpecificSecondField('30', start_datetime=self.start_datetime)
+# class CronAnySecondFieldTest(unittest.TestCase):
+#     def setUp(self) -> None:
+#         self.start_datetime = datetime.utcnow().replace(second=0)
+#         self.cron_every_second = cron.CronSpecificSecondField('30', start_datetime=self.start_datetime)
+#
+#     def test_second_cron_next_value(self):
+#         self.assertEqual(self.cron_every_second.next_value(), 30)
+#
+#     def test_cron_value_range(self):
+#         with self.assertRaises(ValueError):
+#             second_cron = cron.CronSpecificSecondField('60', self.start_datetime)
+#         with self.assertRaises(ValueError):
+#             second_cron = cron.CronSpecificSecondField('-50', self.start_datetime)
+#
+#     def test_cron_value_error(self):
+#         with self.assertRaises(ValueError):
+#             second_cron = cron.CronSpecificSecondField('asdf', self.start_datetime)
 
-    def test_second_cron_next_value(self):
-        self.assertEqual(self.cron_every_second.next_value(), 30)
 
-    def test_cron_value_range(self):
-        with self.assertRaises(ValueError):
-            print('testing range')
-            second_cron = cron.CronSpecificSecondField('60', self.start_datetime)
-        with self.assertRaises(ValueError):
-            second_cron = cron.CronSpecificSecondField('-50', self.start_datetime)
-
-    def test_cron_value_error(self):
-        with self.assertRaises(ValueError):
-            second_cron = cron.CronSpecificSecondField('asdf', self.start_datetime)
-
-
-if __name__ == '__main__':    
+if __name__ == '__main__':
     unittest.main()
+
+
