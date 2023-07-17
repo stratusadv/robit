@@ -1,6 +1,5 @@
 import unittest
 from datetime import datetime
-
 from robit.core import cron_wes as cron
 
 
