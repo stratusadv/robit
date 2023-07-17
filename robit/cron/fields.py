@@ -6,12 +6,15 @@ from robit.cron.enums import CronFieldTypeEnum
 
 
 class CronField(ABC):
-    value_range: range = range(1, 59)
+    """
+        Range creates a sequence of numbers starting at the first but does not include the last.
+    """
+    value_range: range = range(1, 60)
 
     def __init__(self, value):
         self.value = value
-        self.possible_values: list = self._get_possible_values()
         self.type: CronFieldTypeEnum = self._get_type()
+        self.possible_values: list = self._get_possible_values()
 
     def _get_possible_values(self) -> list:
         range_finder = CronRangeFinder(self)
@@ -26,11 +29,11 @@ class CronField(ABC):
         pass
 
     def _get_type(self):
-        return CronFieldIdentifier(self).identify()
+        return CronFieldIdentifier(self.value).identify()
 
 
 class CronMinuteField(CronField):
-    value_range: range = range(0, 59)
+    value_range: range = range(0, 60)
 
     def increment_datetime(self, dt) -> datetime:
         return dt + timedelta(minutes=1)
@@ -40,7 +43,7 @@ class CronMinuteField(CronField):
 
 
 class CronHourField(CronField):
-    value_range: range = range(0, 23)
+    value_range: range = range(0, 24)
 
     def increment_datetime(self, dt) -> datetime:
         return dt + timedelta(hours=1)
@@ -50,7 +53,7 @@ class CronHourField(CronField):
 
 
 class CronDayOfMonthField(CronField):
-    value_range: range = range(1, 31)
+    value_range: range = range(1, 32)
 
     def increment_datetime(self, dt) -> datetime:
         return dt + timedelta(days=1)
@@ -60,20 +63,24 @@ class CronDayOfMonthField(CronField):
 
 
 class CronMonthField(CronField):
-    value_range: range = range(1, 12)
+    value_range: range = range(1, 13)
 
-    def increment_datetime(self, dt) -> datetime:
-        return dt.replace(month=dt.month % 12 + 1, day=1) + timedelta(days=(dt.day == 1) - 1)
+    def increment_datetime(self, dt: datetime) -> datetime:
+        if dt.month == 12:
+            return dt.replace(year=dt.year + 1, month=1, day=1)
+        else:
+            return dt.replace(month=dt.month + 1, day=1)
 
     def is_valid_dt(self, dt: datetime) -> bool:
         return dt.month in self.possible_values
 
 
 class CronDayOfWeekField(CronField):
-    value_range: range = range(0, 6)
+    value_range: range = range(0, 7)
 
     def increment_datetime(self, dt) -> datetime:
         return dt + timedelta(days=1)
 
     def is_valid_dt(self, dt: datetime) -> bool:
-        return dt.weekday() in self.possible_values
+        cron_day_of_week = (dt.weekday() + 1) % 7
+        return cron_day_of_week in self.possible_values

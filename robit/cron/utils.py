@@ -4,8 +4,8 @@ from robit.cron.enums import CronFieldTypeEnum
 
 
 class CronFieldIdentifier:
-    def __init__(self, cron_field: 'CronField'):
-        self.cron_field = cron_field
+    def __init__(self, cron_field_value: 'str'):
+        self.value = cron_field_value
         self._identifiers = [self._is_every, self._is_range, self._is_step, self._is_list, self._is_specific]
 
     def identify(self) -> CronFieldTypeEnum:
@@ -14,28 +14,28 @@ class CronFieldIdentifier:
             if isinstance(identity, CronFieldTypeEnum):
                 return identity
 
-        raise ValueError(f'{self.cron_field} is not a valid cron field pattern.')
+        raise ValueError(f'{self.value} is not a valid cron field pattern.')
 
     def _is_every(self):
-        if self.cron_field.value == '*':
+        if self.value == '*':
             return CronFieldTypeEnum.EVERY
 
     def _is_range(self):
         pattern = r'^\d+-\d+$'
-        if bool(re.match(pattern, self.cron_field.value)):
+        if bool(re.match(pattern, self.value)):
             return CronFieldTypeEnum.RANGE
 
     def _is_step(self):
-        if '/' in self.cron_field.value:
+        if '/' in self.value:
             return CronFieldTypeEnum.STEP
 
     def _is_list(self):
-        if ',' in self.cron_field.value:
+        if ',' in self.value:
             return CronFieldTypeEnum.LIST
 
     def _is_specific(self):
         pattern = re.compile(r'^\d+$')
-        if bool(pattern.match(self.cron_field.value)):
+        if bool(pattern.match(self.value)):
             return CronFieldTypeEnum.SPECIFIC
 
 
@@ -59,7 +59,7 @@ class CronRangeFinder:
         raise ValueError(f'Cannot find valid range for {self.cron_field}. Is it a valid pattern?')
 
     def _every(self):
-        return list(range(self.cron_field.value_range.start, self.cron_field.value_range.stop + 1))
+        return list(range(self.cron_field.value_range.start, self.cron_field.value_range.stop))
 
     def _specific(self):
         if int(self.cron_field.value) not in self.cron_field.value_range:
@@ -76,7 +76,7 @@ class CronRangeFinder:
         field_class = type(self.cron_field)
         possible_step_values = field_class(cron_field_value).possible_values
 
-        return [value for value in possible_step_values if value % step_value == 0]
+        return possible_step_values[::step_value]
 
     def _list(self):
         valid_values = [int(value) for value in self.cron_field.value.split(',')]
@@ -99,7 +99,9 @@ class CronRangeFinder:
             raise ValueError(
                 f'Start value is not withing the range {self.cron_field.value_range.start} to {self.cron_field.value_range.stop}.')
 
+        print(end_value)
         if end_value not in self.cron_field.value_range:
             raise ValueError(f'End value is not withing the range {self.cron_field.value_range.start} to {self.cron_field.value_range.stop}.')
 
-        return list(range(start_value, end_value + 1))
+        # Need to increase end_value by 1 to include it in the range
+        return [value for value in range(start_value, end_value + 1)]
