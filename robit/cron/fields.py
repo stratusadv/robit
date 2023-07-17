@@ -16,6 +16,9 @@ class CronField(ABC):
         self.type: CronFieldTypeEnum = self._get_type()
         self.possible_values: list = self._get_possible_values()
 
+        if len(self.possible_values) == 0:
+            raise ValueError(f'{self.value} is not a valid cron field pattern.')
+
     def _get_possible_values(self) -> list:
         range_finder = CronRangeFinder(self)
         return range_finder.possible_values()
