@@ -2,6 +2,9 @@ import random
 from time import sleep
 
 from robit import Worker
+import robit
+
+print(robit.config.UTC_OFFSET)
 
 
 def function_to_alert_me(**kwargs):
@@ -16,7 +19,6 @@ wo = Worker(
     # web_server_port=8000,
     monitor_address='http://127.0.0.1192.:8200',
     monitor_key='Your-Own-Unique-Monitor-Key-That-Secure',
-    utc_offset=-6,
     # alert_method=function_to_alert_me,
     # alert_health_threshold=99.0,
 )

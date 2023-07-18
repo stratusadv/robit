@@ -23,13 +23,12 @@ class Worker:
             monitor_address: str = None,
             monitor_port: int = 8200,
             monitor_key: str = None,
-            utc_offset: int = 0,
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
     ):
         self.id = Id()
         self.name = Name(name)
-        self.clock = Clock(utc_offset=utc_offset)
+        self.clock = Clock()
         self.health = Health()
         self.status = Status()
 
@@ -38,7 +37,7 @@ class Worker:
                 address=web_server_address,
                 port=web_server_port,
                 key=key,
-                html_replace_dict={'title': self.name.__str__()}
+                html_replace_dict={'title': str(self.name)}
             )
         else:
             self.web_server = None
@@ -63,7 +62,7 @@ class Worker:
             **kwargs
     ):
         if name not in self.group_dict:
-            self.group_dict[name] = Group(name=name, utc_offset=self.clock.utc_offset, **kwargs)
+            self.group_dict[name] = Group(name=name, **kwargs)
 
     def add_job(
             self,
@@ -77,20 +76,20 @@ class Worker:
 
     def as_dict(self):
         return {
-            'id': self.id.__str__(),
-            'name': self.name.__str__(),
+            'id': str(self.id),
+            'name': str(self.name),
             'groups': self.convert_groups_to_dict_list(),
-            'health': self.health.__str__(),
-            'status': self.status.__str__(),
+            'health': str(self.health),
+            'status': str(self.status),
             'clock': self.clock.as_dict(),
             'job_details': self.job_detail_dict()
         }
 
     def as_dict_to_monitor(self):
         return {
-            'id': self.id.__str__(),
-            'name': self.name.__str__(),
-            'health': self.health.__str__(),
+            'id': str(self.id),
+            'name': str(self.name),
+            'health': str(self.health),
             'clock': self.clock.as_dict(),
         }
 

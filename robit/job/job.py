@@ -1,11 +1,11 @@
 import logging
-from datetime import datetime
 from time import sleep
-from typing import Callable
+from typing import Callable, Optional
 
 from robit.core.alert import Alert
 from robit.core.clock import Clock, CREATED_DATE_FORMAT
 from robit.core.counter import Counter
+from robit.core.utils import tz_now
 from robit.cron.cron import Cron
 from robit.core.health import Health
 from robit.core.id import Id
@@ -20,8 +20,7 @@ class Job:
             self,
             name: str,
             method,
-            method_kwargs: dict = {},
-            utc_offset: int = 0,
+            method_kwargs: Optional[dict] = None,
             cron: str = '* * * * *',
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
@@ -29,9 +28,13 @@ class Job:
         self.id = Id()
         self.name = Name(name)
         self.method = method
-        self.method_kwargs = method_kwargs
 
-        self.cron = Cron(cron_syntax=cron, utc_offset=utc_offset)
+        if method_kwargs is None:
+            self.method_kwargs = dict()
+        else:
+            self.method_kwargs = method_kwargs
+
+        self.cron = Cron(cron_syntax=cron)
         self.next_run_datetime = self.cron.next_datetime()
 
         if 'alert_method' is not None:
@@ -42,7 +45,7 @@ class Job:
         else:
             self.alert = None
 
-        self.clock = Clock(utc_offset=utc_offset)
+        self.clock = Clock()
 
         self.timer = Timer()
 
@@ -50,11 +53,11 @@ class Job:
 
         self.success_count = Counter()
         self.failed_count = Counter()
-        self.failed_log = Log(max_messages=20, utc_offset=utc_offset)
+        self.failed_log = Log(max_messages=20)
 
         self.health = Health()
 
-        self.result_log = Log(max_messages=200, utc_offset=utc_offset)
+        self.result_log = Log(max_messages=200)
 
     @property
     def method_verbose(self):
@@ -70,7 +73,7 @@ class Job:
         self.next_run_datetime = self.cron.next_datetime()
 
     def should_run(self):
-        return datetime.now() > self.next_run_datetime
+        return tz_now() > self.next_run_datetime
 
     def run(self):
         if self.should_run():
@@ -110,26 +113,26 @@ class Job:
 
     def as_dict(self):
         return {
-            'id': self.id.__str__(),
-            'name': self.name.__str__(),
-            'status': self.status.__str__(),
+            'id': str(self.id),
+            'name': str(self.name),
+            'status': str(self.status),
             'next_run_datetime': self.next_run_datetime_verbose(),
             'success_count': self.success_count.total,
-            'health': self.health.__str__(),
+            'health': str(self.health),
             'failed_count': self.failed_count.total,
         }
 
     def as_dict_full(self):
         return {
-            'id': self.id.__str__(),
-            'name': self.name.__str__(),
+            'id': str(self.id),
+            'name': str(self.name),
             'method': self.method_verbose,
-            'status': self.status.__str__(),
+            'status': str(self.status),
             'result_log': self.result_log.message_list,
             'clock': self.clock.as_dict(),
             'timer': self.timer.as_dict(),
             'success_count': self.success_count.total,
-            'health': self.health.__str__(),
+            'health': str(self.health),
             'failed_count': self.failed_count.total,
             'failed_log': self.failed_log.message_list,
         }

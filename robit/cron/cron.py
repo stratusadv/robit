@@ -1,16 +1,17 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
+from robit.core.utils import tz_now
 from robit.cron.fields import CronMinuteField, CronHourField, CronDayOfMonthField, CronMonthField, CronDayOfWeekField
 from robit.core.clock import CREATED_DATE_FORMAT
+from robit.config import config
 
 
 class Cron:
-    def __init__(self, cron_syntax: str, utc_offset: int = 0):
+    def __init__(self, cron_syntax: str):
         """
         Responsible for parsing a cron string and returning the next datetime that the cron string will run.
         """
         self.cron_syntax = cron_syntax
-        self.utc_offset = utc_offset
         self.field_dict: dict = self._parse_cron_field()
 
     def _parse_cron_field(self) -> dict:
@@ -28,7 +29,7 @@ class Cron:
         }
 
     def next_datetime(self) -> datetime:
-        now = datetime.now()
+        now = tz_now()
         next_dt = now.replace(second=0, microsecond=0)
 
         while True:

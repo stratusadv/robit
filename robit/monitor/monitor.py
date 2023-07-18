@@ -18,13 +18,12 @@ class Monitor:
             web_server_address: str = '127.0.0.1',
             web_server_port: int = 8200,
             key: str = None,
-            utc_offset: int = 0,
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
     ):
         self.id = Id()
         self.name = Name(name)
-        self.clock = Clock(utc_offset=utc_offset)
+        self.clock = Clock()
         self.health = Health()
         self.status = Status()
 
@@ -33,7 +32,7 @@ class Monitor:
                 address=web_server_address,
                 port=web_server_port,
                 key=key,
-                html_replace_dict={'title': self.name.__str__()}
+                html_replace_dict={'title': str(self.name)}
             )
             self.web_server.post_dict['worker_dict'] = dict()
         else:
@@ -51,10 +50,10 @@ class Monitor:
 
     def as_dict(self):
         return {
-            'id': self.id.__str__(),
-            'name': self.name.__str__(),
-            'health': self.health.__str__(),
-            'status': self.status.__str__(),
+            'id': str(self.id),
+            'name': str(self.name),
+            'health': str(self.health),
+            'status': str(self.status),
             'clock': self.clock.as_dict(),
             'workers': self.calculate_workers_to_list(),
         }
@@ -90,7 +89,6 @@ class Monitor:
                 self.web_server.update_api_dict(self.as_dict())
 
             sleep(1)
-
 
     def stop(self):
         pass

@@ -14,7 +14,6 @@ class Group:
     def __init__(
             self,
             name: str = 'default',
-            utc_offset: int = 0,
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
             alert_health_threshold: float = 95.0,
@@ -23,7 +22,7 @@ class Group:
         self.name = Name(name)
         self.health = Health()
         self.status = Status()
-        self.clock = Clock(utc_offset=utc_offset)
+        self.clock = Clock()
 
         self.job_list = list()
 
@@ -40,7 +39,7 @@ class Group:
         self.thread.daemon = True
 
     def add_job(self, name: str, method, **kwargs):
-        self.job_list.append(Job(name=name, method=method, utc_offset=self.clock.utc_offset, **kwargs))
+        self.job_list.append(Job(name=name, method=method, **kwargs))
 
     def calculate_health(self):
         self.health.reset()
@@ -55,7 +54,7 @@ class Group:
         job_dict_full = dict()
 
         for job in self.job_list:
-            job_dict_full[job.id.__str__()] = job.as_dict_full()
+            job_dict_full[str(job.id)] = job.as_dict_full()
 
         return job_dict_full
 
@@ -80,9 +79,9 @@ class Group:
 
     def as_dict(self):
         return {
-            'id': self.id.__str__(),
-            'name': self.name.__str__(),
-            'health': self.health.__str__(),
+            'id': str(self.id),
+            'name': str(self.name),
+            'health': str(self.health),
             'jobs': self.convert_jobs_to_dict_list(),
-            'status': self.status.__str__(),
+            'status': str(self.status),
         }
