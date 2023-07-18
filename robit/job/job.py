@@ -70,7 +70,7 @@ class Job:
         self.next_run_datetime = self.cron.next_datetime()
 
     def should_run(self):
-        return datetime.now() >= self.next_run_datetime
+        return datetime.now() > self.next_run_datetime
 
     def run(self):
         if self.should_run():
