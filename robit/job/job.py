@@ -77,8 +77,6 @@ class Job:
 
     def run(self):
         if self.should_run():
-            print(f'Job "{self.name}" should run: {self.should_run()}')
-            print(f'Now {tz_now()} > Next Run {self.next_run_datetime}')
             self.set_next_run_datetime()
 
             logging.warning(f'STARTING: Job "{self.name}"')
