@@ -4,7 +4,7 @@ from time import sleep
 from robit import Worker
 import robit
 
-print(robit.config.UTC_OFFSET)
+robit.set_utc_offset(-6)
 
 
 def function_to_alert_me(**kwargs):

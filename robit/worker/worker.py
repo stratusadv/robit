@@ -1,5 +1,5 @@
 from time import sleep
-from typing import Callable
+from typing import Callable, Optional
 
 from robit.core.alert import Alert
 from robit.core.clock import Clock
@@ -19,12 +19,12 @@ class Worker:
             web_server: bool = False,
             web_server_address: str = '127.0.0.1',
             web_server_port: int = 8100,
-            key: str = None,
-            monitor_address: str = None,
+            key: Optional[str] = None,
+            monitor_address: Optional[str] = None,
             monitor_port: int = 8200,
-            monitor_key: str = None,
-            alert_method: Callable = None,
-            alert_method_kwargs: dict = None,
+            monitor_key: Optional[str] = None,
+            alert_method: Optional[Callable] = None,
+            alert_method_kwargs: Optional[dict] = None,
     ):
         self.id = Id()
         self.name = Name(name)
@@ -39,8 +39,7 @@ class Worker:
                 key=key,
                 html_replace_dict={'title': str(self.name)}
             )
-        else:
-            self.web_server = None
+
 
         self.monitor_address = monitor_address
         self.monitor_port = monitor_port
@@ -51,8 +50,6 @@ class Worker:
                 method=alert_method,
                 method_kwargs=alert_method_kwargs
             )
-        else:
-            self.alert = None
 
         self.group_dict = dict()
 
