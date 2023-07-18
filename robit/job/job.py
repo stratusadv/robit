@@ -1,11 +1,12 @@
 import logging
+from datetime import datetime
 from time import sleep
 from typing import Callable
 
 from robit.core.alert import Alert
-from robit.core.clock import Clock
+from robit.core.clock import Clock, CREATED_DATE_FORMAT
 from robit.core.counter import Counter
-from robit.core.cron import Cron
+from robit.cron.cron import Cron
 from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.log import Log
@@ -21,7 +22,7 @@ class Job:
             method,
             method_kwargs: dict = {},
             utc_offset: int = 0,
-            cron: str = '* * * * * *',
+            cron: str = '* * * * *',
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
     ):
@@ -31,6 +32,7 @@ class Job:
         self.method_kwargs = method_kwargs
 
         self.cron = Cron(cron_syntax=cron, utc_offset=utc_offset)
+        self.next_run_datetime = self.cron.next_datetime()
 
         if 'alert_method' is not None:
             self.alert = Alert(
@@ -61,9 +63,18 @@ class Job:
         else:
             return f'{ self.method.__name__ }()'
 
+    def next_run_datetime_verbose(self):
+        return self.next_run_datetime.strftime(CREATED_DATE_FORMAT)
+
+    def set_next_run_datetime(self):
+        self.next_run_datetime = self.cron.next_datetime()
+
+    def should_run(self):
+        return datetime.now() >= self.next_run_datetime
+
     def run(self):
-        if self.cron.is_past_next_run_datetime():
-            self.cron.set_next_run_time()
+        if self.should_run():
+            self.set_next_run_datetime()
 
             logging.warning(f'STARTING: Job "{self.name}"')
 
@@ -102,7 +113,7 @@ class Job:
             'id': self.id.__str__(),
             'name': self.name.__str__(),
             'status': self.status.__str__(),
-            'next_run_datetime': self.cron.next_run_datetime_verbose,
+            'next_run_datetime': self.next_run_datetime_verbose(),
             'success_count': self.success_count.total,
             'health': self.health.__str__(),
             'failed_count': self.failed_count.total,

@@ -1,17 +1,20 @@
 from datetime import datetime
-import calendar
-
 
 from robit.cron.fields import CronMinuteField, CronHourField, CronDayOfMonthField, CronMonthField, CronDayOfWeekField
-from robit.cron.enums import CronFieldTypeEnum
+from robit.core.clock import CREATED_DATE_FORMAT
+
 
 class Cron:
-    def __init__(self, cron_string):
-        self.cron_string: str = cron_string
+    def __init__(self, cron_syntax: str, utc_offset: int = 0):
+        """
+        Responsible for parsing a cron string and returning the next datetime that the cron string will run.
+        """
+        self.cron_syntax = cron_syntax
+        self.utc_offset = utc_offset
         self.field_dict: dict = self._parse_cron_field()
 
     def _parse_cron_field(self) -> dict:
-        fields = self.cron_string.split()
+        fields = self.cron_syntax.split()
 
         if len(fields) != 5:
             raise ValueError("Invalid cron string format")
@@ -34,6 +37,8 @@ class Cron:
                 if not cron_field.is_valid_dt(next_dt):
                     next_dt = cron_field.increment_datetime(next_dt)
                     break
+                elif next_dt.year - now.year > 4:
+                    raise ValueError("Cron string is invalid")
             else:
                 # Else runs when loop completes without a break.
                 # Once all fields are valid, check if the datetime is greater than the current datetime.
@@ -43,13 +48,5 @@ class Cron:
                     # Increment the minute field and try again.
                     next_dt = self.field_dict['minute'].increment_datetime(next_dt)
 
-    def validate(self):
-        # Todo: Need to validate it is looking for an actual date or catch the exception.
-        month_field = self.field_dict['month']
-        if month_field.type != CronFieldTypeEnum.EVERY:
-            possible_months = month_field.possible_values
-            for month_int in possible_months:
-                #
-                start_date = datetime(year, month, 1)
-                _, last_day = calendar.monthrange(year, month)
-                end_date = datetime(year, month, last_day)
+    def next_datetime_verbose(self) -> str:
+        return self.next_datetime().strftime(CREATED_DATE_FORMAT)

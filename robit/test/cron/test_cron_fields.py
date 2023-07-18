@@ -37,7 +37,8 @@ class TestCronMonthField(unittest.TestCase):
         self.test_dt = datetime(2023, 7, 17, 4, 30, 0)
 
     def test_month_field(self):
-        self.assertEqual(self.month_cron.increment_datetime(self.test_dt), datetime(2023, 8, 17, 4, 30, 0))
+        # Sets next month and back to day one to keep incrementing dates.
+        self.assertEqual(self.month_cron.increment_datetime(self.test_dt), datetime(2023, 8, 1, 4, 30, 0))
 
 
 class TestCronDayOfWeekField(unittest.TestCase):

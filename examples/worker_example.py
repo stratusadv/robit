@@ -32,8 +32,20 @@ def function_sleep_for_time(sleep_time: int):
     return 'Slept for 6 seconds'
 
 
-wo.add_job('Specific Sleep Period Function', function_sleep_for_time, method_kwargs={'sleep_time': 6}, group='Sleeping', cron='30 * * * * *')
-wo.add_job('Sleep for Short Period', function_sleep_short, group='Sleeping', cron='1 * * * *')
+wo.add_job(
+    'Specific Sleep Period Function',
+    function_sleep_for_time,
+    method_kwargs={'sleep_time': 6},
+    group='Sleeping',
+    cron='* * * * *'
+)
+
+wo.add_job(
+    'Sleep for Short Period',
+    function_sleep_short,
+    group='Sleeping',
+    cron='*/2 * * * *'
+)
 
 
 def function_random_fail_often():
@@ -50,8 +62,19 @@ def function_random_fail_rare():
     return 'No Error'
 
 
-wo.add_job('A Function that Fails Often', function_random_fail_often, group='Failing', cron='10 * * * * *')
-wo.add_job('Might Fail Some Times', function_random_fail_rare, group='Failing', cron='5 * * * * *')
+wo.add_job(
+    'A Function that Fails Often',
+    function_random_fail_often,
+    group='Failing',
+    cron='* * * * *'
+)
+
+wo.add_job(
+    'Might Fail Some Times',
+    function_random_fail_rare,
+    group='Failing',
+    cron='* * * * *'
+)
 
 
 def function_full_speed():

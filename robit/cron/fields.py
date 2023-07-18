@@ -1,5 +1,7 @@
+import calendar
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
+from typing import Optional
 
 from robit.cron.utils import CronFieldIdentifier, CronRangeFinder
 from robit.cron.enums import CronFieldTypeEnum
@@ -57,6 +59,7 @@ class CronHourField(CronField):
 
 class CronDayOfMonthField(CronField):
     value_range: range = range(1, 32)
+    _current_month: Optional[int] = None
 
     def increment_datetime(self, dt) -> datetime:
         return dt + timedelta(days=1)
@@ -69,6 +72,7 @@ class CronMonthField(CronField):
     value_range: range = range(1, 13)
 
     def increment_datetime(self, dt: datetime) -> datetime:
+        # Sets next month and back to day one to keep incrementing dates.
         if dt.month == 12:
             return dt.replace(year=dt.year + 1, month=1, day=1)
         else:
