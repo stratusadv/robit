@@ -25,6 +25,8 @@ class Worker:
             monitor_key: Optional[str] = None,
             alert_method: Optional[Callable] = None,
             alert_method_kwargs: Optional[dict] = None,
+            max_threads: int = 10,
+            max_processes: int = 10,
     ):
         self.id = Id()
         self.name = Name(name)
@@ -52,21 +54,21 @@ class Worker:
         else:
             self.alert = None
 
-        self.group_dict = dict()
+        self.groups: dict[str: Group] = dict()
 
     def add_group(self, name: str, **kwargs) -> None:
-        if name not in self.group_dict:
-            self.group_dict[name] = Group(name=name, **kwargs)
+        if name not in self.groups:
+            self.groups[name] = Group(name=name, **kwargs)
 
-    def add_job(self, name: str, method: Callable, group: str = 'Default', **kwargs) -> None:
+    def add_job(self, name: str, method: Callable, group: str = 'Unnamed Group', **kwargs) -> None:
         self.add_group(group)
-        self.group_dict[group].add_job(name, method, **kwargs)
+        self.groups[group].add_job(name, method, **kwargs)
 
     def as_dict(self) -> dict:
         return {
             'id': str(self.id),
             'name': str(self.name),
-            'groups': self.convert_groups_to_dict_list(),
+            'groups': [group.as_dict() for group in self.groups.values()],
             'health': str(self.health),
             'status': str(self.status),
             'clock': self.clock.as_dict(),
@@ -84,16 +86,13 @@ class Worker:
     def calculate_health(self) -> None:
         self.health.reset()
 
-        for group in self.group_dict.values():
+        for group in self.groups.values():
             self.health.average(group.health.percentage)
-
-    def convert_groups_to_dict_list(self) -> list:
-        return [group.as_dict() for group in self.group_dict.values()]
 
     def job_detail_dict(self) -> dict:
         job_detail_dict = dict()
 
-        for group in self.group_dict.values():
+        for group in self.groups.values():
             job_detail_dict = {**job_detail_dict, **group.job_list_as_dict_full()}
 
         return job_detail_dict
@@ -101,28 +100,31 @@ class Worker:
     def restart(self):
         pass
 
-    def run_group_dict(self) -> None:
-        for group in self.group_dict.values():
+    def run_groups(self) -> None:
+        for group in self.groups.values():
             group.start()
 
     def start(self) -> None:
         if self.web_server:
             self.web_server.start()
 
-        self.run_group_dict()
+        self.run_groups()
 
-        while True:
-            self.calculate_health()
-
-            if self.alert:
-                self.alert.check_health_threshold(f'Worker "{self.name}"', self.health)
-
-            if self.web_server:
-                self.web_server.update_api_dict(self.as_dict())
-
-            if self.monitor_address:
-                post_worker_data_to_monitor(self.monitor_address, self.monitor_key, self.as_dict_to_monitor())
-            sleep(1)
+        # Todo: Is this going to cause problems?
+        # Todo: Does this need to be in its own thread?
+        # while True:
+        #     self.calculate_health()
+        #
+        #     if self.alert:
+        #         self.alert.check_health_threshold(f'Worker "{self.name}"', self.health)
+        #
+        #     if self.web_server:
+        #         self.web_server.update_api_dict(self.as_dict())
+        #
+        #     if self.monitor_address:
+        #         post_worker_data_to_monitor(self.monitor_address, self.monitor_key, self.as_dict_to_monitor())
+        #
+        #     sleep(1)
 
     def stop(self):
         pass

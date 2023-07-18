@@ -1,4 +1,5 @@
-import threading
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
+from time import sleep
 from typing import Callable
 
 from robit.core.alert import Alert
@@ -13,18 +14,23 @@ from robit.core.status import Status
 class Group:
     def __init__(
             self,
-            name: str = 'default',
+            name: str = 'Unnamed Group',
+            max_threads: int = 10,
+            max_processes: int = 2,
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
             alert_health_threshold: float = 95.0,
     ):
-        self.id = Id()
-        self.name = Name(name)
-        self.health = Health()
-        self.status = Status()
-        self.clock = Clock()
+        self.id: Id = Id()
+        self.name: Name = Name(name)
+        self.health: Health = Health()
+        self.status: Status = Status()
+        self.clock: Clock = Clock()
+        self.max_threads: int = max_threads
+        self.max_processes: int = max_processes
 
-        self.job_list = list()
+
+        self.job_list: list[Job] = list()
 
         if alert_method is not None:
             self.alert = Alert(
@@ -35,10 +41,7 @@ class Group:
         else:
             self.alert = None
 
-        self.thread = threading.Thread(target=self.run_job_list)
-        self.thread.daemon = True
-
-    def add_job(self, name: str, method, **kwargs):
+    def add_job(self, name: str, method: Callable, **kwargs):
         self.job_list.append(Job(name=name, method=method, **kwargs))
 
     def calculate_health(self):
@@ -71,8 +74,38 @@ class Group:
     def restart(self):
         pass
 
+    def ready_thread_jobs(self) -> list[Job]:
+        ready_jobs = list()
+
+        for job in self.job_list:
+            if job.status.is_ready():
+                ready_jobs.append(job)
+
+        return ready_jobs
+
     def start(self):
-        self.thread.start()
+        with ThreadPoolExecutor(max_workers=self.max_threads) as executor:
+            while True:
+                # Iterable that maps futures to jobs
+                job_list = {executor.submit(job.run, **job.method_kwargs): job for job in self.ready_thread_jobs()}
+
+                for future in as_completed(job_list):
+                    completed_job = job_list[future]
+                    result = future.result()
+                    # Process completed job here
+                sleep(1)
+
+        with ProcessPoolExecutor(max_workers=self.max_processes) as executor:
+            while True:
+                # Iterable that maps futures to jobs
+                job_list = {executor.submit(job.run, **job.method_kwargs): job for job in self.ready_thread_jobs()}
+
+                for future in as_completed(job_list):
+                    completed_job = job_list[future]
+                    result = future.result()
+                    # Process completed job here
+                sleep(1)
+
 
     def stop(self):
         pass

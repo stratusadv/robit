@@ -19,9 +19,10 @@ class Job:
     def __init__(
             self,
             name: str,
-            method,
+            method: Callable,
             method_kwargs: Optional[dict] = None,
             cron: str = '* * * * *',
+            execution_type: str = 'thread',
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
     ):
