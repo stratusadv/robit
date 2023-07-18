@@ -40,38 +40,29 @@ class Worker:
                 html_replace_dict={'title': str(self.name)}
             )
 
-
         self.monitor_address = monitor_address
         self.monitor_port = monitor_port
         self.monitor_key = monitor_key
 
-        if 'alert_method' is not None:
+        if alert_method is not None:
             self.alert = Alert(
                 method=alert_method,
                 method_kwargs=alert_method_kwargs
             )
+        else:
+            self.alert = None
 
         self.group_dict = dict()
 
-    def add_group(
-            self,
-            name: str,
-            **kwargs
-    ):
+    def add_group(self, name: str, **kwargs) -> None:
         if name not in self.group_dict:
             self.group_dict[name] = Group(name=name, **kwargs)
 
-    def add_job(
-            self,
-            name: str,
-            method: Callable,
-            group: str = 'Default',
-            **kwargs
-    ):
+    def add_job(self, name: str, method: Callable, group: str = 'Default', **kwargs) -> None:
         self.add_group(group)
         self.group_dict[group].add_job(name, method, **kwargs)
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         return {
             'id': str(self.id),
             'name': str(self.name),
@@ -82,7 +73,7 @@ class Worker:
             'job_details': self.job_detail_dict()
         }
 
-    def as_dict_to_monitor(self):
+    def as_dict_to_monitor(self) -> dict:
         return {
             'id': str(self.id),
             'name': str(self.name),
@@ -90,16 +81,16 @@ class Worker:
             'clock': self.clock.as_dict(),
         }
 
-    def calculate_health(self):
+    def calculate_health(self) -> None:
         self.health.reset()
 
         for group in self.group_dict.values():
             self.health.average(group.health.percentage)
 
-    def convert_groups_to_dict_list(self):
+    def convert_groups_to_dict_list(self) -> list:
         return [group.as_dict() for group in self.group_dict.values()]
 
-    def job_detail_dict(self):
+    def job_detail_dict(self) -> dict:
         job_detail_dict = dict()
 
         for group in self.group_dict.values():
@@ -110,11 +101,11 @@ class Worker:
     def restart(self):
         pass
 
-    def run_group_dict(self):
+    def run_group_dict(self) -> None:
         for group in self.group_dict.values():
             group.start()
 
-    def start(self):
+    def start(self) -> None:
         if self.web_server:
             self.web_server.start()
 

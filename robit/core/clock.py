@@ -1,6 +1,4 @@
-from datetime import datetime, timedelta
-
-from robit.config import config
+from datetime import datetime
 from robit.core.utils import tz_now
 
 CREATED_DATE_FORMAT = '%b %d, %Y at %I:%M:%S %p'

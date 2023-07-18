@@ -2,6 +2,7 @@ from robit.core.clock import Clock
 
 
 class Log:
+
     def __init__(
             self,
             max_messages: int = 5,

@@ -26,7 +26,7 @@ class Group:
 
         self.job_list = list()
 
-        if 'alert_method' is not None:
+        if alert_method is not None:
             self.alert = Alert(
                 method=alert_method,
                 method_kwargs=alert_method_kwargs,

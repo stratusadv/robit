@@ -3,4 +3,4 @@ from robit.config import config
 
 
 def tz_now() -> datetime:
-    return datetime.utcnow() + timedelta(hours=config.UTC_OFFSET)
+    return (datetime.utcnow() + timedelta(hours=config.UTC_OFFSET)).replace(microsecond=0)

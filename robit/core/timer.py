@@ -1,4 +1,4 @@
-from datetime import datetime
+from robit.core.utils import tz_now
 
 
 class Timer:
@@ -35,10 +35,10 @@ class Timer:
             self.average_duration = total_duration / len(self.duration_list)
 
     def start(self):
-        self.timer = datetime.utcnow()
+        self.timer = tz_now()
 
     def stop(self):
-        duration = (datetime.utcnow() - self.timer).total_seconds()
+        duration = (tz_now() - self.timer).total_seconds()
 
         self.last_duration = duration
         self.duration_list.insert(0, duration)

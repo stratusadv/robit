@@ -68,7 +68,7 @@ class Health:
         else:
             self.percentage = value
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         return {
             'percentage': self.percentage,
         }
