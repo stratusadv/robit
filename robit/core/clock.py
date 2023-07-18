@@ -1,18 +1,13 @@
-from datetime import datetime, timedelta
+from datetime import datetime
+from robit.core.utils import tz_now
 
 CREATED_DATE_FORMAT = '%b %d, %Y at %I:%M:%S %p'
 
 
 class Clock:
-    def __init__(
-            self,
-            utc_offset: int = 0,
-    ):
-
-        self.utc_offset = utc_offset
-
+    def __init__(self,):
         self.created_utc = datetime.utcnow()
-        self.created_tz = datetime.utcnow() + timedelta(hours=utc_offset)
+        self.created_tz = tz_now()
 
     def as_dict(self):
         return {
@@ -30,5 +25,5 @@ class Clock:
 
     @property
     def now_tz_verbose(self):
-        return (datetime.utcnow() + timedelta(hours=self.utc_offset)).strftime(CREATED_DATE_FORMAT)
+        return tz_now().strftime(CREATED_DATE_FORMAT)
 

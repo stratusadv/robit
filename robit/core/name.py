@@ -1,9 +1,9 @@
-class Name:
-    def __init__(self, name: str):
-        self.name = name
+from dataclasses import dataclass
 
-    def __repr__(self):
-        return self.__str__()
+
+@dataclass()
+class Name:
+    name: str
 
     def __str__(self):
         return self.name

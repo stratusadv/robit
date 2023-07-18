@@ -1,14 +1,14 @@
-import logging
+from typing import Optional
 from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 import threading
 
 
-def get_text_from_file(name):
+def get_text_from_file(name: str) -> str:
     return Path(Path(__file__).parent.parent.resolve(), 'html', name).read_text()
 
 
-def html_encode_file(name, replace_dict: dict = None):
+def html_encode_file(name: str, replace_dict: dict = None) -> bytes:
     html = get_text_from_file(name)
 
     if replace_dict:
@@ -28,7 +28,7 @@ class WebRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write('Nothing to See Here'.encode("utf8"))
 
     @property
-    def path_list(self):
+    def path_list(self) -> list:
         temp_path_list = self.path.split('/')
         path_list = list()
 
@@ -38,7 +38,7 @@ class WebRequestHandler(BaseHTTPRequestHandler):
 
         return path_list
 
-    def is_in_path_list(self, path_list: list):
+    def is_in_path_list(self, path_list: list) -> bool:
         if len(path_list) >= 1:
             if path_list[0] is None:
                 del path_list[0]
@@ -52,7 +52,7 @@ class WebRequestHandler(BaseHTTPRequestHandler):
         else:
             return False
 
-    def served_static(self):
+    def served_static(self) -> bool:
         if 1 < len(self.path.split('.')) < 3:
             extension = self.path[1:].split('.')[1]
             if extension in ('js', 'css', 'html', 'png'):
@@ -74,7 +74,7 @@ class WebRequestHandler(BaseHTTPRequestHandler):
 
         return False
 
-    def _set_headers(self, content_type='text/html'):
+    def _set_headers(self, content_type: str = 'text/html') -> None:
         self.send_response(200)
         self.send_header("Content-type", content_type)
         self.end_headers()
@@ -91,12 +91,18 @@ class WebRequestHandler(BaseHTTPRequestHandler):
 
 
 class WebServer:
-    def __init__(self, address='localhost', port=8000, key=None, html_replace_dict=None):
+    def __init__(
+            self,
+            address: str = 'localhost',
+            port: int = 8000,
+            key: Optional[str] = None,
+            html_replace_dict: Optional[dict] = None
+    ):
         self.api_dict = dict()
         self.post_dict = dict()
 
         self.address = address
-        self.port = int(port)
+        self.port = port
         self.key = key
 
         self.html_replace_dict = html_replace_dict
@@ -120,7 +126,7 @@ class WebServer:
         print(f'Starting httpd server at {href_link}')
 
         if self.key is None:
-            print(f'We do not reccomend running servers with out keys!')
+            print(f'We do not recommend running servers with out keys!')
 
     def stop(self):
         pass
