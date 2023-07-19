@@ -63,19 +63,19 @@ def function_random_fail_rare():
     return 'No Error'
 
 
-wo.add_job(
-    'A Function that Fails Often',
-    function_random_fail_often,
-    group='Failing',
-    cron='* * * * *'
-)
-
-wo.add_job(
-    'Might Fail Some Times',
-    function_random_fail_rare,
-    group='Failing',
-    cron='* * * * *'
-)
+# wo.add_job(
+#     'A Function that Fails Often',
+#     function_random_fail_often,
+#     group='Failing',
+#     cron='* * * * *'
+# )
+#
+# wo.add_job(
+#     'Might Fail Some Times',
+#     function_random_fail_rare,
+#     group='Failing',
+#     cron='* * * * *'
+# )
 
 
 def function_full_speed():

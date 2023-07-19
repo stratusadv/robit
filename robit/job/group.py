@@ -102,16 +102,17 @@ class Group:
         return completed_jobs
 
     def start(self):
-        thread_jobs = threading.Thread(target=self.execute_thread_jobs)
-        process_jobs = threading.Thread(target=self.execute_process_jobs)
+        pass
+        # thread_jobs = threading.Thread(target=self.execute_thread_jobs)
+        # process_jobs = threading.Thread(target=self.execute_process_jobs)
 
         # start both threads
-        thread_jobs.start()
-        process_jobs.start()
+        # thread_jobs.start()
+        # process_jobs.start()
 
         # wait for both threads to finish
-        thread_jobs.join()
-        process_jobs.join()
+        # thread_jobs.join()
+        # process_jobs.join()
 
         # Now both thread_jobs and process_jobs have completed
 
