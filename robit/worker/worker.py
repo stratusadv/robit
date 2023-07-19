@@ -1,4 +1,7 @@
+import json
+import math
 import multiprocessing
+import random
 import socket
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
@@ -48,9 +51,7 @@ class Worker:
                 key=key,
                 html_replace_dict={'title': str(self.name)}
             )
-
-            self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.client.connect(('localhost', 8000))
+            self.client = None
 
         self.monitor_address = monitor_address
         self.monitor_port = monitor_port
@@ -113,18 +114,21 @@ class Worker:
     def process_queue(self):
         self.update_server()
         if not self.queue.empty():
-            # Get job
             job = self.queue.get()
-            # Run job and update server
-            result = job.run()
-            # Return results and update sever
 
-            if self.web_server:
-                self.client.send(b'Completed Job!')
-                data = self.client.recv(1024)
-                print('Received from server: ', data.decode('utf-8'))
+            # if self.web_server:
+                # id = random.randint(1, 1000)
+                # payload = json.dumps(self.as_dict()).encode('utf-8')
+                # print(len(payload))
+                # print(len(payload) / 1024)
+                # self.client.send(json.dumps(self.as_dict()).encode('utf-8'))
 
-            self.update_server()
+            job.run()
+
+            self.calculate_health()
+            # if self.web_server:
+            #     self.client.send(json.dumps(self.as_dict()).encode('utf-8'))
+
             # Complete job
             self.queue.task_done()
 
@@ -137,23 +141,31 @@ class Worker:
 
         self.calculate_health()
 
-        if self.alert:
-            self.alert.check_health_threshold(f'Worker "{self.name}"', self.health)
-
-        if self.web_server:
-            self.web_server.update_api_dict(self.as_dict())
-
-        if self.monitor_address:
-            post_worker_data_to_monitor(self.monitor_address, self.monitor_key, self.as_dict_to_monitor())
+        # if self.alert:
+        #     self.alert.check_health_threshold(f'Worker "{self.name}"', self.health)
+        #
+        # if self.web_server:
+        #     self.web_server.update_api_dict(self.as_dict())
+        #
+        # if self.monitor_address:
+        #     post_worker_data_to_monitor(self.monitor_address, self.monitor_key, self.as_dict_to_monitor())
 
     def start(self) -> None:
         if self.web_server:
-            # Todo: Start webserver on different process
-            # Todo: Update webserver so it is not tightly coupled to the worker.
-
             multiprocessing.Process(target=self.web_server.start).start()
-            # self.web_server.start()
-
+            self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.client.connect(('localhost', 8000))
+            # id = random.randint(1, 1000)
+            # payload = json.dumps(self.as_dict()).encode('utf-8')
+            self.client.send(json.dumps(self.as_dict()).encode('utf-8'))
+            # for i in range(1, math.ceil(len(payload) / 1024) + 1):
+            #     print(i)
+            #     start_index = (i - 1) * 1024
+            #     end_index = 1 * 1024
+            #     print(start_index)
+            #     print(end_index)
+            #
+            #     self.client.send(payload[start_index: end_index])
 
         while True:
             self.add_jobs_to_queue()
