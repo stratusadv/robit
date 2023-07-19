@@ -1,7 +1,5 @@
 import json
-import math
 import multiprocessing
-import random
 import socket
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
@@ -17,6 +15,7 @@ from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.name import Name
 from robit.core.status import Status
+from robit.socket.socket import ClientSocket
 from robit.worker.web_server import WorkerWebServer
 
 
@@ -112,22 +111,12 @@ class Worker:
         pass
 
     def process_queue(self):
-        self.update_server()
         if not self.queue.empty():
             job = self.queue.get()
-
-            # if self.web_server:
-                # id = random.randint(1, 1000)
-                # payload = json.dumps(self.as_dict()).encode('utf-8')
-                # print(len(payload))
-                # print(len(payload) / 1024)
-                # self.client.send(json.dumps(self.as_dict()).encode('utf-8'))
-
             job.run()
 
-            self.calculate_health()
-            # if self.web_server:
-            #     self.client.send(json.dumps(self.as_dict()).encode('utf-8'))
+            if self.web_server:
+                self.update_web_server()
 
             # Complete job
             self.queue.task_done()
@@ -137,39 +126,27 @@ class Worker:
         for job in job_list:
             self.thread_pool.submit(self.process_queue)
 
-    def update_server(self):
+    def update_web_server(self):
+        client_socket = ClientSocket('localhost', 8000)
+        client_socket.start()
+        client_socket.send(self.as_dict())
+        client_socket.close()
 
-        self.calculate_health()
-
-        # if self.alert:
-        #     self.alert.check_health_threshold(f'Worker "{self.name}"', self.health)
-        #
-        # if self.web_server:
-        #     self.web_server.update_api_dict(self.as_dict())
-        #
+        # Todo: Need to update the monitor
         # if self.monitor_address:
         #     post_worker_data_to_monitor(self.monitor_address, self.monitor_key, self.as_dict_to_monitor())
 
     def start(self) -> None:
         if self.web_server:
             multiprocessing.Process(target=self.web_server.start).start()
-            self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.client.connect(('localhost', 8000))
-            # id = random.randint(1, 1000)
-            # payload = json.dumps(self.as_dict()).encode('utf-8')
-            self.client.send(json.dumps(self.as_dict()).encode('utf-8'))
-            # for i in range(1, math.ceil(len(payload) / 1024) + 1):
-            #     print(i)
-            #     start_index = (i - 1) * 1024
-            #     end_index = 1 * 1024
-            #     print(start_index)
-            #     print(end_index)
-            #
-            #     self.client.send(payload[start_index: end_index])
+            self.update_web_server()
 
         while True:
             self.add_jobs_to_queue()
             self.process_queue()
+            self.calculate_health()
+            if self.alert:
+                self.alert.check_health_threshold(f'Worker "{self.name}"', self.health)
             sleep(1)
 
     def stop(self):

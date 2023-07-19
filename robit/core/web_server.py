@@ -1,9 +1,10 @@
 import json
-import socket
 from typing import Optional
 from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 import threading
+
+from robit.socket.socket import WebServerSocket
 
 
 def get_text_from_file(name: str) -> str:
@@ -116,23 +117,13 @@ class WebServer:
         pass
 
     def start_socket(self):
-
-        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.bind(('localhost', 8000))
-        server.listen(1)
-
-        print('Listening on port 8000...')
-
-        while True:
-            client, address = server.accept()
-            print('Accepted connection from: ', address)
-            while True:
-                data = client.recv(1024)
-                print(data.decode('utf-8'))
-                if not data:
-                    print('breaking')
-                    break
-            client.close()
+        socket = WebServerSocket(
+            host='localhost',
+            port=8000,
+            web_server=self
+        )
+        socket.start()
+        socket.process_requests()
 
     def start(self):
         threading.Thread(target=self.httpd_serve).start()
