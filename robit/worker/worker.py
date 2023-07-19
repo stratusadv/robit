@@ -1,3 +1,5 @@
+import asyncio
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import sleep
 from typing import Callable, Optional
 
@@ -100,31 +102,32 @@ class Worker:
     def restart(self):
         pass
 
-    def run_groups(self) -> None:
-        for group in self.groups.values():
-            group.start()
-
     def start(self) -> None:
         if self.web_server:
             self.web_server.start()
 
-        self.run_groups()
+        with ThreadPoolExecutor(max_workers=2) as executor:
 
-        # Todo: Is this going to cause problems?
-        # Todo: Does this need to be in its own thread?
-        # while True:
-        #     self.calculate_health()
-        #
-        #     if self.alert:
-        #         self.alert.check_health_threshold(f'Worker "{self.name}"', self.health)
-        #
-        #     if self.web_server:
-        #         self.web_server.update_api_dict(self.as_dict())
-        #
-        #     if self.monitor_address:
-        #         post_worker_data_to_monitor(self.monitor_address, self.monitor_key, self.as_dict_to_monitor())
-        #
-        #     sleep(1)
+            while True:
+                group_map = {executor.submit(group.start): group for group in self.groups.values()}
+
+                for future in as_completed(group_map):
+                    print(f'{group_map[future].name} Completed')
+                    # completed_job = job_list[future]
+                    # completed_jobs.append((completed_job, future.result()))
+
+                self.calculate_health()
+
+                if self.alert:
+                    self.alert.check_health_threshold(f'Worker "{self.name}"', self.health)
+
+                if self.web_server:
+                    self.web_server.update_api_dict(self.as_dict())
+
+                if self.monitor_address:
+                    post_worker_data_to_monitor(self.monitor_address, self.monitor_key, self.as_dict_to_monitor())
+
+            # sleep(1)
 
     def stop(self):
         pass
