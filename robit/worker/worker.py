@@ -142,6 +142,7 @@ class Worker:
             self.update_web_server()
 
         while True:
+            # Adds ready jobs to a queue and processes them in a thread pool
             self.add_jobs_to_queue()
             self.process_queue()
             self.calculate_health()
