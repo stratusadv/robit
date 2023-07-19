@@ -1,3 +1,4 @@
+import socket
 from typing import Optional
 from http.server import BaseHTTPRequestHandler
 from pathlib import Path
@@ -107,9 +108,6 @@ class WebServer:
 
         self.html_replace_dict = html_replace_dict
 
-        self.thread = threading.Thread(target=self.httpd_serve)
-        self.thread.daemon = True
-
     def httpd_serve(self):
         pass
 
@@ -117,9 +115,10 @@ class WebServer:
         pass
 
     def start(self):
-        self.thread.start()
-        href_link = f'http://{self.address}:{self.port}'
+        threading.Thread(target=self.httpd_serve).start()
+        threading.Thread(target=start_socket).start()
 
+        href_link = f'http://{self.address}:{self.port}'
         if self.key:
             href_link += f'/{self.key}/'
 
@@ -134,3 +133,24 @@ class WebServer:
     def update_api_dict(self, update_dict: dict):
         for key, val in update_dict.items():
             self.api_dict[key] = val
+
+
+def start_socket():
+
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(('localhost', 8000))
+    server.listen(1)
+
+    print('Listening on port 8000...')
+
+    while True:
+        client, address = server.accept()
+        print('Accepted connection from: ', address)
+        while True:
+            data = client.recv(1024)
+            if not data:
+                break
+            print('Received from client: ', data.decode('utf-8'))
+            client.send(b'Echo from server: ' + data)
+        client.close()
+

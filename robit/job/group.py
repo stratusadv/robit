@@ -1,14 +1,9 @@
-import asyncio
-import threading
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
-from time import sleep
 from typing import Callable
 
 from robit.core.alert import Alert
 from robit.core.clock import Clock
 from robit.core.health import Health
 from robit.core.id import Id
-from robit.core.utils import tz_now
 from robit.job import Job
 from robit.core.name import Name
 from robit.core.status import Status
@@ -18,8 +13,6 @@ class Group:
     def __init__(
             self,
             name: str = 'Unnamed Group',
-            max_threads: int = 10,
-            max_processes: int = 2,
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
             alert_health_threshold: float = 95.0,
@@ -29,8 +22,6 @@ class Group:
         self.health: Health = Health()
         self.status: Status = Status()
         self.clock: Clock = Clock()
-        self.max_threads: int = max_threads
-        self.max_processes: int = max_processes
 
         self.job_list: list[Job] = list()
 
@@ -76,45 +67,8 @@ class Group:
     def restart(self):
         pass
 
-    def execute_thread_jobs(self):
-        with ThreadPoolExecutor(max_workers=self.max_threads) as executor:
-            completed_jobs = list()
-            thread_jobs = [job for job in self.job_list if job.execution_type == 'thread']
-            job_list = {executor.submit(job.run): job for job in thread_jobs}
-
-            for future in as_completed(job_list):
-                completed_job = job_list[future]
-                completed_jobs.append((completed_job, future.result()))
-
-        return completed_jobs
-
-    def execute_process_jobs(self):
-        with ProcessPoolExecutor(max_workers=self.max_processes) as executor:
-            completed_jobs = list()
-            process_jobs = [job for job in self.job_list if job.execution_type == 'process']
-            job_list = {executor.submit(job.run): job for job in process_jobs}
-
-            for future in as_completed(job_list):
-                completed_job = job_list[future]
-                result = future.result()
-                completed_jobs.append((completed_job, result))
-
-        return completed_jobs
-
     def start(self):
         pass
-        # thread_jobs = threading.Thread(target=self.execute_thread_jobs)
-        # process_jobs = threading.Thread(target=self.execute_process_jobs)
-
-        # start both threads
-        # thread_jobs.start()
-        # process_jobs.start()
-
-        # wait for both threads to finish
-        # thread_jobs.join()
-        # process_jobs.join()
-
-        # Now both thread_jobs and process_jobs have completed
 
     def stop(self):
         pass

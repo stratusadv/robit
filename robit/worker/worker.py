@@ -1,9 +1,14 @@
+import multiprocessing
+import socket
 from concurrent.futures import ThreadPoolExecutor
+from time import sleep
 from typing import Callable, Optional
 import queue
 
 from robit.core.alert import Alert
 from robit.core.clock import Clock
+from robit.core.utils import tz_now
+from robit.core.web_client import post_worker_data_to_monitor
 from robit.job.group import Group
 from robit.core.health import Health
 from robit.core.id import Id
@@ -43,6 +48,9 @@ class Worker:
                 key=key,
                 html_replace_dict={'title': str(self.name)}
             )
+
+            self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.client.connect(('localhost', 8000))
 
         self.monitor_address = monitor_address
         self.monitor_port = monitor_port
@@ -103,48 +111,54 @@ class Worker:
         pass
 
     def process_queue(self):
-        # Todo: Needs to run it it's own thread
-        job = self.queue.get()
-        result = job.run()
-        print(result)
-        print(f'Job "{job.name}" completed')
-        self.queue.task_done()
+        self.update_server()
+        if not self.queue.empty():
+            # Get job
+            job = self.queue.get()
+            # Run job and update server
+            result = job.run()
+            # Return results and update sever
 
-    def start(self) -> None:
-        # if self.web_server:
-        #     self.web_server.start()
+            if self.web_server:
+                self.client.send(b'Completed Job!')
+                data = self.client.recv(1024)
+                print('Received from server: ', data.decode('utf-8'))
 
-        # Return all jobs that are ready to be executed
-        job_list = [self.queue.put(job) for group in self.groups.values() for job in group.job_list]
+            self.update_server()
+            # Complete job
+            self.queue.task_done()
 
+    def add_jobs_to_queue(self):
+        job_list = [self.queue.put(job) for group in self.groups.values() for job in group.job_list if tz_now() > job.next_run_datetime]
         for job in job_list:
             self.thread_pool.submit(self.process_queue)
 
-        # Pass the jobs to the queue
+    def update_server(self):
 
-        # Separate thread that is processing the queue
+        self.calculate_health()
 
-        # group_map = {executor.submit(group.start): group for group in self.groups.values()}
-        #
-        # for future in as_completed(group_map):
-        #     print(f'{group_map[future].name} Completed')
-        #     # completed_job = job_list[future]
-        #     # completed_jobs.append((completed_job, future.result()))
-        #
-        # # Todo: Need to simplify this
-        # # Todo: This needs to be responsive. Do i need to have this ore event based?
-        # self.calculate_health()
-        #
-        # if self.alert:
-        #     self.alert.check_health_threshold(f'Worker "{self.name}"', self.health)
-        #
-        # if self.web_server:
-        #     self.web_server.update_api_dict(self.as_dict())
-        #
-        # if self.monitor_address:
-        #     post_worker_data_to_monitor(self.monitor_address, self.monitor_key, self.as_dict_to_monitor())
-        #
-        # sleep(1)
+        if self.alert:
+            self.alert.check_health_threshold(f'Worker "{self.name}"', self.health)
+
+        if self.web_server:
+            self.web_server.update_api_dict(self.as_dict())
+
+        if self.monitor_address:
+            post_worker_data_to_monitor(self.monitor_address, self.monitor_key, self.as_dict_to_monitor())
+
+    def start(self) -> None:
+        if self.web_server:
+            # Todo: Start webserver on different process
+            # Todo: Update webserver so it is not tightly coupled to the worker.
+
+            multiprocessing.Process(target=self.web_server.start).start()
+            # self.web_server.start()
+
+
+        while True:
+            self.add_jobs_to_queue()
+            self.process_queue()
+            sleep(1)
 
     def stop(self):
         pass
