@@ -116,6 +116,8 @@ class Worker:
                     # completed_job = job_list[future]
                     # completed_jobs.append((completed_job, future.result()))
 
+                # Todo: Need to simplify this
+                # Todo: This needs to be responsive. Do i need to have this ore event based?
                 self.calculate_health()
 
                 if self.alert:
@@ -127,7 +129,7 @@ class Worker:
                 if self.monitor_address:
                     post_worker_data_to_monitor(self.monitor_address, self.monitor_key, self.as_dict_to_monitor())
 
-            # sleep(1)
+                sleep(1)
 
     def stop(self):
         pass
