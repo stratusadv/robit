@@ -1,10 +1,10 @@
 import ast
 import json
 import urllib.parse
-from urllib import parse
 from http.server import HTTPServer
 
-from robit.core.web_server import WebServer, WebRequestHandler, html_encode_file
+from robit.web_server.web_server import WebServer, WebRequestHandler
+from robit.web_server.utils import html_encode_file
 
 
 class MonitorWebServer(WebServer):

@@ -3,24 +3,8 @@ from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 import threading
 
-
-def get_text_from_file(name: str) -> str:
-    return Path(Path(__file__).parent.parent.resolve(), 'html', name).read_text()
-
-
-def html_encode_file(name: str, replace_dict: dict = None) -> bytes:
-    html = get_text_from_file(name)
-
-    if replace_dict:
-        html_str = str(html)
-
-        for key, val in replace_dict.items():
-            html_str = html_str.replace(f'||{key}||', val)
-
-        return html_str.encode("utf8")
-
-    else:
-        return html.encode("utf8")
+from robit.socket.socket import WebServerSocket
+from robit.web_server.utils import html_encode_file
 
 
 class WebRequestHandler(BaseHTTPRequestHandler):
@@ -107,19 +91,22 @@ class WebServer:
 
         self.html_replace_dict = html_replace_dict
 
-        self.thread = threading.Thread(target=self.httpd_serve)
-        self.thread.daemon = True
-
     def httpd_serve(self):
         pass
 
     def restart(self):
         pass
 
-    def start(self):
-        self.thread.start()
-        href_link = f'http://{self.address}:{self.port}'
+    def start_socket(self):
+        socket = WebServerSocket(web_server=self)
+        socket.start()
+        socket.process_requests()
 
+    def start(self):
+        threading.Thread(target=self.httpd_serve).start()
+        threading.Thread(target=self.start_socket).start()
+
+        href_link = f'http://{self.address}:{self.port}'
         if self.key:
             href_link += f'/{self.key}/'
 

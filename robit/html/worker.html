@@ -81,15 +81,16 @@
                                                             </div>
                                                             <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
                                                                 <span class="fs-7 text-worker-muted">Status</span><br/>
-                                                                <span x-show="job.status === 'Running'"
-                                                                      class="h6 text-status-running"
-                                                                      x-text="job.status"></span>
-                                                                <span x-show="job.status === 'Error'"
-                                                                      class="h6 text-status-error"
-                                                                      x-text="job.status"></span>
-                                                                <span x-show="job.status === 'Queued'"
-                                                                      class="h6 text-status-waiting"
-                                                                      x-text="job.status"></span>
+                                                                    <span
+                                                                        x-text="job.status"
+                                                                        class="h6"
+                                                                        :class="{
+                                                                            'text-status-running': job.status === 'Running',
+                                                                            'text-status-error': job.status === 'Error',
+                                                                            'text-status-waiting': job.status === 'Queued'
+                                                                        }"
+                                                                    ></span>
+
                                                             </div>
                                                             <div class="col-6 text-center pb-2 pb-sm-0 d-block d-sm-none">
                                                                 <span class="fs-7 text-worker-muted">Health</span><br/>

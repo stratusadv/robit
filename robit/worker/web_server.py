@@ -1,7 +1,8 @@
 import json
 from http.server import HTTPServer
 
-from robit.core.web_server import WebServer, WebRequestHandler, html_encode_file
+from robit.web_server.web_server import WebServer, WebRequestHandler
+from robit.web_server.utils import html_encode_file
 
 
 class WorkerWebServer(WebServer):
@@ -20,7 +21,6 @@ class WorkerWebServer(WebServer):
                         'name': api_dict['name'],
                         'groups': api_dict['groups'],
                         'health': api_dict['health'],
-                        'status': api_dict['status'],
                         'clock': api_dict['clock'],
                     }
                     self.wfile.write(json.dumps(worker_dict, indent=4).encode("utf8"))

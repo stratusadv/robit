@@ -51,8 +51,8 @@ wo.add_job(
 
 
 def function_random_fail_often():
-    if 1 == random.randint(1,2):
-        division_by_zero = 5 / 0
+    # if 1 == random.randint(1,2):
+    division_by_zero = 5 / 0
     sleep(4)
     return 'No Error'
 
@@ -65,7 +65,7 @@ def function_random_fail_rare():
 
 
 wo.add_job(
-    'A Function that Fails Often',
+    'A Function that Fails',
     function_random_fail_often,
     group='Failing',
     cron='* * * * *'
