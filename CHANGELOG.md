@@ -1,4 +1,4 @@
-## v0.3.1.a1
+## v0.3.2
 - Separate processes for web server
 - Socket communication for web server and worker
 - Queue for ready jobs
