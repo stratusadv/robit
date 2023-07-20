@@ -98,11 +98,7 @@ class WebServer:
         pass
 
     def start_socket(self):
-        socket = WebServerSocket(
-            host='localhost',
-            port=8000,
-            web_server=self
-        )
+        socket = WebServerSocket(web_server=self)
         socket.start()
         socket.process_requests()
 

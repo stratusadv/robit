@@ -2,9 +2,12 @@ import json
 import socket
 from abc import ABC, abstractmethod
 
+DEFAULT_HOST = '127.0.0.1'
+DEFAULT_PORT = 8080
+
 
 class Socket(ABC):
-    def __init__(self, host, port):
+    def __init__(self, host: str = DEFAULT_HOST, port: int = DEFAULT_PORT):
         self.host = host
         self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -36,7 +39,7 @@ class ServerSocket(Socket):
 
 
 class WebServerSocket(ServerSocket):
-    def __init__(self, host, port, web_server):
+    def __init__(self, web_server, host: str = DEFAULT_HOST, port: int = DEFAULT_PORT):
         super().__init__(host, port)
         self.web_server = web_server
 

@@ -125,7 +125,7 @@ class Worker:
             job.status.waiting()
 
     def update_web_server(self):
-        client_socket = ClientSocket('localhost', 8000)
+        client_socket = ClientSocket()
         client_socket.start()
         client_socket.send(self.as_dict())
         client_socket.close()
