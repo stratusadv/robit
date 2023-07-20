@@ -1,5 +1,4 @@
 import logging
-from time import sleep
 from typing import Callable, Optional
 
 from robit.core.alert import Alert
@@ -11,8 +10,8 @@ from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.log import Log
 from robit.core.name import Name
-from robit.core.status import Status
-from robit.core.timer import Timer
+from robit.status import Status
+from robit.timer import Timer, timing_decorator
 
 
 class Job:
@@ -49,7 +48,7 @@ class Job:
 
         self.clock = Clock()
         self.timer = Timer()
-        self.status = Status(value='queued')
+        self.status = Status()
 
         self.success_count = Counter()
         self.failed_count = Counter()
@@ -58,6 +57,14 @@ class Job:
         self.health = Health()
 
         self.result_log = Log(max_messages=200)
+
+    @timing_decorator
+    def execute_method(self):
+        if self.method_kwargs:
+            method_result = self.method(**self.method_kwargs)
+        else:
+            method_result = self.method()
+        return method_result
 
     @property
     def method_verbose(self):
@@ -76,41 +83,32 @@ class Job:
         return tz_now() > self.next_run_datetime
 
     def run(self):
-        if self.should_run():
-            self.set_next_run_datetime()
+        self.status.running()
+        self.set_next_run_datetime()
 
-            logging.warning(f'STARTING: Job "{self.name}"')
+        logging.warning(f'STARTING: Job "{self.name}"')
 
-            self.status.set('run')
-            self.timer.start()
+        try:
+            method_result = self.execute_method()
+            logging.warning(f'SUCCESS: Job "{self.name}" completed')
 
-            try:
-                if self.method_kwargs:
-                    method_result = self.method(**self.method_kwargs)
-                else:
-                    method_result = self.method()
-                self.timer.stop()
-                logging.warning(f'SUCCESS: Job "{self.name}" completed')
-                self.success_count.increase()
-                self.health.add_positive()
-                if method_result:
-                    self.result_log.add_message(str(method_result))
-                self.status.set('queued')
-            except Exception as e:
-                self.status.set('error')
-                failed_message = f'ERROR: Job "{self.name}" failed on exception "{e}"'
-                logging.warning(failed_message)
-                self.failed_log.add_message(failed_message)
-                self.failed_count.increase()
-                self.health.add_negative()
+            self.success_count.increase()
+            self.health.add_positive()
 
-            if self.alert:
-                self.alert.check_health_threshold(f'Job "{self.name}"', self.health)
-        else:
-            if self.status.value != 'error':
-                self.status.set('queued')
+            if method_result:
+                self.result_log.add_message(str(method_result))
 
+            self.status.queued()
+        except Exception as e:
+            self.status.error()
+            failed_message = f'ERROR: Job "{self.name}" failed on exception "{e}"'
+            logging.warning(failed_message)
+            self.failed_log.add_message(failed_message)
+            self.failed_count.increase()
+            self.health.add_negative()
 
+        if self.alert:
+            self.alert.check_health_threshold(f'Job "{self.name}"', self.health)
 
     def as_dict(self):
         return {

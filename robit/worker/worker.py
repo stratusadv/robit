@@ -1,6 +1,4 @@
-import json
 import multiprocessing
-import socket
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
 from typing import Callable, Optional
@@ -9,12 +7,11 @@ import queue
 from robit.core.alert import Alert
 from robit.core.clock import Clock
 from robit.core.utils import tz_now
-from robit.core.web_client import post_worker_data_to_monitor
+from robit.web_server.utils import post_worker_data_to_monitor
 from robit.job.group import Group
 from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.name import Name
-from robit.core.status import Status
 from robit.socket.socket import ClientSocket
 from robit.worker.web_server import WorkerWebServer
 
@@ -41,7 +38,6 @@ class Worker:
 
         self.clock = Clock()
         self.health = Health()
-        self.status = Status()
 
         if web_server:
             self.web_server = WorkerWebServer(
@@ -80,7 +76,6 @@ class Worker:
             'name': str(self.name),
             'groups': [group.as_dict() for group in self.groups.values()],
             'health': str(self.health),
-            'status': str(self.status),
             'clock': self.clock.as_dict(),
             'job_details': self.job_detail_dict()
         }
@@ -122,8 +117,10 @@ class Worker:
             self.queue.task_done()
 
     def add_jobs_to_queue(self):
-        job_list = [self.queue.put(job) for group in self.groups.values() for job in group.job_list if tz_now() > job.next_run_datetime]
-        for job in job_list:
+        ready_jobs = [job for group in self.groups.values() for job in group.job_list if tz_now() > job.next_run_datetime]
+        for job in ready_jobs:
+            self.queue.put(job)
+            job.status.waiting()
             self.thread_pool.submit(self.process_queue)
 
     def update_web_server(self):
@@ -138,11 +135,12 @@ class Worker:
 
     def start(self) -> None:
         if self.web_server:
+            # Start the webserver in a different process and send initial data
             multiprocessing.Process(target=self.web_server.start).start()
             self.update_web_server()
 
         while True:
-            # Adds ready jobs to a queue and processes them in a thread pool
+            # Continually adds ready jobs to the queue
             self.add_jobs_to_queue()
             self.process_queue()
             self.calculate_health()

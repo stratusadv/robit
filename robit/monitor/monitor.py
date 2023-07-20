@@ -6,7 +6,6 @@ from robit.core.clock import Clock
 from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.name import Name
-from robit.core.status import Status
 from robit.monitor.web_server import MonitorWebServer
 
 
@@ -25,7 +24,6 @@ class Monitor:
         self.name = Name(name)
         self.clock = Clock()
         self.health = Health()
-        self.status = Status()
 
         if web_server:
             self.web_server = MonitorWebServer(
@@ -53,7 +51,6 @@ class Monitor:
             'id': str(self.id),
             'name': str(self.name),
             'health': str(self.health),
-            'status': str(self.status),
             'clock': self.clock.as_dict(),
             'workers': self.calculate_workers_to_list(),
         }

@@ -6,7 +6,6 @@ from robit.core.health import Health
 from robit.core.id import Id
 from robit.job import Job
 from robit.core.name import Name
-from robit.core.status import Status
 
 
 class Group:
@@ -20,7 +19,6 @@ class Group:
         self.id: Id = Id()
         self.name: Name = Name(name)
         self.health: Health = Health()
-        self.status: Status = Status()
         self.clock: Clock = Clock()
 
         self.job_list: list[Job] = list()
@@ -79,5 +77,4 @@ class Group:
             'name': str(self.name),
             'health': str(self.health),
             'jobs': self.convert_jobs_to_dict_list(),
-            'status': str(self.status),
         }

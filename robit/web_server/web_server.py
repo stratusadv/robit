@@ -1,29 +1,10 @@
-import json
 from typing import Optional
 from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 import threading
 
 from robit.socket.socket import WebServerSocket
-
-
-def get_text_from_file(name: str) -> str:
-    return Path(Path(__file__).parent.parent.resolve(), 'html', name).read_text()
-
-
-def html_encode_file(name: str, replace_dict: dict = None) -> bytes:
-    html = get_text_from_file(name)
-
-    if replace_dict:
-        html_str = str(html)
-
-        for key, val in replace_dict.items():
-            html_str = html_str.replace(f'||{key}||', val)
-
-        return html_str.encode("utf8")
-
-    else:
-        return html.encode("utf8")
+from robit.web_server.utils import html_encode_file
 
 
 class WebRequestHandler(BaseHTTPRequestHandler):
