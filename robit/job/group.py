@@ -52,25 +52,6 @@ class Group:
 
         return job_dict_full
 
-    def run_job_list(self):
-        while True:
-            for job in self.job_list:
-                job.run()
-
-            self.calculate_health()
-
-            if self.alert:
-                self.alert.check_health_threshold(f'Group "{self.name}"', self.health)
-
-    def restart(self):
-        pass
-
-    def start(self):
-        pass
-
-    def stop(self):
-        pass
-
     def as_dict(self):
         return {
             'id': str(self.id),

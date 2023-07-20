@@ -20,13 +20,19 @@ class Worker:
     def __init__(
             self,
             name: str,
+
             web_server: bool = False,
             web_server_address: str = '127.0.0.1',
             web_server_port: int = 8100,
+
             key: Optional[str] = None,
+
             monitor_address: Optional[str] = None,
             monitor_port: int = 8200,
             monitor_key: Optional[str] = None,
+
+            max_thread_workers: int = 2,
+
             alert_method: Optional[Callable] = None,
             alert_method_kwargs: Optional[dict] = None,
     ):
@@ -34,7 +40,7 @@ class Worker:
         self.name = Name(name)
 
         self.queue = queue.Queue()
-        self.thread_pool = ThreadPoolExecutor(max_workers=2)
+        self.thread_pool = ThreadPoolExecutor(max_workers=max_thread_workers)
 
         self.clock = Clock()
         self.health = Health()
@@ -46,7 +52,6 @@ class Worker:
                 key=key,
                 html_replace_dict={'title': str(self.name)}
             )
-            self.client = None
 
         self.monitor_address = monitor_address
         self.monitor_port = monitor_port
@@ -106,22 +111,18 @@ class Worker:
         pass
 
     def process_queue(self):
-        if not self.queue.empty():
+        # Pass all the queued jobs to the thread pool
+        while not self.queue.empty():
             job = self.queue.get()
-            job.run()
-
-            if self.web_server:
-                self.update_web_server()
-
-            # Complete job
+            self.thread_pool.submit(job.run)
             self.queue.task_done()
 
     def add_jobs_to_queue(self):
         ready_jobs = [job for group in self.groups.values() for job in group.job_list if tz_now() > job.next_run_datetime]
         for job in ready_jobs:
             self.queue.put(job)
+            job.set_next_run_datetime()
             job.status.waiting()
-            self.thread_pool.submit(self.process_queue)
 
     def update_web_server(self):
         client_socket = ClientSocket('localhost', 8000)
@@ -137,10 +138,10 @@ class Worker:
         if self.web_server:
             # Start the webserver in a different process and send initial data
             multiprocessing.Process(target=self.web_server.start).start()
-            self.update_web_server()
 
         while True:
             # Continually adds ready jobs to the queue
+            self.update_web_server()
             self.add_jobs_to_queue()
             self.process_queue()
             self.calculate_health()

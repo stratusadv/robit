@@ -43,7 +43,6 @@ class WebServerSocket(ServerSocket):
     def process_requests(self):
         while True:
             client, address = self.socket.accept()
-            print('Socket Accepted connection from: ', address)
             json_string = ''
             while True:
                 data = client.recv(1024)

@@ -84,7 +84,6 @@ class Job:
 
     def run(self):
         self.status.running()
-        self.set_next_run_datetime()
 
         logging.warning(f'STARTING: Job "{self.name}"')
 
