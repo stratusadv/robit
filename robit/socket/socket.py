@@ -35,6 +35,7 @@ class ServerSocket(Socket):
         pass
 
     def start(self):
+        logging.warning(f'Starting server on {self.host}:{self.port}')
         self.socket.bind((self.host, self.port))
         self.socket.listen(1)
         logging.warning(f'Server started on {self.host}:{self.port}')

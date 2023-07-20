@@ -126,11 +126,15 @@ class Worker:
             job.status.waiting()
 
     def update_web_server(self):
-        client_socket = ClientSocket()
-        client_socket.start()
-        logging.warning(f'Connecting to {client_socket.host}:{client_socket.port}')
-        client_socket.send(self.as_dict())
-        client_socket.close()
+        try:
+            client_socket = ClientSocket()
+            logging.warning(f'Connecting to socket {client_socket.host}:{client_socket.port}')
+            client_socket.start()
+            client_socket.send(self.as_dict())
+            client_socket.close()
+            logging.warning(f'Connected to socket {client_socket.host}:{client_socket.port}')
+        except Exception as e:
+            logging.warning(f'Unable to connect to socket -{e}')
 
         # Todo: Need to update the monitor
         # if self.monitor_address:

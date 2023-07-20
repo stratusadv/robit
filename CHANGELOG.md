@@ -1,3 +1,6 @@
+## v0.3.2.2
+- Error handling when connecting to socket from client
+
 ## v0.3.2.1
 - Updating default socket port to 8100
 
