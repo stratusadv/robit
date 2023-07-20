@@ -1,3 +1,4 @@
+import logging
 import multiprocessing
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
@@ -127,6 +128,7 @@ class Worker:
     def update_web_server(self):
         client_socket = ClientSocket()
         client_socket.start()
+        logging.warning(f'Connecting to {client_socket.host}:{client_socket.port}')
         client_socket.send(self.as_dict())
         client_socket.close()
 

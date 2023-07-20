@@ -1,9 +1,10 @@
 import json
+import logging
 import socket
 from abc import ABC, abstractmethod
 
 DEFAULT_HOST = '127.0.0.1'
-DEFAULT_PORT = 8080
+DEFAULT_PORT = 8300
 
 
 class Socket(ABC):
@@ -36,6 +37,7 @@ class ServerSocket(Socket):
     def start(self):
         self.socket.bind((self.host, self.port))
         self.socket.listen(1)
+        logging.warning(f'Server started on {self.host}:{self.port}')
 
 
 class WebServerSocket(ServerSocket):

@@ -1,3 +1,6 @@
+## v0.3.2.1
+- Updating default socket port to 8100
+
 ## v0.3.2
 - Separate processes for web server
 - Socket communication for web server and worker
