@@ -7,8 +7,6 @@ import queue
 
 from robit.core.alert import Alert
 from robit.core.clock import Clock
-from robit.core.utils import tz_now
-from robit.web_server.utils import post_worker_data_to_monitor
 from robit.job.group import Group
 from robit.core.health import Health
 from robit.core.id import Id
@@ -119,7 +117,7 @@ class Worker:
             self.queue.task_done()
 
     def add_jobs_to_queue(self):
-        ready_jobs = [job for group in self.groups.values() for job in group.job_list if tz_now() > job.next_run_datetime]
+        ready_jobs = [job for group in self.groups.values() for job in group.job_list if job.should_run()]
         for job in ready_jobs:
             self.queue.put(job)
             job.set_next_run_datetime()

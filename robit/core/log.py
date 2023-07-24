@@ -1,3 +1,5 @@
+from collections import deque
+
 from robit.core.clock import Clock
 
 
@@ -7,20 +9,16 @@ class Log:
             self,
             max_messages: int = 5,
     ):
-        self.max_messages = max_messages
-        self.message_list = list()
+        # deque are optimized for appending and popping from both ends.
+        self.messages: deque = deque(maxlen=max_messages)
 
         self.clock = Clock()
 
     def add_message(self, message: str):
-        self.message_list.insert(0, f'[{self.clock.now_tz_verbose}] {message}')
-        self.trim()
-
-    def trim(self):
-        if len(self.message_list) > self.max_messages:
-            del self.message_list[self.max_messages:]
+        self.messages.appendleft(f'[{self.clock.now_tz_verbose}] {message}')
 
     def as_dict(self):
+        # Need to convert deque to list to be able to serialize to JSON.
         return {
-            'log': self.message_list
+            'log': list(self.messages)
         }

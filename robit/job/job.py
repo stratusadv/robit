@@ -38,7 +38,7 @@ class Job:
         self.cron = Cron(cron_syntax=cron)
         self.next_run_datetime = self.cron.next_datetime()
 
-        if 'alert_method' is not None:
+        if alert_method is not None:
             self.alert = Alert(
                 method=alert_method,
                 method_kwargs=alert_method_kwargs
@@ -52,11 +52,11 @@ class Job:
 
         self.success_count = Counter()
         self.failed_count = Counter()
-        self.failed_log = Log(max_messages=20)
+        self.failed_log = Log(max_messages=10)
 
         self.health = Health()
 
-        self.result_log = Log(max_messages=200)
+        self.result_log = Log(max_messages=10)
 
     @timing_decorator
     def execute_method(self):
@@ -126,11 +126,11 @@ class Job:
             'name': str(self.name),
             'method': self.method_verbose,
             'status': str(self.status),
-            'result_log': self.result_log.message_list,
+            'result_log': list(self.result_log.messages),
             'clock': self.clock.as_dict(),
             'timer': self.timer.as_dict(),
             'success_count': self.success_count.total,
             'health': str(self.health),
             'failed_count': self.failed_count.total,
-            'failed_log': self.failed_log.message_list,
+            'failed_log': list(self.failed_log.messages),
         }
