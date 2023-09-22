@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 
 
-@dataclass()
+@dataclass
 class Counter:
     total: int = 0
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.total)
 
-    def __repr__(self):
+    def __repr__(self) -> int:
         return self.total
 
     def as_dict(self) -> dict:

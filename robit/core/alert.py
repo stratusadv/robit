@@ -13,7 +13,7 @@ class Alert:
             method_kwargs: dict = None,
             health_threshold: float = 95.0,
             hours_between_messages: int = 24,
-    ):
+    ) -> None:
 
         self.method = method
 
@@ -27,7 +27,7 @@ class Alert:
 
         self.last_message_datetime = tz_now() - timedelta(hours=self.hours_between_messages)
 
-    def check_health_threshold(self, name, health: Health):
+    def check_health_threshold(self, name: str, health: Health) -> None:
         if tz_now() >= self.last_message_datetime + timedelta(hours=self.hours_between_messages):
             if health.percentage_hundreds <= self.health_threshold:
                 alert_message = f'ALERT: {name} dropped below the {self.health_threshold} percentage health threshold.'
