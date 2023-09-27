@@ -15,7 +15,7 @@ class Group:
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
             alert_health_threshold: float = 95.0,
-    ):
+    ) -> None:
         self.id: Id = Id()
         self.name: Name = Name(name)
         self.health: Health = Health()
@@ -32,19 +32,19 @@ class Group:
         else:
             self.alert = None
 
-    def add_job(self, name: str, method: Callable, **kwargs):
+    def add_job(self, name: str, method: Callable, **kwargs) -> None:
         self.job_list.append(Job(name=name, method=method, **kwargs))
 
-    def calculate_health(self):
+    def calculate_health(self) -> None:
         self.health.reset()
 
         for job in self.job_list:
             self.health.average(job.health.percentage)
 
-    def convert_jobs_to_dict_list(self):
+    def convert_jobs_to_dict_list(self) -> list:
         return [job.as_dict() for job in self.job_list]
 
-    def job_list_as_dict_full(self):
+    def job_list_as_dict_full(self) -> dict:
         job_dict_full = dict()
 
         for job in self.job_list:
@@ -52,7 +52,7 @@ class Group:
 
         return job_dict_full
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         return {
             'id': str(self.id),
             'name': str(self.name),

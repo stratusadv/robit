@@ -19,7 +19,7 @@ class Monitor:
             key: str = None,
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
-    ):
+    ) -> None:
         self.id = Id()
         self.name = Name(name)
         self.clock = Clock()
@@ -46,7 +46,7 @@ class Monitor:
 
         self.worker_dict = self.web_server.post_dict['worker_dict']
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         return {
             'id': str(self.id),
             'name': str(self.name),
@@ -55,13 +55,13 @@ class Monitor:
             'workers': self.calculate_workers_to_list(),
         }
 
-    def calculate_health(self):
+    def calculate_health(self) -> None:
         self.health.reset()
 
         for worker in self.worker_dict.values():
             self.health.average(float(worker['health']) * 0.01)
 
-    def calculate_workers_to_list(self):
+    def calculate_workers_to_list(self) -> list:
         worker_list = list()
 
         for worker in self.worker_dict.values():
@@ -69,10 +69,10 @@ class Monitor:
 
         return worker_list
 
-    def restart(self):
+    def restart(self) -> None:
         pass
 
-    def start(self):
+    def start(self) -> None:
         if self.web_server:
             self.web_server.start()
 
@@ -87,5 +87,5 @@ class Monitor:
 
             sleep(1)
 
-    def stop(self):
+    def stop(self) -> None:
         pass

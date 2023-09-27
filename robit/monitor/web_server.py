@@ -8,7 +8,7 @@ from robit.web_server.utils import html_encode_file
 
 
 class MonitorWebServer(WebServer):
-    def httpd_serve(self):
+    def httpd_serve(self) -> None:
         api_dict = self.api_dict
         post_dict = self.post_dict
         key = self.key

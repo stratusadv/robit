@@ -7,7 +7,7 @@ from robit.config import config
 
 
 class Cron:
-    def __init__(self, cron_syntax: str):
+    def __init__(self, cron_syntax: str) -> None:
         """
         Responsible for parsing a cron string and returning the next datetime that the cron string will run.
         """

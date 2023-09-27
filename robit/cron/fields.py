@@ -13,7 +13,7 @@ class CronField(ABC):
     """
     value_range: range = range(1, 60)
 
-    def __init__(self, value):
+    def __init__(self, value: str) -> None:
         self.value = value
         self.type: CronFieldTypeEnum = self._get_type()
         self.possible_values: list = self._get_possible_values()
@@ -26,21 +26,21 @@ class CronField(ABC):
         return range_finder.possible_values()
 
     @abstractmethod
-    def increment_datetime(self, dt) -> datetime:
+    def increment_datetime(self, dt: datetime) -> datetime:
         pass
 
     @abstractmethod
     def is_valid_dt(self, dt: datetime) -> bool:
         pass
 
-    def _get_type(self):
+    def _get_type(self) -> CronFieldTypeEnum:
         return CronFieldIdentifier(self.value).identify()
 
 
 class CronMinuteField(CronField):
     value_range: range = range(0, 60)
 
-    def increment_datetime(self, dt) -> datetime:
+    def increment_datetime(self, dt: datetime) -> datetime:
         return dt + timedelta(minutes=1)
 
     def is_valid_dt(self, dt: datetime) -> bool:
@@ -50,7 +50,7 @@ class CronMinuteField(CronField):
 class CronHourField(CronField):
     value_range: range = range(0, 24)
 
-    def increment_datetime(self, dt) -> datetime:
+    def increment_datetime(self, dt: datetime) -> datetime:
         return dt + timedelta(hours=1)
 
     def is_valid_dt(self, dt: datetime) -> bool:
@@ -61,7 +61,7 @@ class CronDayOfMonthField(CronField):
     value_range: range = range(1, 32)
     _current_month: Optional[int] = None
 
-    def increment_datetime(self, dt) -> datetime:
+    def increment_datetime(self, dt: datetime) -> datetime:
         return dt + timedelta(days=1)
 
     def is_valid_dt(self, dt: datetime) -> bool:
@@ -85,7 +85,7 @@ class CronMonthField(CronField):
 class CronDayOfWeekField(CronField):
     value_range: range = range(0, 7)
 
-    def increment_datetime(self, dt) -> datetime:
+    def increment_datetime(self, dt: datetime) -> datetime:
         return dt + timedelta(days=1)
 
     def is_valid_dt(self, dt: datetime) -> bool:
