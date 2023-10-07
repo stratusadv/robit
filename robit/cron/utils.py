@@ -5,7 +5,7 @@ from robit.cron.fields import CronField
 
 
 class CronFieldIdentifier:
-    def __init__(self, cron_field_value: 'str'):
+    def __init__(self, cron_field_value: 'str') -> None:
         self.value = cron_field_value
         self._identifiers = [self._is_every, self._is_range, self._is_step, self._is_list, self._is_specific]
 

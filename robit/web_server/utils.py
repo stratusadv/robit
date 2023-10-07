@@ -23,7 +23,7 @@ def html_encode_file(name: str, replace_dict: dict = None) -> bytes:
         return html.encode("utf8")
 
 
-def post_worker_data_to_monitor(address, key, post_dict):
+def post_worker_data_to_monitor(address: str, key: str, post_dict: dict) -> None:
     try:
         request = Request(f'{address}/{key}/worker_update/', quote_plus(json.dumps(post_dict)).encode())
         urlopen(request)

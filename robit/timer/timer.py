@@ -6,7 +6,7 @@ class Timer:
             self,
             duration_decimal_places: int = 2,
             duration_list_max: int = 20,
-    ):
+    ) -> None:
         self.start_time: float = 0.0
 
         self.duration_decimal_places = duration_decimal_places
@@ -19,7 +19,7 @@ class Timer:
         self.shortest_duration = 0.0
         self.longest_duration = 0.0
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         return {
             'average_duration': f'{self.average_duration:,.{self.duration_decimal_places}f}',
             'last_duration': f'{self.last_duration:,.{self.duration_decimal_places}f}',
@@ -27,17 +27,17 @@ class Timer:
             'longest_duration': f'{self.longest_duration:,.{self.duration_decimal_places}f}',
         }
 
-    def calculate_average_duration(self):
+    def calculate_average_duration(self) -> None:
         total_duration = 0.0
         if len(self.duration_list) > 0:
             for duration in self.duration_list:
                 total_duration += duration
             self.average_duration = total_duration / len(self.duration_list)
 
-    def start(self):
+    def start(self) -> None:
         self.timer = tz_now()
 
-    def stop(self):
+    def stop(self) -> None:
         duration = (tz_now() - self.timer).total_seconds()
 
         self.last_duration = duration
@@ -52,7 +52,7 @@ class Timer:
         self.calculate_average_duration()
         self.trim_duration_list()
 
-    def trim_duration_list(self):
+    def trim_duration_list(self) -> None:
         if len(self.duration_list) > self.duration_list_max:
             del self.duration_list[self.duration_list_max:]
 

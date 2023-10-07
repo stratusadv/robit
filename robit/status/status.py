@@ -2,31 +2,31 @@ from robit.status.enums import StatusChoiceEnum
 
 
 class Status:
-    def __init__(self, value: StatusChoiceEnum = StatusChoiceEnum.QUEUED):
+    def __init__(self, value: StatusChoiceEnum = StatusChoiceEnum.QUEUED) -> None:
         self._value = value
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'Status({self.value})'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.value)
 
-    def error(self):
+    def error(self) -> None:
         self.value = StatusChoiceEnum.ERROR
 
-    def halted(self):
+    def halted(self) -> None:
         self.value = StatusChoiceEnum.HALT
 
-    def queued(self):
+    def queued(self) -> None:
         self.value = StatusChoiceEnum.QUEUED
 
-    def running(self):
+    def running(self) -> None:
         self.value = StatusChoiceEnum.RUN
 
-    def starting(self):
+    def starting(self) -> None:
         self.value = StatusChoiceEnum.START
 
-    def stopped(self):
+    def stopped(self) -> None:
         self.value = StatusChoiceEnum.STOP
 
     @property
@@ -34,10 +34,10 @@ class Status:
         return self._value.value
 
     @value.setter
-    def value(self, value: StatusChoiceEnum):
+    def value(self, value: StatusChoiceEnum) -> None:
         self._value = value
 
-    def waiting(self):
+    def waiting(self) -> None:
         self.value = StatusChoiceEnum.WAIT
 
 

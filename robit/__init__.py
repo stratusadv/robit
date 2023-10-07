@@ -4,7 +4,7 @@ from robit.monitor.monitor import Monitor
 from robit.config import config
 
 
-def set_utc_offset(utc_offset: int):
+def set_utc_offset(utc_offset: int) -> None:
     config.UTC_OFFSET = utc_offset
 
 
