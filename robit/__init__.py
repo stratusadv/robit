@@ -1,6 +1,5 @@
 import logging
 from robit.worker.worker import Worker
-from robit.monitor.monitor import Monitor
 from robit.config import config
 
 

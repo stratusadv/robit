@@ -70,5 +70,8 @@ class Health:
 
     def as_dict(self) -> dict:
         return {
+            'max_count': self.max_count,
             'percentage': self.percentage,
+            'positive_count': self.positive_count,
+            'negative_count': self.negative_count,
         }

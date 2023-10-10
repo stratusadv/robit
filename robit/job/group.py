@@ -41,9 +41,6 @@ class Group:
         for job in self.job_list:
             self.health.average(job.health.percentage)
 
-    def convert_jobs_to_dict_list(self) -> list:
-        return [job.as_dict() for job in self.job_list]
-
     def job_list_as_dict_full(self) -> dict:
         job_dict_full = dict()
 
@@ -57,5 +54,5 @@ class Group:
             'id': str(self.id),
             'name': str(self.name),
             'health': str(self.health),
-            'jobs': self.convert_jobs_to_dict_list(),
+            'jobs': [job.as_dict() for job in self.job_list],
         }

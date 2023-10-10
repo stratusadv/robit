@@ -1,7 +1,6 @@
 import re
 
 from robit.cron.enums import CronFieldTypeEnum
-from robit.cron.fields import CronField
 
 
 class CronFieldIdentifier:
@@ -41,7 +40,7 @@ class CronFieldIdentifier:
 
 
 class CronRangeFinder:
-    def __init__(self, cron_field: CronField) -> None:
+    def __init__(self, cron_field) -> None:
         self.cron_field = cron_field
 
     def possible_values(self) -> list:
