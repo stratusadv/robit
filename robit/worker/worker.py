@@ -134,10 +134,6 @@ class Worker:
         except Exception as e:
             logging.warning(f'Unable to connect to socket -{e}')
 
-        # Todo: Need to update the monitor
-        # if self.monitor_address:
-        #     post_worker_data_to_monitor(self.monitor_address, self.monitor_key, self.as_dict_to_monitor())
-
     def start(self) -> None:
         if self.web_server:
             # Start the webserver in a different process and send initial data

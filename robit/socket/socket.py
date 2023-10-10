@@ -8,33 +8,33 @@ DEFAULT_PORT = 8300
 
 
 class Socket(ABC):
-    def __init__(self, host: str = DEFAULT_HOST, port: int = DEFAULT_PORT):
+    def __init__(self, host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> None:
         self.host = host
         self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    def close(self):
+    def close(self) -> None:
         self.socket.close()
 
     @abstractmethod
-    def start(self):
+    def start(self) -> None:
         pass
 
 
 class ClientSocket(Socket):
-    def start(self):
+    def start(self) -> None:
         self.socket.connect((self.host, self.port))
 
-    def send(self, data):
+    def send(self, data: str) -> None:
         self.socket.send(json.dumps(data).encode('utf-8'))
 
 
 class ServerSocket(Socket):
     @abstractmethod
-    def process_requests(self):
+    def process_requests(self) -> None:
         pass
 
-    def start(self):
+    def start(self) -> None:
         logging.warning(f'Starting server on {self.host}:{self.port}')
         self.socket.bind((self.host, self.port))
         self.socket.listen(1)
@@ -42,11 +42,11 @@ class ServerSocket(Socket):
 
 
 class WebServerSocket(ServerSocket):
-    def __init__(self, web_server, host: str = DEFAULT_HOST, port: int = DEFAULT_PORT):
+    def __init__(self, web_server, host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> None:
         super().__init__(host, port)
         self.web_server = web_server
 
-    def process_requests(self):
+    def process_requests(self) -> None:
         while True:
             client, address = self.socket.accept()
             json_string = ''

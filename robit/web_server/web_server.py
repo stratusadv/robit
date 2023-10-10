@@ -8,7 +8,7 @@ from robit.web_server.utils import html_encode_file
 
 
 class WebRequestHandler(BaseHTTPRequestHandler):
-    def not_found(self):
+    def not_found(self) -> None:
         self.wfile.write('Nothing to See Here'.encode("utf8"))
 
     @property
@@ -63,13 +63,13 @@ class WebRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-type", content_type)
         self.end_headers()
 
-    def do_GET(self):
+    def do_GET(self) -> None:
         pass
 
-    def do_HEAD(self):
+    def do_HEAD(self) -> None:
         self._set_headers()
 
-    def do_POST(self):
+    def do_POST(self) -> None:
         self._set_headers()
         self.not_found()
 
@@ -81,7 +81,7 @@ class WebServer:
             port: int = 8000,
             key: Optional[str] = None,
             html_replace_dict: Optional[dict] = None
-    ):
+    ) -> None:
         self.api_dict = dict()
         self.post_dict = dict()
 
@@ -91,18 +91,18 @@ class WebServer:
 
         self.html_replace_dict = html_replace_dict
 
-    def httpd_serve(self):
+    def httpd_serve(self) -> None:
         pass
 
-    def restart(self):
+    def restart(self) -> None:
         pass
 
-    def start_socket(self):
+    def start_socket(self) -> None:
         socket = WebServerSocket(web_server=self)
         socket.start()
         socket.process_requests()
 
-    def start(self):
+    def start(self) -> None:
         threading.Thread(target=self.httpd_serve).start()
         threading.Thread(target=self.start_socket).start()
 
@@ -115,9 +115,9 @@ class WebServer:
         if self.key is None:
             print(f'We do not recommend running servers with out keys!')
 
-    def stop(self):
+    def stop(self) -> None:
         pass
 
-    def update_api_dict(self, update_dict: dict):
+    def update_api_dict(self, update_dict: dict) -> None:
         for key, val in update_dict.items():
             self.api_dict[key] = val

@@ -1,6 +1,6 @@
 import unittest
 
-from robit import Worker, Monitor
+from robit import Worker
 
 
 class TestCore(unittest.TestCase):
@@ -10,12 +10,3 @@ class TestCore(unittest.TestCase):
             self.assertTrue(True)
         except:
             self.assertTrue(False)
-
-    def test_monitor(self):
-        try:
-            mo = Monitor('Watchy McTesterson')
-            self.assertTrue(True)
-        except:
-            self.assertTrue(False)
-
-

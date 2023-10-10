@@ -24,7 +24,7 @@ class Job:
             execution_type: str = 'thread',
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
-    ):
+    ) -> None:
         self.id = Id()
         self.name = Name(name)
         self.method = method
@@ -67,22 +67,22 @@ class Job:
         return method_result
 
     @property
-    def method_verbose(self):
+    def method_verbose(self) -> str:
         if self.method_kwargs:
             return f'{self.method.__name__}(kwargs={self.method_kwargs})'
         else:
             return f'{ self.method.__name__ }()'
 
-    def next_run_datetime_verbose(self):
+    def next_run_datetime_verbose(self) -> str:
         return self.next_run_datetime.strftime(CREATED_DATE_FORMAT)
 
-    def set_next_run_datetime(self):
+    def set_next_run_datetime(self) -> None:
         self.next_run_datetime = self.cron.next_datetime()
 
-    def should_run(self):
+    def should_run(self) -> bool:
         return tz_now() > self.next_run_datetime
 
-    def run(self):
+    def run(self) -> None:
         self.status.running()
 
         logging.warning(f'STARTING: Job "{self.name}"')
@@ -109,7 +109,7 @@ class Job:
         if self.alert:
             self.alert.check_health_threshold(f'Job "{self.name}"', self.health)
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         return {
             'id': str(self.id),
             'name': str(self.name),
@@ -120,17 +120,11 @@ class Job:
             'failed_count': self.failed_count.total,
         }
 
-    def as_dict_full(self):
-        return {
-            'id': str(self.id),
-            'name': str(self.name),
+    def as_dict_full(self) -> dict:
+        return self.as_dict() | {
             'method': self.method_verbose,
-            'status': str(self.status),
             'result_log': list(self.result_log.messages),
             'clock': self.clock.as_dict(),
             'timer': self.timer.as_dict(),
-            'success_count': self.success_count.total,
-            'health': str(self.health),
-            'failed_count': self.failed_count.total,
             'failed_log': list(self.failed_log.messages),
         }
