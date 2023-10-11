@@ -1,8 +1,8 @@
 import random
 from time import sleep
 
-from robit import Worker
 import robit
+
 
 robit.set_utc_offset(-6)
 
@@ -11,7 +11,7 @@ def function_to_alert_me(**kwargs):
     print(f"{kwargs['alert_message']}")
 
 
-wo = Worker(
+wo = robit.Worker(
     name='Robit Example Worker',
     key='Your-Own-Unique-Worker-Key-That-Is-Secure',
     web_server=True,

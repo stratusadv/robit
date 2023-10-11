@@ -1,5 +1,5 @@
-class RobitConfig:
+class Config:
     UTC_OFFSET = -6
 
 
-config = RobitConfig()
+config = Config()

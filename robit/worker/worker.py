@@ -26,10 +26,6 @@ class Worker:
 
             key: Optional[str] = None,
 
-            monitor_address: Optional[str] = None,
-            monitor_port: int = 8200,
-            monitor_key: Optional[str] = None,
-
             max_thread_workers: int = 2,
 
             alert_method: Optional[Callable] = None,
@@ -51,10 +47,6 @@ class Worker:
                 key=key,
                 html_replace_dict={'title': str(self.name)}
             )
-
-        self.monitor_address = monitor_address
-        self.monitor_port = monitor_port
-        self.monitor_key = monitor_key
 
         if alert_method is not None:
             self.alert = Alert(

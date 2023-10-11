@@ -1,10 +1,10 @@
 import logging
 from robit.worker.worker import Worker
-from robit.config import config
+from robit.config import config as _config
 
 
 def set_utc_offset(utc_offset: int) -> None:
-    config.UTC_OFFSET = utc_offset
+    _config.UTC_OFFSET = utc_offset
 
 
 logging.basicConfig(
