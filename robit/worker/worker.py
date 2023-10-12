@@ -1,9 +1,9 @@
-import logging
 import multiprocessing
+import queue
+import os
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
 from typing import Callable, Optional
-import queue
 
 from robit.core.alert import Alert
 from robit.core.clock import Clock
@@ -25,7 +25,7 @@ class Worker:
 
             key: Optional[str] = None,
 
-            max_thread_workers: int = 2,
+            max_thread_workers: int = os.cpu_count() * 2,
 
             alert_method: Optional[Callable] = None,
             alert_method_kwargs: Optional[dict] = None,

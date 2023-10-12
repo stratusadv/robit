@@ -35,7 +35,28 @@ def function_sleep_for_time(sleep_time: int):
 wo.add_job(
     'Specific Sleep Period Function',
     function_sleep_for_time,
-    method_kwargs={'sleep_time': 6},
+    method_kwargs={'sleep_time': 12},
+    group='Sleeping',
+    cron='* * * * *'
+)
+wo.add_job(
+    'Specific Sleep Period Function',
+    function_sleep_for_time,
+    method_kwargs={'sleep_time': 12},
+    group='Sleeping',
+    cron='* * * * *'
+)
+wo.add_job(
+    'Specific Sleep Period Function',
+    function_sleep_for_time,
+    method_kwargs={'sleep_time': 12},
+    group='Sleeping',
+    cron='* * * * *'
+)
+wo.add_job(
+    'Specific Sleep Period Function',
+    function_sleep_for_time,
+    method_kwargs={'sleep_time': 12},
     group='Sleeping',
     cron='* * * * *'
 )
