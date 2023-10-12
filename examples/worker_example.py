@@ -17,8 +17,6 @@ wo = robit.Worker(
     web_server=True,
     # web_server_address='0.0.0.0',
     # web_server_port=8000,
-    monitor_address='http://127.0.0.1192.:8200',
-    monitor_key='Your-Own-Unique-Monitor-Key-That-Secure',
     # alert_method=function_to_alert_me,
     # alert_health_threshold=99.0,
 )

@@ -11,8 +11,7 @@ from robit.job.group import Group
 from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.name import Name
-from robit.socket.socket import ClientSocket
-from robit.worker.web_server import WorkerWebServer
+from robit.web_server.server import WebServer
 
 
 class Worker:
@@ -37,11 +36,14 @@ class Worker:
         self.queue = queue.Queue()
         self.thread_pool = ThreadPoolExecutor(max_workers=max_thread_workers)
 
+
         self.clock = Clock()
         self.health = Health()
 
+        self.web_server_conn = None
+
         if web_server:
-            self.web_server = WorkerWebServer(
+            self.web_server = WebServer(
                 address=web_server_address,
                 port=web_server_port,
                 key=key,
@@ -116,19 +118,11 @@ class Worker:
             job.status.waiting()
 
     def update_web_server(self):
-        try:
-            client_socket = ClientSocket()
-            logging.warning(f'Connecting to socket {client_socket.host}:{client_socket.port}')
-            client_socket.start()
-            client_socket.send(self.as_dict())
-            client_socket.close()
-            logging.warning(f'Connected to socket {client_socket.host}:{client_socket.port}')
-        except Exception as e:
-            logging.warning(f'Unable to connect to socket -{e}')
+        self.web_server_conn.send(self.as_dict())
 
     def start(self) -> None:
         if self.web_server:
-            # Start the webserver in a different process and send initial data
+            self.web_server_conn, self.web_server.worker_conn = multiprocessing.Pipe()
             multiprocessing.Process(target=self.web_server.start).start()
 
         while True:

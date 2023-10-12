@@ -1,13 +1,15 @@
-from typing import Optional
-from http.server import BaseHTTPRequestHandler
+import json
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
-import threading
 
-from robit.socket.socket import WebServerSocket
 from robit.web_server.utils import html_encode_file
 
 
 class WebRequestHandler(BaseHTTPRequestHandler):
+    api_dict: dict
+    key: str
+    html_replace_dict: dict
+
     def not_found(self) -> None:
         self.wfile.write('Nothing to See Here'.encode("utf8"))
 
@@ -63,8 +65,46 @@ class WebRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-type", content_type)
         self.end_headers()
 
-    def do_GET(self) -> None:
-        pass
+    def do_GET(self):
+        if self.is_in_path_list([self.key, 'worker_api']):
+            self._set_headers()
+            worker_dict = {
+                'id': self.api_dict['id'],
+                'name': self.api_dict['name'],
+                'groups': self.api_dict['groups'],
+                'health': self.api_dict['health'],
+                'clock': self.api_dict['clock'],
+            }
+            self.wfile.write(json.dumps(worker_dict, indent=4).encode("utf8"))
+
+        elif self.is_in_path_list([self.key, 'job_api']):
+            self._set_headers()
+            if len(self.path_list) == 3:
+                job_key = self.path_list[2]
+            elif len(self.path_list) == 2:
+                job_key = self.path_list[1]
+            else:
+                job_key = None
+
+            if job_key:
+                try:
+                    job_dict = {
+                        'job_detail': self.api_dict['job_details'][job_key]
+                    }
+                    self.wfile.write(json.dumps(job_dict, indent=4).encode("utf8"))
+                except KeyError:
+                    pass
+
+        elif self.served_static():
+            pass
+
+        elif self.is_in_path_list([self.key]):
+            self._set_headers()
+            self.wfile.write(html_encode_file('worker.html', replace_dict=self.html_replace_dict))
+
+        else:
+            self._set_headers()
+            self.not_found()
 
     def do_HEAD(self) -> None:
         self._set_headers()
@@ -74,50 +114,3 @@ class WebRequestHandler(BaseHTTPRequestHandler):
         self.not_found()
 
 
-class WebServer:
-    def __init__(
-            self,
-            address: str = 'localhost',
-            port: int = 8000,
-            key: Optional[str] = None,
-            html_replace_dict: Optional[dict] = None
-    ) -> None:
-        self.api_dict = dict()
-        self.post_dict = dict()
-
-        self.address = address
-        self.port = port
-        self.key = key
-
-        self.html_replace_dict = html_replace_dict
-
-    def httpd_serve(self) -> None:
-        pass
-
-    def restart(self) -> None:
-        pass
-
-    def start_socket(self) -> None:
-        socket = WebServerSocket(web_server=self)
-        socket.start()
-        socket.process_requests()
-
-    def start(self) -> None:
-        threading.Thread(target=self.httpd_serve).start()
-        threading.Thread(target=self.start_socket).start()
-
-        href_link = f'http://{self.address}:{self.port}'
-        if self.key:
-            href_link += f'/{self.key}/'
-
-        print(f'Starting httpd server at {href_link}')
-
-        if self.key is None:
-            print(f'We do not recommend running servers with out keys!')
-
-    def stop(self) -> None:
-        pass
-
-    def update_api_dict(self, update_dict: dict) -> None:
-        for key, val in update_dict.items():
-            self.api_dict[key] = val
