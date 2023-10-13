@@ -13,7 +13,7 @@ document.addEventListener('alpine:init', () => {
             this.get_worker_data()
             setInterval(() => {
                 this.get_worker_data()
-            }, 2000)
+            }, 1000)
         },
 
         async get_worker_data() {
