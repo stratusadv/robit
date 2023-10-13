@@ -1,9 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from robit.core.utils import tz_now
 from robit.cron.fields import CronMinuteField, CronHourField, CronDayOfMonthField, CronMonthField, CronDayOfWeekField
-from robit.core.clock import CREATED_DATE_FORMAT
-from robit.config import config
+from robit.core.clock import CREATED_DATE_FORMAT, Clock
 
 
 class Cron:
@@ -13,6 +11,7 @@ class Cron:
         """
         self.cron_syntax = cron_syntax
         self.field_dict: dict = self._parse_cron_field()
+        self.clock = Clock()
 
     def _parse_cron_field(self) -> dict:
         fields = self.cron_syntax.split()
@@ -29,7 +28,7 @@ class Cron:
         }
 
     def next_datetime(self) -> datetime:
-        now = tz_now()
+        now = self.clock.now_tz
         next_dt = now.replace(second=0, microsecond=0)
 
         while True:
