@@ -90,6 +90,7 @@ class Worker:
         self.health.reset()
 
         for group in self.groups.values():
+            group.calculate_health()
             self.health.average(group.health.percentage)
 
     def job_detail_dict(self) -> dict:
