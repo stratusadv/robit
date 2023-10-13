@@ -17,28 +17,22 @@ class Cron:
         fields = self.cron_syntax.split()
         field_length = len(fields)
 
-        if field_length == 5:
-            cron_fields = {
-                'second': CronSecondField('0'),
-                'minute': CronMinuteField(fields[0]),
-                'hour': CronHourField(fields[1]),
-                'day_of_month': CronDayOfMonthField(fields[2]),
-                'month': CronMonthField(fields[3]),
-                'day_of_week': CronDayOfWeekField(fields[4])
-            }
-        elif field_length == 6:
-            cron_fields = {
-                'second': CronSecondField(fields[0]),
-                'minute': CronMinuteField(fields[1]),
-                'hour': CronHourField(fields[2]),
-                'day_of_month': CronDayOfMonthField(fields[3]),
-                'month': CronMonthField(fields[4]),
-                'day_of_week': CronDayOfWeekField(fields[5])
-            }
-        else:
+        if field_length not in [5, 6]:
             raise ValueError('Invalid cron string format')
 
-        return cron_fields
+        if field_length == 5:
+            fields[:0] = '0'
+
+        print(fields)
+
+        return {
+            'second': CronSecondField(fields[0]),
+            'minute': CronMinuteField(fields[1]),
+            'hour': CronHourField(fields[2]),
+            'day_of_month': CronDayOfMonthField(fields[3]),
+            'month': CronMonthField(fields[4]),
+            'day_of_week': CronDayOfWeekField(fields[5])
+        }
 
     def next_datetime(self) -> datetime:
         now = self.clock.now_tz
