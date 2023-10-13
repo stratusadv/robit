@@ -1,4 +1,4 @@
-from robit.core.utils import tz_now
+from robit.core.clock import Clock
 
 
 class Timer:
@@ -19,6 +19,8 @@ class Timer:
         self.shortest_duration = 0.0
         self.longest_duration = 0.0
 
+        self.clock = Clock()
+
     def as_dict(self) -> dict:
         return {
             'average_duration': f'{self.average_duration:,.{self.duration_decimal_places}f}',
@@ -35,10 +37,10 @@ class Timer:
             self.average_duration = total_duration / len(self.duration_list)
 
     def start(self) -> None:
-        self.timer = tz_now()
+        self.timer = self.clock.now_tz
 
     def stop(self) -> None:
-        duration = (tz_now() - self.timer).total_seconds()
+        duration = (self.clock.now_tz - self.timer).total_seconds()
 
         self.last_duration = duration
         self.duration_list.insert(0, duration)

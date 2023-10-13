@@ -4,7 +4,6 @@ from typing import Callable, Optional
 from robit.core.alert import Alert
 from robit.core.clock import Clock, CREATED_DATE_FORMAT
 from robit.core.counter import Counter
-from robit.core.utils import tz_now
 from robit.cron.cron import Cron
 from robit.core.health import Health
 from robit.core.id import Id
@@ -80,7 +79,7 @@ class Job:
         self.next_run_datetime = self.cron.next_datetime()
 
     def should_run(self) -> bool:
-        return tz_now() > self.next_run_datetime
+        return self.clock.now_tz > self.next_run_datetime
 
     def run(self) -> None:
         self.status.running()

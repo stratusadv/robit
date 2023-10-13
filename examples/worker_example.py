@@ -39,26 +39,13 @@ wo.add_job(
     group='Sleeping',
     cron='* * * * *'
 )
+
 wo.add_job(
-    'Specific Sleep Period Function',
+    'Sleep 2 Seconds Function Every 5 Seconds',
     function_sleep_for_time,
-    method_kwargs={'sleep_time': 12},
+    method_kwargs={'sleep_time': 2},
     group='Sleeping',
-    cron='* * * * *'
-)
-wo.add_job(
-    'Specific Sleep Period Function',
-    function_sleep_for_time,
-    method_kwargs={'sleep_time': 12},
-    group='Sleeping',
-    cron='* * * * *'
-)
-wo.add_job(
-    'Specific Sleep Period Function',
-    function_sleep_for_time,
-    method_kwargs={'sleep_time': 12},
-    group='Sleeping',
-    cron='* * * * *'
+    cron='*/5 * * * * *'
 )
 
 wo.add_job(
@@ -106,7 +93,7 @@ def function_full_speed():
     return f'Max multiplication result of {x:,}'
 
 
-# wo.add_job('Lower Delay Function', function_full_speed, group='Rapid Execution', cron='30 * * * * *')
+wo.add_job('Lower Delay Function', function_full_speed, group='Rapid Execution', cron='30 * * * * *')
 
 
 if __name__ == '__main__':

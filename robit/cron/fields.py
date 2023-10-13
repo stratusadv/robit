@@ -37,6 +37,16 @@ class CronField(ABC):
         return CronFieldIdentifier(self.value).identify()
 
 
+class CronSecondField(CronField):
+    value_range: range = range(0, 60)
+
+    def increment_datetime(self, dt: datetime) -> datetime:
+        return dt + timedelta(seconds=1)
+
+    def is_valid_dt(self, dt: datetime) -> bool:
+        return dt.second in self.possible_values
+
+
 class CronMinuteField(CronField):
     value_range: range = range(0, 60)
 

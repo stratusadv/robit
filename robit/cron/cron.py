@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from robit.cron.fields import CronMinuteField, CronHourField, CronDayOfMonthField, CronMonthField, CronDayOfWeekField
+from robit.cron.fields import CronSecondField, CronMinuteField, CronHourField, CronDayOfMonthField, CronMonthField, CronDayOfWeekField
 from robit.core.clock import CREATED_DATE_FORMAT, Clock
 
 
@@ -15,17 +15,30 @@ class Cron:
 
     def _parse_cron_field(self) -> dict:
         fields = self.cron_syntax.split()
+        field_length = len(fields)
 
-        if len(fields) != 5:
-            raise ValueError("Invalid cron string format")
+        if field_length == 5:
+            cron_fields = {
+                'second': CronSecondField('0'),
+                'minute': CronMinuteField(fields[0]),
+                'hour': CronHourField(fields[1]),
+                'day_of_month': CronDayOfMonthField(fields[2]),
+                'month': CronMonthField(fields[3]),
+                'day_of_week': CronDayOfWeekField(fields[4])
+            }
+        elif field_length == 6:
+            cron_fields = {
+                'second': CronSecondField(fields[0]),
+                'minute': CronMinuteField(fields[1]),
+                'hour': CronHourField(fields[2]),
+                'day_of_month': CronDayOfMonthField(fields[3]),
+                'month': CronMonthField(fields[4]),
+                'day_of_week': CronDayOfWeekField(fields[5])
+            }
+        else:
+            raise ValueError('Invalid cron string format')
 
-        return {
-            "minute": CronMinuteField(fields[0]),
-            "hour": CronHourField(fields[1]),
-            "day_of_month": CronDayOfMonthField(fields[2]),
-            "month": CronMonthField(fields[3]),
-            "day_of_week": CronDayOfWeekField(fields[4])
-        }
+        return cron_fields
 
     def next_datetime(self) -> datetime:
         now = self.clock.now_tz
@@ -46,7 +59,7 @@ class Cron:
                     return next_dt
                 else:
                     # Increment the minute field and try again.
-                    next_dt = self.field_dict['minute'].increment_datetime(next_dt)
+                    next_dt = self.field_dict['second'].increment_datetime(next_dt)
 
     def next_datetime_verbose(self) -> str:
         return self.next_datetime().strftime(CREATED_DATE_FORMAT)
