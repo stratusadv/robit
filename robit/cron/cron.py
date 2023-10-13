@@ -23,8 +23,6 @@ class Cron:
         if field_length == 5:
             fields[:0] = '0'
 
-        print(fields)
-
         return {
             'second': CronSecondField(fields[0]),
             'minute': CronMinuteField(fields[1]),
