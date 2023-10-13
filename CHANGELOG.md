@@ -1,3 +1,11 @@
+## v0.4.0
+
+#### Features
+
+#### Changes
+
+#### Bug Fixes
+
 ## v0.3.3
 
 #### Features
