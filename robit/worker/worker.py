@@ -78,14 +78,6 @@ class Worker:
             'job_details': self.job_detail_dict()
         }
 
-    def as_dict_to_monitor(self) -> dict:
-        return {
-            'id': str(self.id),
-            'name': str(self.name),
-            'health': str(self.health),
-            'clock': self.clock.as_dict(),
-        }
-
     def calculate_health(self) -> None:
         self.health.reset()
 
