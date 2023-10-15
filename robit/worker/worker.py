@@ -1,4 +1,5 @@
 import atexit
+import logging
 import multiprocessing
 import queue
 import os
@@ -10,6 +11,7 @@ from robit.core.alert import Alert
 from robit.core.clock import Clock
 from robit.core.counter import Counter
 from robit.job.group import Group
+from robit.job.enums import JobStatus
 from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.name import Name
@@ -31,6 +33,7 @@ class Worker:
 
             alert_method: Optional[Callable] = None,
             alert_method_kwargs: Optional[dict] = None,
+            alert_health_threshold: float = 95.0,
     ):
         self.id = Id()
         self.name = Name(name)
@@ -58,7 +61,8 @@ class Worker:
         if alert_method is not None:
             self.alert = Alert(
                 method=alert_method,
-                method_kwargs=alert_method_kwargs
+                method_kwargs=alert_method_kwargs,
+                health_threshold=alert_health_threshold
             )
         else:
             self.alert = None
@@ -102,8 +106,8 @@ class Worker:
         ready_jobs = [job for group in self.groups.values() for job in group.job_list if job.should_run()]
         for job in ready_jobs:
             self.queue.put(job)
+            job.status = JobStatus.WAIT
             job.set_next_run_datetime()
-            job.status.waiting()
 
     def update_web_server(self):
         self.web_server_conn.send(self.as_dict())
@@ -127,6 +131,7 @@ class Worker:
             sleep(1)
 
     def stop(self):
+        logging.warning(f'STOPPING: Worker "{self.name}" is being stopped')
         self.web_server_process.terminate()
         self.web_server_process.join()
 

@@ -11,8 +11,7 @@ from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.log import Log
 from robit.core.name import Name
-from robit.job import Group
-from robit.status import Status
+from robit.job import Group, JobStatus
 from robit.timer import Timer, timing_decorator
 
 
@@ -25,16 +24,15 @@ class Job:
             method: Callable,
             method_kwargs: Optional[dict] = None,
             cron: str = '* * * * *',
-            execution_type: str = 'thread',
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
+            alert_health_threshold: float = 95.0
     ) -> None:
         self.worker = worker
         self.group = group
         self.id = Id()
         self.name = Name(name)
         self.method = method
-        self.execution_type = execution_type
 
         if method_kwargs is None:
             self.method_kwargs = dict()
@@ -45,21 +43,21 @@ class Job:
                 raise ValueError(
                     f'Job method kwargs contains reserved argument "worker". This argument is provided to all jobs for access the worker object.')
 
-
         self.cron = Cron(cron_syntax=cron)
         self.next_run_datetime = self.cron.next_datetime()
 
         if alert_method is not None:
             self.alert = Alert(
                 method=alert_method,
-                method_kwargs=alert_method_kwargs
+                method_kwargs=alert_method_kwargs,
+                health_threshold=alert_health_threshold,
             )
         else:
             self.alert = None
 
         self.clock = Clock()
         self.timer = Timer()
-        self.status = Status()
+        self.status = JobStatus.QUEUED
 
         self.success_count = Counter()
         self.failed_count = Counter()
@@ -92,38 +90,47 @@ class Job:
         self.next_run_datetime = self.cron.next_datetime()
 
     def should_run(self) -> bool:
-        return self.clock.now_tz > self.next_run_datetime
+        if self.status == JobStatus.QUEUED or self.status == JobStatus.ERROR:
+            return self.clock.now_tz > self.next_run_datetime
+        else:
+            return False
 
     def run(self) -> None:
-        self.status.running()
+        self.status = JobStatus.RUN
 
         logging.warning(f'STARTING: Job "{self.name}"')
 
         try:
-            method_result = self.execute_method()
-            logging.warning(f'SUCCESS: Job "{self.name}" completed')
-
-            self.success_count.increase()
-            self.group.success_count.increase()
-            self.worker.success_count.increase()
-            self.health.add_positive()
-
-            if method_result:
-                self.result_log.add_message(str(method_result))
-
-            self.status.queued()
+            self.run_method()
         except Exception as e:
-            self.status.error()
-            failed_message = f'ERROR: Job "{self.name}" failed on exception "{e}"'
-            logging.warning(failed_message)
-            self.failed_log.add_message(failed_message)
-            self.failed_count.increase()
-            self.group.failed_count.increase()
-            self.worker.failed_count.increase()
-            self.health.add_negative()
+            self.handle_run_exception(e)
 
         if self.alert:
             self.alert.check_health_threshold(f'Job "{self.name}"', self.health)
+
+    def run_method(self) -> None:
+        method_result = self.execute_method()
+        logging.warning(f'SUCCESS: Job "{self.name}" completed')
+
+        self.success_count.increase()
+        self.group.success_count.increase()
+        self.worker.success_count.increase()
+        self.health.add_positive()
+
+        if method_result:
+            self.result_log.add_message(str(method_result))
+
+        self.status = JobStatus.QUEUED
+
+    def handle_run_exception(self, e) -> None:
+        self.status = JobStatus.ERROR
+        failed_message = f'ERROR: Job "{self.name}" failed on exception "{e}"'
+        logging.warning(failed_message)
+        self.failed_log.add_message(failed_message)
+        self.failed_count.increase()
+        self.group.failed_count.increase()
+        self.worker.failed_count.increase()
+        self.health.add_negative()
 
     def as_dict(self) -> dict:
         return {

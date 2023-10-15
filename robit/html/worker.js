@@ -17,14 +17,14 @@ document.addEventListener('alpine:init', () => {
         },
 
         async get_worker_data() {
-            let response = await fetch("worker_api/");
+            let response = await fetch("api/worker/");
             let responseText = await response.text();
             this.data = JSON.parse(responseText)
             console.log(this.data)
         },
 
         async get_job_details(id) {
-            let response = await fetch("job_api/" + id);
+            let response = await fetch("api/job/" + id);
             let job = document.getElementById("job-" + id)
             if (job.style.display === 'block') {
                 job.style.display = 'none'

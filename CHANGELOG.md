@@ -1,13 +1,19 @@
 ## v0.4.0
 
 #### Features
-All jobs can now access the worker object through the kwargs dictionary of any method in a job.
+- All jobs can now access the worker object through the kwargs dictionary of any method in a job.
+- Added alerts that allow you to have a method called when the health of the worker drops below a certain health threshold.
 
 #### Changes
+- Updated the web server api to now give more information.
+    - /your-key/api/ - Provides basic worker information.
+    - /your-key/api/worker/ - Provides worker and group information.
+    - /your-kwy/api/job/id/ - Provide detailed job information.
 
 #### Bug Fixes
-Proper exit for all processes.
-Job execution is now at the right second.
+- Proper exit for all processes.
+- Job execution is now at the right second.
+- Fixed job status to properly manage job execution from getting stuck in an infinite run cycle.
 
 ## v0.3.3
 

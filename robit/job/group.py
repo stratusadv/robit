@@ -34,7 +34,7 @@ class Group:
             self.alert = Alert(
                 method=alert_method,
                 method_kwargs=alert_method_kwargs,
-                health_threshold=alert_health_threshold
+                health_threshold=alert_health_threshold,
             )
         else:
             self.alert = None

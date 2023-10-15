@@ -66,7 +66,7 @@ class WebRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        if self.is_in_path_list([self.key, 'worker_api']):
+        if self.is_in_path_list([self.key, 'api', 'worker']):
             self._set_headers()
             worker_dict = {
                 'id': self.api_dict['id'],
@@ -74,15 +74,15 @@ class WebRequestHandler(BaseHTTPRequestHandler):
                 'groups': self.api_dict['groups'],
                 'health': self.api_dict['health'],
                 'clock': self.api_dict['clock'],
+                'success_count': self.api_dict['success_count'],
+                'failed_count': self.api_dict['failed_count'],
             }
             self.wfile.write(json.dumps(worker_dict, indent=4).encode("utf8"))
 
-        elif self.is_in_path_list([self.key, 'job_api']):
+        elif self.is_in_path_list([self.key, 'api', 'job']):
             self._set_headers()
-            if len(self.path_list) == 3:
-                job_key = self.path_list[2]
-            elif len(self.path_list) == 2:
-                job_key = self.path_list[1]
+            if len(self.path_list) == 4:
+                job_key = self.path_list[3]
             else:
                 job_key = None
 
@@ -94,6 +94,19 @@ class WebRequestHandler(BaseHTTPRequestHandler):
                     self.wfile.write(json.dumps(job_dict, indent=4).encode("utf8"))
                 except KeyError:
                     pass
+
+        elif self.is_in_path_list([self.key, 'api']):
+            self._set_headers()
+            worker_dict = {
+                'id': self.api_dict['id'],
+                'name': self.api_dict['name'],
+                'health': self.api_dict['health'],
+                'clock': self.api_dict['clock'],
+                'success_count': self.api_dict['success_count'],
+                'failed_count': self.api_dict['failed_count'],
+            }
+            self.wfile.write(json.dumps(worker_dict, indent=4).encode("utf8"))
+
 
         elif self.served_static():
             pass
