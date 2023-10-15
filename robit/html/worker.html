@@ -86,6 +86,7 @@
                                                                         class="h6"
                                                                         :class="{
                                                                             'text-status-running': job.status === 'Running',
+                                                                            'text-status-retrying': job.status === 'Retrying',
                                                                             'text-status-error': job.status === 'Error',
                                                                             'text-status-waiting': job.status === 'Queued'
                                                                         }"

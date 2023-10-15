@@ -65,6 +65,10 @@
     color: #009900 !important;
 }
 
+.text-status-retrying {
+    color: #999900 !important;
+}
+
 .text-status-waiting {
     color: #666666 !important;
 }

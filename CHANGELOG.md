@@ -3,12 +3,14 @@
 #### Features
 - All jobs can now access the worker object through the kwargs dictionary of any method in a job.
 - Added alerts that allow you to have a method called when the health of the worker drops below a certain health threshold.
+- Jobs now support retries. 
+  - Use the retry_attempts argument when adding a job.
 
 #### Changes
 - Updated the web server api to now give more information.
-    - /your-key/api/ - Provides basic worker information.
-    - /your-key/api/worker/ - Provides worker and group information.
-    - /your-kwy/api/job/id/ - Provide detailed job information.
+  - /your-key/api/ - Provides basic worker information.
+  - /your-key/api/worker/ - Provides worker and group information.
+  - /your-kwy/api/job/id/ - Provide detailed job information.
 
 #### Bug Fixes
 - Proper exit for all processes.

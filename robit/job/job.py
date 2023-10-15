@@ -26,7 +26,8 @@ class Job:
             cron: str = '* * * * *',
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
-            alert_health_threshold: float = 95.0
+            alert_health_threshold: float = 95.0,
+            retry_attempts: int = 0
     ) -> None:
         self.worker = worker
         self.group = group
@@ -67,6 +68,8 @@ class Job:
 
         self.result_log = Log(max_messages=10)
 
+        self.retry_attempts = retry_attempts
+
     @timing_decorator
     def execute_method(self):
         if 'worker' in inspect.getfullargspec(self.method).args:
@@ -97,13 +100,18 @@ class Job:
 
     def run(self) -> None:
         self.status = JobStatus.RUN
-
         logging.warning(f'STARTING: Job "{self.name}"')
 
-        try:
-            self.run_method()
-        except Exception as e:
-            self.handle_run_exception(e)
+        for attempt in range(self.retry_attempts + 1):
+            try:
+                self.run_method()
+                break
+            except Exception as e:
+                if attempt >= self.retry_attempts:
+                    self.handle_run_exception(e)
+                else:
+                    self.status = JobStatus.RETRY
+                    logging.warning(f'RETRYING: Job "{self.name}" after failing on exception "{e}" attempt {attempt + 1} of {self.retry_attempts}.')
 
         if self.alert:
             self.alert.check_health_threshold(f'Job "{self.name}"', self.health)
