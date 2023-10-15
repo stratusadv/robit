@@ -96,5 +96,12 @@ def function_full_speed():
 wo.add_job('Lower Delay Function', function_full_speed, group='Rapid Execution', cron='* * * * * *')
 
 
+def function_send_worker_information(worker: robit.Worker):
+    return f'Worker Success Count: {worker.success_count}'
+
+
+wo.add_job('Send Worker Information', function_send_worker_information, group='Webhooks Or Database Update', cron='*/30 * * * * *')
+
+
 if __name__ == '__main__':
     wo.start()

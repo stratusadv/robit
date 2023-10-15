@@ -1,6 +1,8 @@
+import inspect
 import logging
 from typing import Callable, Optional
 
+from robit import Worker
 from robit.core.alert import Alert
 from robit.core.clock import Clock, CREATED_DATE_FORMAT
 from robit.core.counter import Counter
@@ -9,6 +11,7 @@ from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.log import Log
 from robit.core.name import Name
+from robit.job import Group
 from robit.status import Status
 from robit.timer import Timer, timing_decorator
 
@@ -16,6 +19,8 @@ from robit.timer import Timer, timing_decorator
 class Job:
     def __init__(
             self,
+            worker: Worker,
+            group: Group,
             name: str,
             method: Callable,
             method_kwargs: Optional[dict] = None,
@@ -24,6 +29,8 @@ class Job:
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
     ) -> None:
+        self.worker = worker
+        self.group = group
         self.id = Id()
         self.name = Name(name)
         self.method = method
@@ -33,6 +40,11 @@ class Job:
             self.method_kwargs = dict()
         else:
             self.method_kwargs = method_kwargs
+
+            if 'worker' in self.method_kwargs:
+                raise ValueError(
+                    f'Job method kwargs contains reserved argument "worker". This argument is provided to all jobs for access the worker object.')
+
 
         self.cron = Cron(cron_syntax=cron)
         self.next_run_datetime = self.cron.next_datetime()
@@ -59,10 +71,11 @@ class Job:
 
     @timing_decorator
     def execute_method(self):
-        if self.method_kwargs:
-            method_result = self.method(**self.method_kwargs)
+        if 'worker' in inspect.getfullargspec(self.method).args:
+            method_result = self.method(worker=self.worker, **self.method_kwargs)
         else:
-            method_result = self.method()
+            method_result = self.method(**self.method_kwargs)
+
         return method_result
 
     @property
@@ -70,7 +83,7 @@ class Job:
         if self.method_kwargs:
             return f'{self.method.__name__}(kwargs={self.method_kwargs})'
         else:
-            return f'{ self.method.__name__ }()'
+            return f'{self.method.__name__}()'
 
     def next_run_datetime_verbose(self) -> str:
         return self.next_run_datetime.strftime(CREATED_DATE_FORMAT)
@@ -91,6 +104,8 @@ class Job:
             logging.warning(f'SUCCESS: Job "{self.name}" completed')
 
             self.success_count.increase()
+            self.group.success_count.increase()
+            self.worker.success_count.increase()
             self.health.add_positive()
 
             if method_result:
@@ -103,6 +118,8 @@ class Job:
             logging.warning(failed_message)
             self.failed_log.add_message(failed_message)
             self.failed_count.increase()
+            self.group.failed_count.increase()
+            self.worker.failed_count.increase()
             self.health.add_negative()
 
         if self.alert:
@@ -114,8 +131,8 @@ class Job:
             'name': str(self.name),
             'status': str(self.status),
             'next_run_datetime': self.next_run_datetime_verbose(),
-            'success_count': self.success_count.total,
             'health': str(self.health),
+            'success_count': self.success_count.total,
             'failed_count': self.failed_count.total,
         }
 

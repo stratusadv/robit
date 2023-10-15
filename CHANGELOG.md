@@ -1,10 +1,13 @@
 ## v0.4.0
 
 #### Features
+All jobs can now access the worker object through the kwargs dictionary of any method in a job.
 
 #### Changes
 
 #### Bug Fixes
+Proper exit for all processes.
+Job execution is now at the right second.
 
 ## v0.3.3
 

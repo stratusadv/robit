@@ -1,3 +1,4 @@
+import atexit
 import multiprocessing
 import queue
 import os
@@ -7,6 +8,7 @@ from typing import Callable, Optional
 
 from robit.core.alert import Alert
 from robit.core.clock import Clock
+from robit.core.counter import Counter
 from robit.job.group import Group
 from robit.core.health import Health
 from robit.core.id import Id
@@ -36,11 +38,14 @@ class Worker:
         self.queue = queue.Queue()
         self.thread_pool = ThreadPoolExecutor(max_workers=max_thread_workers)
 
-
         self.clock = Clock()
         self.health = Health()
 
-        self.web_server_conn = None
+        self.success_count = Counter()
+        self.failed_count = Counter()
+
+        self.web_server_conn: multiprocessing.Pipe = ...
+        self.web_server_process: multiprocessing.Process = ...
 
         if web_server:
             self.web_server = WebServer(
@@ -62,21 +67,11 @@ class Worker:
 
     def add_group(self, name: str, **kwargs) -> None:
         if name not in self.groups:
-            self.groups[name] = Group(name=name, **kwargs)
+            self.groups[name] = Group(worker=self, name=name, **kwargs)
 
     def add_job(self, name: str, method: Callable, group: str = 'Unnamed Group', **kwargs) -> None:
         self.add_group(group)
         self.groups[group].add_job(name, method, **kwargs)
-
-    def as_dict(self) -> dict:
-        return {
-            'id': str(self.id),
-            'name': str(self.name),
-            'groups': [group.as_dict() for group in self.groups.values()],
-            'health': str(self.health),
-            'clock': self.clock.as_dict(),
-            'job_details': self.job_detail_dict()
-        }
 
     def calculate_health(self) -> None:
         self.health.reset()
@@ -116,7 +111,10 @@ class Worker:
     def start(self) -> None:
         if self.web_server:
             self.web_server_conn, self.web_server.worker_conn = multiprocessing.Pipe()
-            multiprocessing.Process(target=self.web_server.start).start()
+            self.web_server_process = multiprocessing.Process(target=self.web_server.start)
+            self.web_server_process.start()
+
+        atexit.register(self.stop)
 
         while True:
             # Continually adds ready jobs to the queue
@@ -129,4 +127,18 @@ class Worker:
             sleep(1)
 
     def stop(self):
-        pass
+        self.web_server_process.terminate()
+        self.web_server_process.join()
+
+    def as_dict(self) -> dict:
+        return {
+            'id': str(self.id),
+            'name': str(self.name),
+            'groups': [group.as_dict() for group in self.groups.values()],
+            'health': str(self.health),
+            'clock': self.clock.as_dict(),
+            'success_count': self.success_count.total,
+            'failed_count': self.failed_count.total,
+            'job_details': self.job_detail_dict()
+        }
+
