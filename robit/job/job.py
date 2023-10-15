@@ -111,7 +111,7 @@ class Job:
                     self.handle_run_exception(e)
                 else:
                     self.status = JobStatus.RETRY
-                    logging.warning(f'RETRYING: Job "{self.name}" after failing on exception "{e}" attempt {attempt + 1} of {self.retry_attempts}.')
+                    logging.warning(f'RETRYING: Job "{self.name}" after failing on exception "{e}" attempt {attempt + 1} of {self.retry_attempts}')
 
         if self.alert:
             self.alert.check_health_threshold(f'Job "{self.name}"', self.health)

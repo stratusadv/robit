@@ -29,11 +29,11 @@ from time import sleep
 import robit
 
 
-# robit.set_utc_offset(-4)
+robit.set_utc_offset(-6)
 
 
 def function_to_alert_me(**kwargs):
-    print(f"{kwargs['alert_message']}")
+    print(f"ALARM !!!! {kwargs['alert_message']}")
 
 
 wo = robit.Worker(
@@ -42,8 +42,8 @@ wo = robit.Worker(
     web_server=True,
     # web_server_address='0.0.0.0',
     # web_server_port=8000,
-    # alert_method=function_to_alert_me,
-    # alert_health_threshold=99.0,
+    alert_method=function_to_alert_me,
+    alert_health_threshold=99.0,
 )
 
 
@@ -54,15 +54,15 @@ def function_sleep_short():
 
 def function_sleep_for_time(sleep_time: int):
     sleep(sleep_time)
-    return 'Slept for 6 seconds'
+    return f'Slept for {sleep_time} seconds'
 
 
 wo.add_job(
     'Specific Sleep Period Function',
     function_sleep_for_time,
-    method_kwargs={'sleep_time': 12},
+    method_kwargs={'sleep_time': 5},
     group='Sleeping',
-    cron='* * * * *'
+    cron='* * * * *',
 )
 
 wo.add_job(
@@ -70,20 +70,20 @@ wo.add_job(
     function_sleep_for_time,
     method_kwargs={'sleep_time': 3},
     group='Sleeping',
-    cron='*/5 * * * * *'
+    cron='*/5 * * * * *',
 )
 
 wo.add_job(
     'Sleep for Short Period',
     function_sleep_short,
     group='Sleeping',
-    cron='*/2 * * * *'
+    cron='*/2 * * * *',
 )
 
 
 def function_random_fail_often():
-    # if 1 == random.randint(1,2):
-    division_by_zero = 5 / 0
+    if 3 <= random.randint(1,4):
+        division_by_zero = 5 / 0
     sleep(4)
     return 'No Error'
 
@@ -99,26 +99,39 @@ wo.add_job(
     'A Function that Fails',
     function_random_fail_often,
     group='Failing',
-    cron='* * * * *'
+    cron='*/10 * * * * *',
+    retry_attempts=4,
 )
 
 wo.add_job(
     'Might Fail Some Times',
     function_random_fail_rare,
     group='Failing',
-    cron='* * * * *'
+    cron='* * * * *',
 )
 
 
 def function_full_speed():
     x = int()
-    for i in range(100000):
+    for i in range(99999999):
         x = i * i
     sleep(1)
     return f'Max multiplication result of {x:,}'
 
 
-wo.add_job('Lower Delay Function', function_full_speed, group='Rapid Execution', cron='* * * * * *')
+wo.add_job(
+    'Lower Delay Function',
+    function_full_speed,
+    group='Rapid Execution',
+    cron='* * * * * *',
+)
+
+
+def function_send_worker_information(worker: robit.Worker):
+    return f'Worker Success Count: {worker.success_count}'
+
+
+wo.add_job('Send Worker Information', function_send_worker_information, group='Webhooks Or Database Update', cron='*/30 * * * * *')
 
 
 if __name__ == '__main__':

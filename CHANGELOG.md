@@ -13,7 +13,7 @@
   - /your-kwy/api/job/id/ - Provide detailed job information.
 
 #### Bug Fixes
-- Proper exit for all processes.
+- Better handling for exiting all processes.
 - Job execution is now at the right second.
 - Fixed job status to properly manage job execution from getting stuck in an infinite run cycle.
 
