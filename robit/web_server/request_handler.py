@@ -107,7 +107,6 @@ class WebRequestHandler(BaseHTTPRequestHandler):
             }
             self.wfile.write(json.dumps(worker_dict, indent=4).encode("utf8"))
 
-
         elif self.served_static():
             pass
 

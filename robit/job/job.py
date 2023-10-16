@@ -2,7 +2,6 @@ import inspect
 import logging
 from typing import Callable, Optional
 
-from robit import Worker
 from robit.core.alert import Alert
 from robit.core.clock import Clock, CREATED_DATE_FORMAT
 from robit.core.counter import Counter
@@ -11,15 +10,15 @@ from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.log import Log
 from robit.core.name import Name
-from robit.job import Group, JobStatus
+from robit.job import JobStatus
 from robit.timer import Timer, timing_decorator
 
 
 class Job:
     def __init__(
             self,
-            worker: Worker,
-            group: Group,
+            worker: 'Worker',
+            group: 'Group',
             name: str,
             method: Callable,
             method_kwargs: Optional[dict] = None,
@@ -112,6 +111,8 @@ class Job:
                 else:
                     self.status = JobStatus.RETRY
                     logging.warning(f'RETRYING: Job "{self.name}" after failing on exception "{e}" attempt {attempt + 1} of {self.retry_attempts}')
+        else:
+            logging.warning(f'CRITICAL ERROR: Job "{self.name}" failed to run and produced no exceptions')
 
         if self.alert:
             self.alert.check_health_threshold(f'Job "{self.name}"', self.health)

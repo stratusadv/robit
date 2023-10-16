@@ -1,3 +1,8 @@
+## v0.4.1
+
+#### Bug Fixes
+- Fixed weird circular import that appears in certain versions of python.
+
 ## v0.4.0
 
 #### Features

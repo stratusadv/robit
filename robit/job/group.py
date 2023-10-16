@@ -1,6 +1,5 @@
 from typing import Callable
 
-from robit import Worker
 from robit.core.alert import Alert
 from robit.core.clock import Clock
 from robit.core.counter import Counter
@@ -13,7 +12,7 @@ from robit.core.name import Name
 class Group:
     def __init__(
             self,
-            worker: Worker,
+            worker: 'Worker',
             name: str = 'Unnamed Group',
             alert_method: Callable = None,
             alert_method_kwargs: dict = None,
