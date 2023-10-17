@@ -102,7 +102,6 @@ class CronRangeFinder:
             raise ValueError(
                 f'Start value is not withing the range {self.cron_field.value_range.start} to {self.cron_field.value_range.stop}.')
 
-        print(end_value)
         if end_value not in self.cron_field.value_range:
             raise ValueError(f'End value is not withing the range {self.cron_field.value_range.start} to {self.cron_field.value_range.stop}.')
 
