@@ -127,7 +127,9 @@ class Job:
         self.health.add_positive()
 
         if method_result:
-            self.result_log.add_message(str(method_result))
+            self.result_log.add_message(str(method_result).replace('"', '').replace("'", ""))
+        else:
+            self.result_log.add_message('No result provided')
 
         self.status = JobStatus.QUEUED
 

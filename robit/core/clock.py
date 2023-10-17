@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 
 from robit.config import config
 
+import pytz
+
 CREATED_DATE_FORMAT = '%b %d, %Y at %I:%M:%S %p'
 
 
@@ -26,7 +28,7 @@ class Clock:
 
     @property
     def now_tz(self) -> datetime:
-        return (datetime.utcnow() + timedelta(hours=config.UTC_OFFSET)).replace(microsecond=0)
+        return datetime.now(pytz.timezone(config.TIMEZONE)).replace(microsecond=0)
 
     @property
     def now_tz_verbose(self) -> str:

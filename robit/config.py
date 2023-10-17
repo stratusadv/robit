@@ -1,5 +1,5 @@
 class Config:
-    UTC_OFFSET = -6
+    TIMEZONE: str = 'UTC'
 
 
 config = Config()

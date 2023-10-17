@@ -1,3 +1,15 @@
+## v0.4.2
+
+#### Features
+- Added pytz to the project to provide support for daylight savings, timezones and all the other date goodness.
+
+#### Changes
+- Default timezone is now set to 'UTC'.
+- Updated setup to include pytz as a dependency.
+
+#### Bug Fixes
+- Removed a default causing dates to set to UTC for mountain standard time.
+
 ## v0.4.1
 
 #### Bug Fixes

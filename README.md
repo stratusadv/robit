@@ -8,9 +8,9 @@ A robot for your bits!
 
 ## Features
 
-- Lightweight (no installed dependencies)
+- Lightweight (one installed dependencies pytz which is also lightweight)
 - Can run with monitoring interface or headless
-- Very simple and easy to setup and configure 
+- Very simple and easy to set up and configure 
 
 ### Interface
 
@@ -145,6 +145,6 @@ The server will start and host a web portal on default port 8100 locally for you
 
 - Boostrap (Responsive UI)
 - Alpine (Better UX)
-
+- PyTZ (Awesome Time Zone Management)
 
 

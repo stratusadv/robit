@@ -20,7 +20,6 @@ document.addEventListener('alpine:init', () => {
             let response = await fetch("api/worker/");
             let responseText = await response.text();
             this.data = JSON.parse(responseText)
-            console.log(this.data)
         },
 
         async get_job_details(id) {

@@ -4,7 +4,7 @@ from time import sleep
 import robit
 
 
-robit.set_utc_offset(-6)
+robit.set_time_zone('America/Edmonton')
 
 
 def function_to_alert_me(**kwargs):
