@@ -99,7 +99,7 @@ class Job:
 
     def run(self) -> None:
         self.status = JobStatus.RUN
-        logging.warning(f'STARTING: Job "{self.name}"')
+        logging.debug(f'STARTING: Job "{self.name}"')
 
         for attempt in range(self.retry_attempts + 1):
             try:
@@ -112,14 +112,14 @@ class Job:
                     self.status = JobStatus.RETRY
                     logging.warning(f'RETRYING: Job "{self.name}" after failing on exception "{e}" attempt {attempt + 1} of {self.retry_attempts}')
         else:
-            logging.warning(f'CRITICAL ERROR: Job "{self.name}" failed to run and produced no exceptions')
+            logging.error(f'CRITICAL: Job "{self.name}" failed to run and produced no exceptions')
 
         if self.alert:
             self.alert.check_health_threshold(f'Job "{self.name}"', self.health)
 
     def run_method(self) -> None:
         method_result = self.execute_method()
-        logging.warning(f'SUCCESS: Job "{self.name}" completed')
+        logging.debug(f'SUCCESS: Job "{self.name}" completed')
 
         self.success_count.increase()
         self.group.success_count.increase()
@@ -135,8 +135,8 @@ class Job:
 
     def handle_run_exception(self, e) -> None:
         self.status = JobStatus.ERROR
-        failed_message = f'ERROR: Job "{self.name}" failed on exception "{e}"'
-        logging.warning(failed_message)
+        failed_message = f'FAILURE: Job "{self.name}" failed on exception "{e}"'
+        logging.error(failed_message)
         self.failed_log.add_message(failed_message)
         self.failed_count.increase()
         self.group.failed_count.increase()

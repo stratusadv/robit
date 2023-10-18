@@ -39,5 +39,5 @@ class Alert:
                     self.last_message_datetime = self.clock.now_tz
                     logging.warning(alert_message)
                 except Exception as e:
-                    failed_message = f'ERROR: Alert method failed on exception "{e}"'
-                    logging.warning(failed_message)
+                    failed_message = f'FAILURE: Alert method failed on exception "{e}"'
+                    logging.error(failed_message)

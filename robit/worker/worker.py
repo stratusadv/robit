@@ -113,22 +113,25 @@ class Worker:
         self.web_server_conn.send(self.as_dict())
 
     def start(self) -> None:
-        if self.web_server:
-            self.web_server_conn, self.web_server.worker_conn = multiprocessing.Pipe()
-            self.web_server_process = multiprocessing.Process(target=self.web_server.start)
-            self.web_server_process.start()
+        try:
+            if self.web_server:
+                self.web_server_conn, self.web_server.worker_conn = multiprocessing.Pipe()
+                self.web_server_process = multiprocessing.Process(target=self.web_server.start)
+                self.web_server_process.start()
 
-        atexit.register(self.stop)
+            atexit.register(self.stop)
 
-        while True:
-            # Continually adds ready jobs to the queue
-            self.update_web_server()
-            self.add_jobs_to_queue()
-            self.process_queue()
-            self.calculate_health()
-            if self.alert:
-                self.alert.check_health_threshold(f'Worker "{self.name}"', self.health)
-            sleep(1)
+            while True:
+                # Continually adds ready jobs to the queue
+                self.update_web_server()
+                self.add_jobs_to_queue()
+                self.process_queue()
+                self.calculate_health()
+                if self.alert:
+                    self.alert.check_health_threshold(f'Worker "{self.name}"', self.health)
+                sleep(1)
+        except Exception as e:
+            logging.error(f'CRITICAL: Worker "{self.name}" failed on exception "{e}"')
 
     def stop(self):
         logging.warning(f'STOPPING: Worker "{self.name}" is being stopped')

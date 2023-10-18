@@ -1,13 +1,7 @@
 ## v0.4.3
 
 #### Features
-- Robit now stores all of its logging and information in an SQlite database for persistent storage and backup.
-
-#### Changes
-- A Change
-
-#### Bug Fixes
-- A Fix
+- Implemented logging to files and a better logging structure for debugging.
 
 ## v0.4.2
 

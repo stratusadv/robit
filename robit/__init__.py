@@ -26,20 +26,23 @@ def set_time_zone(timezone: str) -> None:
         raise ValueError(f'"{timezone}" is an invalid time zone. Choices are {pytz.all_timezones_set}')
 
 
-log_handler = TimedRotatingFileHandler(
+timed_rotating_log_handler = TimedRotatingFileHandler(
     _config.LOG_FILE_NAME,
     when='midnight',
-    interval=1,
     backupCount=_config.LOG_BACKUP_DAYS,
 )
+timed_rotating_log_handler.setLevel(logging.WARNING)
+
+stream_log_handler = logging.StreamHandler()
+stream_log_handler.setLevel(logging.WARNING)
 
 logging.basicConfig(
     level=logging.DEBUG,
-    format='Process - - [%(asctime)-15s] %(message)s',
+    format='Process - %(levelname)s - [%(asctime)-15s] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S',
     handlers=[
-        log_handler,
-        logging.StreamHandler(),
+        timed_rotating_log_handler,
+        stream_log_handler,
     ]
 )
 

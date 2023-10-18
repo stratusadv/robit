@@ -57,14 +57,14 @@ wo.add_job(
 
 
 def function_random_fail_often():
-    if 3 <= random.randint(1,4):
+    if 3 <= random.randint(1,5):
         division_by_zero = 5 / 0
     sleep(4)
     return 'No Error'
 
 
 def function_random_fail_rare():
-    if 1 == random.randint(1,20):
+    if 1 == random.randint(1,10):
         division_by_zero = 5 / 0
     sleep(4)
     return 'No Error'
