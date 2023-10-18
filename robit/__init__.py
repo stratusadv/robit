@@ -34,7 +34,7 @@ timed_rotating_log_handler = TimedRotatingFileHandler(
 timed_rotating_log_handler.setLevel(logging.WARNING)
 
 stream_log_handler = logging.StreamHandler()
-stream_log_handler.setLevel(logging.WARNING)
+stream_log_handler.setLevel(logging.DEBUG)
 
 logging.basicConfig(
     level=logging.DEBUG,

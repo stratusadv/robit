@@ -108,6 +108,7 @@ class Job:
             except Exception as e:
                 if attempt >= self.retry_attempts:
                     self.handle_run_exception(e)
+                    break
                 else:
                     self.status = JobStatus.RETRY
                     logging.warning(f'RETRYING: Job "{self.name}" after failing on exception "{e}" attempt {attempt + 1} of {self.retry_attempts}')

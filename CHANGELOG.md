@@ -3,6 +3,9 @@
 #### Features
 - Implemented logging to files and a better logging structure for debugging.
 
+#### Bug Fix
+- Correct issue with logging the wrong information if a job exhausts all of its retry attempts.
+
 ## v0.4.2
 
 #### Features
