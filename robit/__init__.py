@@ -27,7 +27,7 @@ def set_time_zone(timezone: str) -> None:
 
 
 timed_rotating_log_handler = TimedRotatingFileHandler(
-    _config.LOG_FILE_NAME,
+    f'{_config.LOG_FILE_NAME}.log',
     when='midnight',
     backupCount=_config.LOG_BACKUP_DAYS,
 )
