@@ -22,12 +22,8 @@ class SqliteDB:
         self.open_connection()
 
         if self.table_does_not_exists(table_name):
-            query = f'CREATE TABLE {table_name} ('
-
-            for key, val in fields.items():
-                query += f'{key} {val},'
-
-            query += f')'
+            columns_and_types = ', '.join([f'{key} {val}' for key, val in fields.items()])
+            query = f'CREATE TABLE {table_name} ({columns_and_types})'
 
             self.cursor.execute(query)
 
@@ -35,8 +31,16 @@ class SqliteDB:
 
     def insert(self, table_name: str, fields: dict) -> None:
         self.open_connection()
-        if self.table_exists():
-            pass
+
+        if self.table_exists(table_name):
+            columns = ', '.join(fields.keys())
+            placeholders = ', '.join([':' + key for key in fields.keys()])
+
+            query = f'INSERT INTO {table_name} ({columns}) VALUES ({placeholders})'
+
+            self.cursor.execute(query, fields)
+
+        self.commit_and_close_connection()
 
     def open_connection(self):
         self.connection = sqlite3.connect(f'{config.DATABASE_FILE_NAME}_{config.VERSION.replace(".", "_")}.db')
