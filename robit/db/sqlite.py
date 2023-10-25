@@ -7,21 +7,22 @@ class SqliteDB:
     def __init__(self) -> None:
         self.connection: sqlite3.Connection = ...
         self.cursor: sqlite3.Cursor = ...
+        self.open_connection()
 
     def table_exists(self, table_name: str) -> bool:
-        return not self.table_does_not_exists(table_name)
+        return not self.table_does_not_exist(table_name)
 
-    def table_does_not_exists(self, table_name: str) -> bool:
+    def table_does_not_exist(self, table_name: str) -> bool:
         self.cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}'")
         if self.cursor.fetchone() is None:
             return True
         else:
             return False
 
-    def create_table(self, table_name: str, fields: dict) -> None:
+    def create_table_if_does_not_exist(self, table_name: str, fields: dict) -> None:
         self.open_connection()
 
-        if self.table_does_not_exists(table_name):
+        if self.table_does_not_exist(table_name):
             columns_and_types = ', '.join([f'{key} {val}' for key, val in fields.items()])
             query = f'CREATE TABLE {table_name} ({columns_and_types})'
 
