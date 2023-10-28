@@ -23,21 +23,20 @@ class Table:
 
     def insert(self, **kwargs) -> None:
         db = SqliteDB()
+        self.validate_insert(**kwargs)
         db.create_table_if_does_not_exist(self.name, self.fields)
-        # Validate fields and insert ETC
-        db.insert(self.name, {
-        })
+        db.insert(self.name, {'pk': None} | kwargs)
 
     def validate_insert(self, **kwargs) -> bool:
         for key, val in kwargs.items():
             if key in self.fields:
                 if not isinstance(val, TABLE_FIELDS_TYPES[key]):
                     raise ValueError(f'Field "{key}" value of "{val}" is type {type(val)} and should be {TABLE_FIELDS_TYPES[key]}')
+            else:
+                raise ValueError(f'Field "{key} is not valid for table "{self.name}". Choices are {self.fields.keys()}')
 
-        return True
-
-    def select_job_results(job_id: str) -> list:
+    def select(self, query_conditions: str = '') -> list:
         db = SqliteDB()
-        # Something simple for filtering return results dynamically
-        db.cursor.execute(f'SELECT result FROM job_results WHERE job_id="{job_id}"')
+        db.cursor.execute(f'SELECT * FROM {self.name} {query_conditions}')
+
         return db.cursor.fetchall()
