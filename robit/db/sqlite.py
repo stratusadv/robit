@@ -9,6 +9,11 @@ class SqliteDB:
         self.cursor: sqlite3.Cursor = ...
         self.open_connection()
 
+    def drop_table(self, table_name):
+        self.open_connection()
+        self.cursor.execute(f'DROP TABLE IF EXISTS {table_name}')
+        self.commit_and_close_connection()
+
     def table_exists(self, table_name: str) -> bool:
         return not self.table_does_not_exist(table_name)
 

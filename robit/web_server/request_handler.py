@@ -2,6 +2,7 @@ import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
+from robit.job.tables import job_results_table
 from robit.web_server.utils import html_encode_file
 
 
@@ -91,6 +92,32 @@ class WebRequestHandler(BaseHTTPRequestHandler):
                     job_dict = {
                         'job_detail': self.api_dict['job_details'][job_key]
                     }
+                    self.wfile.write(json.dumps(job_dict, indent=4).encode("utf8"))
+                except KeyError:
+                    pass
+
+        elif self.is_in_path_list([self.key, 'api', 'job_results', ]):
+            self._set_headers()
+            if len(self.path_list) == 4:
+                job_key = self.path_list[3]
+            else:
+                job_key = None
+
+            if job_key:
+                try:
+                    job_dict = {
+                        'job_detail': self.api_dict['job_details'][job_key],
+                        'results': job_results_table.select_rows(f'WHERE job_id="{job_key}" ORDER BY datetime_entered DESC LIMIT 2000'),
+                    }
+
+                    # job_result_rows = job_results_table.select(f'WHERE job_id="{job_key}" ORDER BY datetime_entered DESC LIMIT 2000')
+                    # for row in job_result_rows:
+                    #     job_dict['results'].append({
+                    #         'type': row[2],
+                    #         'message': row[3],
+                    #         'datetime_entered': row[4],
+                    #     })
+
                     self.wfile.write(json.dumps(job_dict, indent=4).encode("utf8"))
                 except KeyError:
                     pass

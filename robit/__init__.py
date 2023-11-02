@@ -8,6 +8,7 @@ from robit.shortcuts import *
 
 timed_rotating_log_handler = TimedRotatingFileHandler(
     f'{_config.LOG_FILE_NAME}.log',
+    delay=True,
     when='midnight',
     backupCount=_config.LOG_BACKUP_DAYS,
 )

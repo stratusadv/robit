@@ -39,6 +39,51 @@
             </div>
         </div>
 
+        <div class="modal fade" id="job-results-modal" tabindex="-1" aria-labelledby="job-results-modal-label"
+             aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header py-2 px-3">
+                        <h4 class="modal-title fs-5" id="job-results-modal-label" x-text="job_results.job_detail.name"></h4>
+                        <button type="button" class="btn-close fs-7" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div id="job-results-modal-body" class="modal-body">
+                        <table class="table table-sm table-responsive">
+                            <thead>
+                            <tr>
+                                <th class="fs-7">Datetime</th>
+                                <th class="fs-7">Type</th>
+                                <th class="fs-7">Message</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <template x-for="(result, i) in job_results.results">
+                                <tr :key="i" class="col-12 px-4 border-bottom">
+                                    <td class="fs-7"
+                                        x-text="result.datetime_entered"></td>
+                                    <td class="fs-7"
+                                        :class="{
+                                            'text-status-running': result.type === 'Completed',
+                                            'text-status-error': result.type === 'Errored',
+                                        }"
+                                        x-text="result.type"></td>
+                                    <td class="fs-7"
+                                        x-text="result.message"></td>
+                                </tr>
+                            </template>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-dark fs-7 px-2 py-1" data-bs-dismiss="modal">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <template x-if="data.groups.length > 0">
 
             <div class="row">
@@ -81,7 +126,7 @@
                                                             </div>
                                                             <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
                                                                 <span class="fs-7 text-worker-muted">Status</span><br/>
-                                                                    <span
+                                                                <span
                                                                         x-text="job.status"
                                                                         class="h6"
                                                                         :class="{
@@ -90,7 +135,7 @@
                                                                             'text-status-error': job.status === 'Error',
                                                                             'text-status-waiting': job.status === 'Queued'
                                                                         }"
-                                                                    ></span>
+                                                                ></span>
 
                                                             </div>
                                                             <div class="col-6 text-center pb-2 pb-sm-0 d-block d-sm-none">
@@ -194,6 +239,17 @@
                                                                                     x-text="message"></li>
                                                                             </div>
                                                                         </template>
+                                                                    </div>
+
+                                                                    <div class="row mb-1 mt-3">
+                                                                        <div class="col-12">
+                                                                            <button x-on:click.stop="get_job_results(job.id)"
+                                                                                    class="btn btn-outline-dark fs-7 px-2 py-1"
+                                                                                    data-bs-toggle="modal"
+                                                                                    data-bs-target="#job-results-modal">
+                                                                                Display All Results
+                                                                            </button>
+                                                                        </div>
                                                                     </div>
 
                                                                 </div>

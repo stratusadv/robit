@@ -9,6 +9,14 @@ class JobExecutionType(str, Enum):
         return self.value.capitalize()
 
 
+class JobResultType(str, Enum):
+    COMPLETED = 'completed'
+    ERRORED = 'errored'
+
+    def __str__(self):
+        return self.value.capitalize()
+
+
 class JobStatus(str, Enum):
     START = 'start'
     HALT = 'halting'
