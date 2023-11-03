@@ -5,9 +5,9 @@ document.addEventListener('alpine:init', () => {
             "clock": {}
         },
 
-        job_details: {
+        job_details: {},
 
-        },
+        job_results: {},
 
         init() {
             this.get_worker_data()
@@ -33,7 +33,15 @@ document.addEventListener('alpine:init', () => {
             let responseText = await response.text();
             let json_data = JSON.parse(responseText)
             this.job_details[json_data.job_detail.id] = json_data.job_detail
+        },
+
+        async get_job_results(id) {
+            let response = await fetch("api/job_results/" + id);
+            // let job_results_modal_body = document.getElementById("job-results-modal-body")
+            let responseText = await response.text();
+            this.job_results = JSON.parse(responseText)
         }
+
 
     }))
 })

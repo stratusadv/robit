@@ -2,6 +2,7 @@ import inspect
 import logging
 from typing import Callable, Optional
 
+from robit.config import config
 from robit.core.alert import Alert
 from robit.core.clock import Clock, CREATED_DATE_FORMAT
 from robit.core.counter import Counter
@@ -10,7 +11,10 @@ from robit.core.health import Health
 from robit.core.id import Id
 from robit.core.log import Log
 from robit.core.name import Name
+from robit.db.utils import datetime_to_string
 from robit.job import JobStatus
+from robit.job.enums import JobResultType
+from robit.job.tables import job_results_table
 from robit.timer import Timer, timing_decorator
 
 
@@ -123,25 +127,50 @@ class Job:
         logging.debug(f'SUCCESS: Job "{self.name}" completed')
 
         self.success_count.increase()
+
         self.group.success_count.increase()
         self.worker.success_count.increase()
+
         self.health.add_positive()
 
         if method_result:
-            self.result_log.add_message(str(method_result).replace('"', '').replace("'", ""))
+            result_message = str(method_result)
         else:
-            self.result_log.add_message('No result provided')
+            result_message = 'No result provided'
+
+        self.result_log.add_message(result_message)
+        if config.DATABASE_LOGGING:
+            job_results_table.insert(
+                job_id=str(self.id),
+                job_name=str(self.name),
+                type=str(JobResultType.COMPLETED),
+                message=result_message,
+                datetime_entered=datetime_to_string(self.clock.now_tz)
+            )
 
         self.status = JobStatus.QUEUED
 
     def handle_run_exception(self, e) -> None:
         self.status = JobStatus.ERROR
+
         failed_message = f'FAILURE: Job "{self.name}" failed on exception "{e}"'
-        logging.error(failed_message)
+        logging.error(str(e))
+
+        if config.DATABASE_LOGGING:
+            job_results_table.insert(
+                job_id=str(self.id),
+                job_name=str(self.name),
+                type=str(JobResultType.ERRORED),
+                message=str(e),
+                datetime_entered=datetime_to_string(self.clock.now_tz)
+            )
+
         self.failed_log.add_message(failed_message)
         self.failed_count.increase()
+
         self.group.failed_count.increase()
         self.worker.failed_count.increase()
+
         self.health.add_negative()
 
     def as_dict(self) -> dict:

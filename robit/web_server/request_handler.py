@@ -1,7 +1,9 @@
 import json
+import logging
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
+from robit.job.tables import job_results_table
 from robit.web_server.utils import html_encode_file
 
 
@@ -93,7 +95,25 @@ class WebRequestHandler(BaseHTTPRequestHandler):
                     }
                     self.wfile.write(json.dumps(job_dict, indent=4).encode("utf8"))
                 except KeyError:
-                    pass
+                    logging.error(f'Web Server Request Handler failed to find job key "{job_key}" in api_dict {self.api_dict}')
+
+        elif self.is_in_path_list([self.key, 'api', 'job_results', ]):
+            self._set_headers()
+            if len(self.path_list) == 4:
+                job_key = self.path_list[3]
+            else:
+                job_key = None
+
+            if job_key:
+                try:
+                    job_dict = {
+                        'job_detail': self.api_dict['job_details'][job_key],
+                        'results': job_results_table.select_rows(f'WHERE job_id="{job_key}" ORDER BY datetime_entered DESC LIMIT 2000'),
+                    }
+
+                    self.wfile.write(json.dumps(job_dict, indent=4).encode("utf8"))
+                except KeyError:
+                    logging.error(f'Web Server Request Handler failed to find job key "{job_key}" in api_dict {self.api_dict}')
 
         elif self.is_in_path_list([self.key, 'api']):
             self._set_headers()

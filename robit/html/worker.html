@@ -26,16 +26,57 @@
     <div id="container" class="d-none">
         <div class="row sticky-top bg-worker-nav shadow-sm">
             <div class="col-6 col-md-4 px-3 py-2">
-                <span class="h7 text-light-muted">Worker</span><br/>
+                <span class="h7 text-light-muted">Worker v||version||</span><br/>
                 <span class="h5 text-light" x-text="data.name"></span>
             </div>
             <div class="col-6 col-md-4 px-3 py-2 text-end text-md-center">
-                <span class="h7 text-light-muted">Date & Time</span><br/>
+                <span class="h7 text-light-muted">Date & Time - ||timezone||</span><br/>
                 <span class="h5 text-light" x-text="data.clock.now"></span>
             </div>
             <div class="col-12 col-md-4 p-3 py-2 text-end">
                 <span class="h7 text-light-muted">Health</span><br/>
                 <span class="h5 text-light" x-text="data.health + '%'"></span>
+            </div>
+        </div>
+
+        <div class="modal fade" id="job-results-modal" tabindex="-1" aria-labelledby="job-results-modal-label"
+             aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-job-layer py-2 px-3">
+                        <h5 class="modal-title fs-5" id="job-results-modal-label"
+                            x-text="job_results.job_detail.name"></h5>
+                        <button type="button" class="btn-close fs-7" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div id="job-results-modal-body" class="modal-body">
+                        <table class="table table-sm table-responsive">
+                            <thead>
+                            <tr>
+                                <th class="fs-7">Datetime</th>
+                                <th class="fs-7">Type</th>
+                                <th class="fs-7">Result</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <template x-for="(result, i) in job_results.results">
+                                <tr :key="i" class="col-12 px-4 border-bottom">
+                                    <td class="fs-7"
+                                        x-text="result.datetime_entered"></td>
+                                    <td class="fs-7"
+                                        :class="{
+                                            'text-status-running': result.type === 'Completed',
+                                            'text-status-error': result.type === 'Errored',
+                                        }"
+                                        x-text="result.type"></td>
+                                    <td class="fs-7"
+                                        x-text="result.message"></td>
+                                </tr>
+                            </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -81,7 +122,7 @@
                                                             </div>
                                                             <div class="col-6 col-sm-2 text-center pb-2 pb-sm-0">
                                                                 <span class="fs-7 text-worker-muted">Status</span><br/>
-                                                                    <span
+                                                                <span
                                                                         x-text="job.status"
                                                                         class="h6"
                                                                         :class="{
@@ -90,7 +131,7 @@
                                                                             'text-status-error': job.status === 'Error',
                                                                             'text-status-waiting': job.status === 'Queued'
                                                                         }"
-                                                                    ></span>
+                                                                ></span>
 
                                                             </div>
                                                             <div class="col-6 text-center pb-2 pb-sm-0 d-block d-sm-none">
@@ -195,6 +236,18 @@
                                                                             </div>
                                                                         </template>
                                                                     </div>
+                                                                    <template x-if="||database_logging||">
+                                                                        <div class="row mb-1 mt-3">
+                                                                            <div class="col-12">
+                                                                                <button x-on:click.stop="get_job_results(job.id)"
+                                                                                        class="btn btn-outline-dark fs-7 px-2 py-1"
+                                                                                        data-bs-toggle="modal"
+                                                                                        data-bs-target="#job-results-modal">
+                                                                                    Display All Results
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </template>
 
                                                                 </div>
 

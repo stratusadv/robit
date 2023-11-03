@@ -1,4 +1,5 @@
 import atexit
+import json
 import logging
 import multiprocessing
 import queue
@@ -7,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from time import sleep
 from typing import Callable, Optional
 
+from robit.config import config
 from robit.core.alert import Alert
 from robit.core.clock import Clock
 from robit.core.counter import Counter
@@ -55,7 +57,12 @@ class Worker:
                 address=web_server_address,
                 port=web_server_port,
                 key=key,
-                html_replace_dict={'title': str(self.name)}
+                html_replace_dict={
+                    'title': str(self.name),
+                    'version': config.VERSION,
+                    'timezone': config.TIMEZONE,
+                    'database_logging': str(config.DATABASE_LOGGING).lower(),
+                }
             )
 
         if alert_method is not None:

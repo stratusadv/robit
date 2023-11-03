@@ -1,3 +1,19 @@
+## v0.4.4
+
+#### Features
+- Job results can now be backup to a sqlite database for longer term storage of results.
+  - Usage: robit.set_database_logging(True)
+
+#### Changes
+- Improved web interface for job results and ability to look at last 1000 results if you are using database logging.
+- Reduced the verbosity of the results when an exception occurs during a job run.
+- Add more information to the web interface (version and timezone).
+
+#### Bugs
+- Added error logging for failed job key lookups in the api.
+- Fixed log rotation for log files.
+- Improved testing of robit by a slight amount.
+
 ## v0.4.3
 
 #### Features

@@ -1,7 +1,16 @@
 import unittest
 from datetime import datetime
 
-from robit.cron.fields import CronMinuteField, CronHourField, CronDayOfMonthField, CronMonthField, CronDayOfWeekField
+from robit.cron.fields import CronSecondField, CronMinuteField, CronHourField, CronDayOfMonthField, CronMonthField, CronDayOfWeekField
+
+
+class TestCronSecondField(unittest.TestCase):
+    def setUp(self) -> None:
+        self.second_cron = CronSecondField('*')
+        self.test_dt = datetime(2023, 7, 17, 4, 30, 10)
+
+    def test_minute_field(self):
+        self.assertEqual(self.second_cron.increment_datetime(self.test_dt), datetime(2023, 7, 17, 4, 30, 11))
 
 
 class TestCronMinuteField(unittest.TestCase):
