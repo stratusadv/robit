@@ -1,10 +1,10 @@
 from setuptools import setup
 
-from robit.config import config
+from robit.version import VERSION
 
 setup(
     name='robit',
-    version=config.VERSION,
+    version=VERSION,
     author='Nathan Johnson & Wesley Howery',
     author_email='info@stratusadv.com',
     description='Chronological Automation Service Framework',
