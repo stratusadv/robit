@@ -5,6 +5,7 @@ import robit
 
 
 robit.set_time_zone('America/Edmonton')
+robit.set_database_logging(True)
 
 
 def function_to_alert_me(**kwargs):
@@ -19,6 +20,18 @@ wo = robit.Worker(
     # web_server_port=8000,
     alert_method=function_to_alert_me,
     alert_health_threshold=99.0,
+)
+
+
+def function_complex_string_result():
+    return 'This is a "Weird" {result} <>\>\\ /" from \o/ with @ "?????" characters'
+
+
+wo.add_job(
+    'Complex String Result',
+    function_complex_string_result,
+    group='Results',
+    cron='*/10 * * * * *',
 )
 
 

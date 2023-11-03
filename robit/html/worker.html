@@ -26,11 +26,11 @@
     <div id="container" class="d-none">
         <div class="row sticky-top bg-worker-nav shadow-sm">
             <div class="col-6 col-md-4 px-3 py-2">
-                <span class="h7 text-light-muted">Worker</span><br/>
+                <span class="h7 text-light-muted">Worker v||version||</span><br/>
                 <span class="h5 text-light" x-text="data.name"></span>
             </div>
             <div class="col-6 col-md-4 px-3 py-2 text-end text-md-center">
-                <span class="h7 text-light-muted">Date & Time</span><br/>
+                <span class="h7 text-light-muted">Date & Time - ||timezone||</span><br/>
                 <span class="h5 text-light" x-text="data.clock.now"></span>
             </div>
             <div class="col-12 col-md-4 p-3 py-2 text-end">
@@ -43,8 +43,9 @@
              aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header py-2 px-3">
-                        <h4 class="modal-title fs-5" id="job-results-modal-label" x-text="job_results.job_detail.name"></h4>
+                    <div class="modal-header bg-job-layer py-2 px-3">
+                        <h5 class="modal-title fs-5" id="job-results-modal-label"
+                            x-text="job_results.job_detail.name"></h5>
                         <button type="button" class="btn-close fs-7" data-bs-dismiss="modal"
                                 aria-label="Close"></button>
                     </div>
@@ -54,7 +55,7 @@
                             <tr>
                                 <th class="fs-7">Datetime</th>
                                 <th class="fs-7">Type</th>
-                                <th class="fs-7">Message</th>
+                                <th class="fs-7">Result</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -74,11 +75,6 @@
                             </template>
                             </tbody>
                         </table>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-dark fs-7 px-2 py-1" data-bs-dismiss="modal">
-                            Close
-                        </button>
                     </div>
                 </div>
             </div>
@@ -240,17 +236,18 @@
                                                                             </div>
                                                                         </template>
                                                                     </div>
-
-                                                                    <div class="row mb-1 mt-3">
-                                                                        <div class="col-12">
-                                                                            <button x-on:click.stop="get_job_results(job.id)"
-                                                                                    class="btn btn-outline-dark fs-7 px-2 py-1"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#job-results-modal">
-                                                                                Display All Results
-                                                                            </button>
+                                                                    <template x-if="||database_logging||">
+                                                                        <div class="row mb-1 mt-3">
+                                                                            <div class="col-12">
+                                                                                <button x-on:click.stop="get_job_results(job.id)"
+                                                                                        class="btn btn-outline-dark fs-7 px-2 py-1"
+                                                                                        data-bs-toggle="modal"
+                                                                                        data-bs-target="#job-results-modal">
+                                                                                    Display All Results
+                                                                                </button>
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
+                                                                    </template>
 
                                                                 </div>
 

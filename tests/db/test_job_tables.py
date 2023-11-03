@@ -14,9 +14,10 @@ class TestJobTables(unittest.TestCase):
         try:
             job_results_table.insert(
                 job_id='abc123',
-                status='something',
-                result='A bunch of text that resembles a result',
-                datetime=datetime_to_string(datetime.now())
+                job_name='A Job of Sorts',
+                type='something',
+                message='A bunch of text that resembles a result',
+                datetime_entered=datetime_to_string(datetime.now())
             )
             self.assertTrue(True)
         except:

@@ -55,7 +55,7 @@ class Table:
                 if not isinstance(val, TABLE_FIELDS_TYPES[self.fields[key]]):
                     raise ValueError(f'Field "{key}" value of "{val}" is type {type(val)} and should be {TABLE_FIELDS_TYPES[key]}')
             else:
-                raise ValueError(f'Field "{key} is not valid for table "{self.name}". Choices are {self.fields.keys()}')
+                raise ValueError(f'Field "{key}" is not valid for table "{self.name}". Choices are {self.fields.keys()}')
 
     def select(self, query_conditions: str = '') -> list:
         db = SqliteDB()

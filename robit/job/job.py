@@ -2,6 +2,7 @@ import inspect
 import logging
 from typing import Callable, Optional
 
+from robit.config import config
 from robit.core.alert import Alert
 from robit.core.clock import Clock, CREATED_DATE_FORMAT
 from robit.core.counter import Counter
@@ -133,18 +134,19 @@ class Job:
         self.health.add_positive()
 
         if method_result:
-            result_message = str(method_result).replace('"', '').replace("'", "")
+            result_message = str(method_result)
         else:
             result_message = 'No result provided'
 
         self.result_log.add_message(result_message)
-
-        job_results_table.insert(
-            job_id=str(self.id),
-            type=str(JobResultType.COMPLETED),
-            message=result_message,
-            datetime_entered=datetime_to_string(self.clock.now_tz)
-        )
+        if config.DATABASE_LOGGING:
+            job_results_table.insert(
+                job_id=str(self.id),
+                job_name=str(self.name),
+                type=str(JobResultType.COMPLETED),
+                message=result_message,
+                datetime_entered=datetime_to_string(self.clock.now_tz)
+            )
 
         self.status = JobStatus.QUEUED
 
@@ -152,14 +154,16 @@ class Job:
         self.status = JobStatus.ERROR
 
         failed_message = f'FAILURE: Job "{self.name}" failed on exception "{e}"'
-        logging.error(failed_message)
+        logging.error(str(e))
 
-        job_results_table.insert(
-            job_id=str(self.id),
-            type=str(JobResultType.ERRORED),
-            message=str(e),
-            datetime_entered=datetime_to_string(self.clock.now_tz)
-        )
+        if config.DATABASE_LOGGING:
+            job_results_table.insert(
+                job_id=str(self.id),
+                job_name=str(self.name),
+                type=str(JobResultType.ERRORED),
+                message=str(e),
+                datetime_entered=datetime_to_string(self.clock.now_tz)
+            )
 
         self.failed_log.add_message(failed_message)
         self.failed_count.increase()

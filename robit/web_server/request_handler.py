@@ -1,4 +1,5 @@
 import json
+import logging
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
@@ -94,7 +95,7 @@ class WebRequestHandler(BaseHTTPRequestHandler):
                     }
                     self.wfile.write(json.dumps(job_dict, indent=4).encode("utf8"))
                 except KeyError:
-                    pass
+                    logging.error(f'Web Server Request Handler failed to find job key "{job_key}" in api_dict {self.api_dict}')
 
         elif self.is_in_path_list([self.key, 'api', 'job_results', ]):
             self._set_headers()
@@ -110,17 +111,9 @@ class WebRequestHandler(BaseHTTPRequestHandler):
                         'results': job_results_table.select_rows(f'WHERE job_id="{job_key}" ORDER BY datetime_entered DESC LIMIT 2000'),
                     }
 
-                    # job_result_rows = job_results_table.select(f'WHERE job_id="{job_key}" ORDER BY datetime_entered DESC LIMIT 2000')
-                    # for row in job_result_rows:
-                    #     job_dict['results'].append({
-                    #         'type': row[2],
-                    #         'message': row[3],
-                    #         'datetime_entered': row[4],
-                    #     })
-
                     self.wfile.write(json.dumps(job_dict, indent=4).encode("utf8"))
                 except KeyError:
-                    pass
+                    logging.error(f'Web Server Request Handler failed to find job key "{job_key}" in api_dict {self.api_dict}')
 
         elif self.is_in_path_list([self.key, 'api']):
             self._set_headers()
