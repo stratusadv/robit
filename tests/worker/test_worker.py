@@ -3,8 +3,8 @@ import unittest
 from robit import Worker
 
 
-class TestCore(unittest.TestCase):
-    def test_worker(self):
+class TestWorker(unittest.TestCase):
+    def test_init(self):
         try:
             wo = Worker('Testy McWorkerson')
             self.assertTrue(True)

@@ -5,7 +5,7 @@ from robit.job.tables import job_results_table
 from robit.db.utils import datetime_to_string
 
 
-class TestJobTables(unittest.TestCase):
+class TestTables(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         job_results_table.drop()

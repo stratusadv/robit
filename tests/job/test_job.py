@@ -3,7 +3,7 @@ import unittest
 from robit.db.sqlite import SqliteDB
 
 
-class TestDatabase(unittest.TestCase):
+class TestJob(unittest.TestCase):
     def test_init(self):
         try:
             db = SqliteDB()
