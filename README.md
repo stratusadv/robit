@@ -8,7 +8,7 @@ A robot for your bits!
 
 ## Features
 
-- Lightweight (one installed dependencies pytz which is also lightweight)
+- Lightweight (only one installed dependencies pytz which is also lightweight)
 - Can run with monitoring interface or headless
 - Very simple and easy to set up and configure 
 
@@ -29,7 +29,8 @@ from time import sleep
 import robit
 
 
-robit.set_utc_offset(-6)
+robit.set_time_zone('America/Edmonton')
+robit.set_database_logging(True)
 
 
 def function_to_alert_me(**kwargs):

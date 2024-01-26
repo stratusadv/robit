@@ -85,6 +85,8 @@ class WebRequestHandler(BaseHTTPRequestHandler):
             self._set_headers()
             if len(self.path_list) == 4:
                 job_key = self.path_list[3]
+            elif len(self.path_list) == 3:
+                job_key = self.path_list[2]
             else:
                 job_key = None
 
@@ -101,6 +103,8 @@ class WebRequestHandler(BaseHTTPRequestHandler):
             self._set_headers()
             if len(self.path_list) == 4:
                 job_key = self.path_list[3]
+            elif len(self.path_list) == 3:
+                job_key = self.path_list[2]
             else:
                 job_key = None
 

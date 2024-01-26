@@ -1,3 +1,11 @@
+## v0.4.5
+
+#### Changes
+- Updated the included alpine to version 3.13.5
+
+#### Bugs
+- Fixed a bug where the interface would not update when not using a key with your worker.
+
 ## v0.4.4
 
 #### Features
