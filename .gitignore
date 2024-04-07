@@ -4,3 +4,5 @@ jupyter/
 robit.egg-info/
 __pycache__/
 *.pyc
+robit*.db
+.coverage
