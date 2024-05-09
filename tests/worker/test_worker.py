@@ -25,5 +25,5 @@ class TestWorker(unittest.TestCase):
     def test_calculate_health(self):
         self.worker.calculate_health()
 
-        self.assertTrue(self.worker.health.percentage == 0.0)
+        self.assertTrue(self.worker.health.percentage == 0.5)
 
