@@ -54,15 +54,15 @@ class Health:
 
     @property
     def percentage_verbose(self) -> str:
-        return f'{self.percentage * 100:,.2f}'
+        return f'{self.percentage_hundreds:,.2f}'
 
     def reset(self) -> None:
         self.percentage = 0.0
         self.average_reset = True
 
     def set_percentage(self, value: float) -> None:
-        if value > 100.0:
-            self.percentage = 100.0
+        if value > 1.0:
+            self.percentage = 1.0
         elif value < 0.0:
             self.percentage = 0.0
         else:

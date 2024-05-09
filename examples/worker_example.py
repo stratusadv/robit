@@ -4,7 +4,7 @@ from time import sleep
 import robit
 
 
-robit.set_time_zone('America/Edmonton')
+robit.set_timezone('America/Edmonton')
 robit.set_database_logging(True)
 
 

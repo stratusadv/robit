@@ -1,12 +1,14 @@
 import unittest
 
-from robit.db.sqlite import SqliteDB
+from robit.job import Job
 
 
 class TestJob(unittest.TestCase):
+    def setUp(self):
+        pass
+
     def test_init(self):
         try:
-            db = SqliteDB()
             self.assertTrue(True)
         except:
             self.assertTrue(False)

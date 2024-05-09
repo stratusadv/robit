@@ -19,7 +19,7 @@ def set_database_logging(status: bool) -> None:
     _config.DATABASE_LOGGING = status
 
 
-def set_time_zone(timezone: str) -> None:
+def set_timezone(timezone: str) -> None:
     if timezone in _pytz.all_timezones_set:
         _config.TIMEZONE = timezone
     else:
