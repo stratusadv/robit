@@ -3,11 +3,18 @@ We want Robit to be the go to for simplistic easy to manage automation for every
 
 In short things can change ...
 
+## Ready to Rock
+- [x] Chronological Task Management
+- [x] Timezone Management
+- [x] Logging Files
+- [x] Database Logging
+ 
+
 ## Coming Soon
--[ ] Ordered job execution with success and failure progression.
+- [ ] Ordered job execution with success and failure progression.
 
 ## Planned
--[ ] Statistic screen for web interface.
+- [ ] Statistic screen for web interface.
 
 ## Dreamed Out
--[ ] Conditional job execution.
+- [ ] Conditional job execution.
