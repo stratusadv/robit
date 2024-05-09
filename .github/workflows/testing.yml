@@ -21,5 +21,5 @@ jobs:
           python-version: '3.x'
 
       - name: Testing
-        run: python -m unittest discover robit/tests
+        run: python -m unittest discover tests
 
