@@ -70,7 +70,7 @@
                                         }"
                                         x-text="result.type"></td>
                                     <td class="fs-7"
-                                        x-text="result.message"></td>
+                                        x-html="result.message.replaceAll('\n', '<br>')"></td>
                                 </tr>
                             </template>
                             </tbody>
@@ -211,8 +211,8 @@
                                                                         <template
                                                                                 x-for="(message, i) in job_details[job.id].failed_log">
                                                                             <div :key="i" class="col-12 px-4">
-                                                                                <li class="fs-7 text-muted"
-                                                                                    x-text="message"></li>
+                                                                                <li class="fs-7 text-muted pb-1"
+                                                                                    x-html="message.replaceAll('\n', '<br>')"></li>
                                                                             </div>
                                                                         </template>
 
@@ -231,7 +231,7 @@
                                                                         <template
                                                                                 x-for="(message, i) in job_details[job.id].result_log">
                                                                             <div :key="i" class="col-12 px-4">
-                                                                                <li class="fs-7 text-muted"
+                                                                                <li class="fs-7 text-muted pb-1"
                                                                                     x-text="message"></li>
                                                                             </div>
                                                                         </template>

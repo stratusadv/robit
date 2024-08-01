@@ -1,3 +1,8 @@
+## v0.4.6
+
+#### Changes
+- Exceptions and Logging now include full stack trace.
+
 ## v0.4.5
 
 #### Changes

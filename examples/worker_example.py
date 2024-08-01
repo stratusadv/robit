@@ -77,7 +77,7 @@ def function_random_fail_often():
 
 
 def function_random_fail_rare():
-    if 1 == random.randint(1,10):
+    if 1 == random.randint(1,20):
         division_by_zero = 5 / 0
     sleep(4)
     return 'No Error'
