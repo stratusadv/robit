@@ -1,5 +1,6 @@
 import inspect
 import logging
+import traceback
 from typing import Callable, Optional
 
 from robit.config import config
@@ -153,15 +154,20 @@ class Job:
     def handle_run_exception(self, e) -> None:
         self.status = JobStatus.ERROR
 
-        failed_message = f'FAILURE: Job "{self.name}" failed on exception "{e}"'
-        logging.error(str(e))
+        stack_trace = '\n'.join([
+            ''.join(traceback.format_exception(None, e, e.__traceback__)).strip()
+        ])
+
+        failed_message = f'FAILURE: Job "{self.name}" failed on exception "{e}"\n{stack_trace}'
+
+        logging.error(failed_message)
 
         if config.DATABASE_LOGGING:
             job_results_table.insert(
                 job_id=str(self.id),
                 job_name=str(self.name),
                 type=str(JobResultType.ERRORED),
-                message=str(e),
+                message=failed_message,
                 datetime_entered=datetime_to_string(self.clock.now_tz)
             )
 
