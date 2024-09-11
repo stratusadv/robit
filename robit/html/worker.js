@@ -37,9 +37,13 @@ document.addEventListener('alpine:init', () => {
 
         async get_job_results(id) {
             let response = await fetch("api/job_results/" + id);
-            // let job_results_modal_body = document.getElementById("job-results-modal-body")
             let responseText = await response.text();
             this.job_results = JSON.parse(responseText)
+        },
+
+        async run_job_action(id, action) {
+            let response = await fetch("api/job_action/" + id + "/" + action);
+            let responseText = await response.text();
         }
 
 

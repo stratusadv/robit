@@ -15,6 +15,10 @@ def set_log_backup_days(days: int) -> None:
     _config.LOG_BACKUP_DAYS = days
 
 
+def set_controls(status: bool) -> None:
+    _config.CONTROLS = status
+
+
 def set_database_logging(status: bool) -> None:
     _config.DATABASE_LOGGING = status
 

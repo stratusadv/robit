@@ -1,5 +1,6 @@
 import json
 import logging
+import multiprocessing
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
@@ -11,9 +12,13 @@ class WebRequestHandler(BaseHTTPRequestHandler):
     api_dict: dict
     key: str
     html_replace_dict: dict
+    worker_conn: multiprocessing.Pipe
 
     def not_found(self) -> None:
         self.wfile.write('Nothing to See Here'.encode("utf8"))
+
+    def send_worker_request(self, key, val) -> None:
+        self.worker_conn.send({key: val})
 
     @property
     def path_list(self) -> list:
@@ -118,6 +123,27 @@ class WebRequestHandler(BaseHTTPRequestHandler):
                     self.wfile.write(json.dumps(job_dict, indent=4).encode("utf8"))
                 except KeyError:
                     logging.error(f'Web Server Request Handler failed to find job key "{job_key}" in api_dict {self.api_dict}')
+
+        elif self.is_in_path_list([self.key, 'api', 'job_action', ]):
+            self._set_headers()
+            if len(self.path_list) == 4:
+                job_key = self.path_list[2]
+                job_action = self.path_list[3]
+            else:
+                job_key = None
+                job_action = None
+
+            if job_key:
+                try:
+                    if job_action == 'pause':
+                        self.send_worker_request('pause', job_key)
+                    if job_action == 'run_now':
+                        self.send_worker_request('run_now', job_key)
+
+                    self.wfile.write(json.dumps({}, indent=4).encode("utf8"))
+                except KeyError:
+                    logging.error(f'Web Server Request Handler failed to find job key "{job_key}" in api_dict {self.api_dict}')
+
 
         elif self.is_in_path_list([self.key, 'api']):
             self._set_headers()

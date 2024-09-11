@@ -96,8 +96,23 @@ class Job:
     def set_next_run_datetime(self) -> None:
         self.next_run_datetime = self.cron.next_datetime()
 
+    def toggle_pause(self):
+        if self.status is JobStatus.PAUSED:
+            self.status = JobStatus.QUEUED
+            self.set_next_run_datetime()
+        elif self.status is not JobStatus.RUN:
+            self.status = JobStatus.PAUSED
+
+    def set_run_now(self) -> None:
+        if self.status is JobStatus.QUEUED:
+            self.status = JobStatus.RUN_NOW
+
     def should_run(self) -> bool:
-        if self.status == JobStatus.QUEUED or self.status == JobStatus.ERROR:
+        if self.status is JobStatus.PAUSED:
+            return False
+        if self.status is JobStatus.RUN_NOW:
+            return True
+        elif self.status == JobStatus.QUEUED or self.status == JobStatus.ERROR:
             return self.clock.now_tz > self.next_run_datetime
         else:
             return False

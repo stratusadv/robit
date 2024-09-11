@@ -20,6 +20,7 @@ class WebServer:
         self.port = port
         self.key = key
 
+
         self.worker_conn = None
 
         self.html_replace_dict = html_replace_dict
@@ -28,6 +29,7 @@ class WebServer:
         WebRequestHandler.api_dict = self.api_dict
         WebRequestHandler.key = self.key
         WebRequestHandler.html_replace_dict = self.html_replace_dict
+        WebRequestHandler.worker_conn = self.worker_conn
 
         httpd = HTTPServer((self.address, self.port), WebRequestHandler)
         httpd.serve_forever()
@@ -53,6 +55,7 @@ class WebServer:
 
     def update_api_dict(self) -> None:
         while True:
-            update_dict = self.worker_conn.recv()
-            for key, val in update_dict.items():
-                self.api_dict[key] = val
+            if self.worker_conn.poll():
+                update_dict = self.worker_conn.recv()
+                for key, val in update_dict.items():
+                    self.api_dict[key] = val

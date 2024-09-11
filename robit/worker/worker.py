@@ -62,6 +62,7 @@ class Worker:
                     'version': config.VERSION,
                     'timezone': config.TIMEZONE,
                     'database_logging': str(config.DATABASE_LOGGING).lower(),
+                    'controls': str(config.CONTROLS).lower(),
                 }
             )
 
@@ -91,6 +92,14 @@ class Worker:
             group.calculate_health()
             self.health.average(group.health.percentage)
 
+    def get_job_by_id(self, job_id: str) -> Optional['Job']:
+        for group in self.groups.values():
+            for job in group.job_list:
+                if job.id.value == job_id:
+                    return job
+
+        return None
+
     def job_detail_dict(self) -> dict:
         job_detail_dict = dict()
 
@@ -119,6 +128,19 @@ class Worker:
     def update_web_server(self):
         self.web_server_conn.send(self.as_dict())
 
+    def process_web_server_requests(self):
+        if self.web_server_conn.poll():
+            update_dict = self.web_server_conn.recv()
+
+            for key, val in update_dict.items():
+                job = self.get_job_by_id(val)
+
+                if job is not None:
+                    if key == 'run_now':
+                        job.set_run_now()
+                    if key == 'pause':
+                        job.toggle_pause()
+
     def start(self) -> None:
         try:
             if self.web_server:
@@ -131,6 +153,7 @@ class Worker:
             while True:
                 # Continually adds ready jobs to the queue
                 self.update_web_server()
+                self.process_web_server_requests()
                 self.add_jobs_to_queue()
                 self.process_queue()
                 self.calculate_health()

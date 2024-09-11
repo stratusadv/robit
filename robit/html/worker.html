@@ -89,7 +89,7 @@
                     <div :key="i" class="col-12">
 
                         <div class="row px-2 px-md-3 pt-3">
-                            <div class="col-12 bg-group-layer shadow-sm rounded-3 p-3">
+                            <div class="col-12 bg-group-layer shadow rounded-3 p-3">
 
                                 <div class="row pb-2">
                                     <div class="col-7 col-md-10">
@@ -108,7 +108,7 @@
 
                                         <template x-for="(job, i) in group.jobs">
 
-                                            <div :key="i" class="col-12 px-3 pb-2">
+                                            <div :key="i" class="col-12 px-2 py-1">
 
                                                 <div x-on:click="get_job_details(job.id)" class="row px-2 px-md-3 pt-2">
                                                     <div class="col-12 bg-job-layer shadow-sm rounded-3 p-2">
@@ -127,8 +127,10 @@
                                                                         class="h6"
                                                                         :class="{
                                                                             'text-status-running': job.status === 'Running',
+                                                                            'text-status-running-now': job.status === 'Running Now',
                                                                             'text-status-retrying': job.status === 'Retrying',
                                                                             'text-status-error': job.status === 'Error',
+                                                                            'text-status-paused': job.status === 'Paused',
                                                                             'text-status-waiting': job.status === 'Queued'
                                                                         }"
                                                                 ></span>
@@ -236,18 +238,31 @@
                                                                             </div>
                                                                         </template>
                                                                     </div>
-                                                                    <template x-if="||database_logging||">
-                                                                        <div class="row mb-1 mt-3">
-                                                                            <div class="col-12">
+                                                                    <div class="row mb-0 mt-3">
+                                                                        <template x-if="||database_logging||">
+                                                                            <div class="col-5">
                                                                                 <button x-on:click.stop="get_job_results(job.id)"
-                                                                                        class="btn btn-outline-dark fs-7 px-2 py-1"
+                                                                                        class="btn btn-outline-dark fs-7 px-2 py-1 fw-bold"
                                                                                         data-bs-toggle="modal"
                                                                                         data-bs-target="#job-results-modal">
                                                                                     Display All Results
                                                                                 </button>
                                                                             </div>
-                                                                        </div>
-                                                                    </template>
+                                                                        </template>
+                                                                        <template x-if="||controls||">
+                                                                            <div class="col-7 text-end">
+                                                                                <button x-on:click.stop="run_job_action(job.id, 'run_now')"
+                                                                                        class="btn btn-outline-success fs-7 px-2 py-1 ms-1 fw-bold">
+                                                                                    Run Now
+                                                                                </button>
+                                                                                <button x-on:click.stop="run_job_action(job.id, 'pause')"
+                                                                                        class="btn btn-outline-danger fs-7 px-2 py-1 ms-1 fw-bold">
+                                                                                    <span x-show="job.status === 'Paused'">Un-Pause</span>
+                                                                                    <span x-show="job.status !== 'Paused'">Pause</span>
+                                                                                </button>
+                                                                            </div>
+                                                                        </template>
+                                                                    </div>
 
                                                                 </div>
 

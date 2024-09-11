@@ -6,6 +6,7 @@ class Config:
     DATABASE_LOGGING: bool = False
     DATABASE_FILE_NAME: str = 'robit'
     DATABASE_BACKUP_DAYS: int = 21
+    CONTROLS: bool = False
 
 
 config = Config()

@@ -22,10 +22,12 @@ class JobStatus(str, Enum):
     HALT = 'halting'
     STOP = 'stopped'
     RUN = 'running'
+    RUN_NOW = 'running now'
     RETRY = 'retrying'
     ERROR = 'error'
     WAIT = 'waiting'
     QUEUED = 'queued'
+    PAUSED = 'paused'
 
     def __str__(self):
         return self.value.capitalize()
