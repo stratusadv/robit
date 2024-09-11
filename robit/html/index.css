@@ -61,7 +61,15 @@
     color: #990000 !important;
 }
 
+.text-status-paused {
+    color: #990000 !important;
+}
+
 .text-status-running {
+    color: #009900 !important;
+}
+
+.text-status-running-now {
     color: #009900 !important;
 }
 

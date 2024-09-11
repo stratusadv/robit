@@ -6,7 +6,7 @@ import robit
 
 robit.set_timezone('America/Edmonton')
 robit.set_database_logging(True)
-
+robit.set_controls(True)
 
 def function_to_alert_me(**kwargs):
     print(f"ALARM !!!! {kwargs['alert_message']}")
