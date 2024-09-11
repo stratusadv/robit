@@ -129,6 +129,9 @@ class WebRequestHandler(BaseHTTPRequestHandler):
             if len(self.path_list) == 4:
                 job_key = self.path_list[2]
                 job_action = self.path_list[3]
+            elif len(self.path_list) == 5:
+                job_key = self.path_list[3]
+                job_action = self.path_list[4]
             else:
                 job_key = None
                 job_action = None

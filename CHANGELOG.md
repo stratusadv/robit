@@ -1,3 +1,8 @@
+## v0.4.8
+
+#### Bugs
+- Fixed a bug where the web interface would not update when not using a key with your worker.
+
 ## v0.4.7
 
 #### Features
@@ -5,7 +10,7 @@
 - There is now a pause control for jobs (via the web interface).
 - All the controls features are disabled by default use the robit.set_controls(True) to activate the controls which are only available in the web interface.
 
-#### Fixed
+#### Bugs
 - Pipe connection between webserver should stop blocking now and provide a better user experience with the web interface.
 
 ## v0.4.6
