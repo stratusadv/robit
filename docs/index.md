@@ -14,7 +14,7 @@ A robot for your bits!
 
 ### Interface
 
-![Screenshot](./img/robit-screenshot.png)
+![Screenshot](static/img/robit-screenshot.png)
 
 ## Usage
 
