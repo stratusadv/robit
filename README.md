@@ -11,6 +11,12 @@ A robot for your bits!
 
 (Pronounced "Row-Bit")
 
+## Features
+
+- Lightweight (only one installed dependencies pytz which is also lightweight)
+- Can run with monitoring interface or headless
+- Very simple and easy to set up and configure 
+
 ## Documentation
 
 Our documentation is available on our [website](https://robit.stratusadv.com), including guides, example, api reference and more.
