@@ -16,7 +16,7 @@ A robot for your bits!
 Our documentation is available on our [website](https://robit.stratusadv.com), including guides, example, api reference and more.
 
 <p align="center">
-    <a href="https://django-glue.stratusadv.com">
-        <img alt="Django Glue Logo" src="https://django-glue.stratusadv.com/static/img/robit_logo_256.png"/>
+    <a href="https://robit.stratusadv.com">
+        <img alt="Robit Logo" src="https://robit.stratusadv.com/static/img/robit_logo_256.png"/>
     </a>
 </p>
