@@ -22,6 +22,11 @@ A robot for your bits!
 
 - Code below is provided in the examples/worker_example.py file of this project.
 
+!!! warning
+    
+    The webserver should be used for admin of the automation only in a local setting.
+    Only expose the webserver to the internet at your own risk.
+
 ```python
 import random
 from time import sleep
