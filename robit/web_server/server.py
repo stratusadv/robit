@@ -1,20 +1,23 @@
+from __future__ import annotations
+
 import threading
-from typing import Optional
+
 from http.server import HTTPServer
+from time import sleep
 
 from robit.web_server.request_handler import WebRequestHandler
 
 
 class WebServer:
     def __init__(
-            self,
-            address: str = 'localhost',
-            port: int = 8000,
-            key: Optional[str] = None,
-            html_replace_dict: Optional[dict] = None
+        self,
+        address: str = 'localhost',
+        port: int = 8000,
+        key: str | None = None,
+        html_replace_dict: dict | None = None
     ) -> None:
-        self.api_dict = dict()
-        self.post_dict = dict()
+        self.api_dict = {}
+        self.post_dict = {}
 
         self.address = address
         self.port = port
@@ -42,13 +45,14 @@ class WebServer:
         threading.Thread(target=self.update_api_dict).start()
 
         href_link = f'http://{self.address}:{self.port}'
+
         if self.key:
             href_link += f'/{self.key}/'
 
         print(f'Starting httpd server at {href_link}')
 
         if self.key is None:
-            print(f'We do not recommend running servers with out keys!')
+            print('We do not recommend running servers with out keys!')
 
     def stop(self) -> None:
         pass
@@ -57,5 +61,8 @@ class WebServer:
         while True:
             if self.worker_conn.poll():
                 update_dict = self.worker_conn.recv()
+
                 for key, val in update_dict.items():
                     self.api_dict[key] = val
+
+            sleep(0.5)
