@@ -64,5 +64,3 @@ class WebServer:
 
                 for key, val in update_dict.items():
                     self.api_dict[key] = val
-
-            sleep(1.0)
