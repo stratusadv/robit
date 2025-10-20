@@ -59,8 +59,10 @@ class WebServer:
 
     def update_api_dict(self) -> None:
         while True:
-            if self.worker_conn.poll(timeout=1.0):
+            if self.worker_conn.poll():
                 update_dict = self.worker_conn.recv()
 
                 for key, val in update_dict.items():
                     self.api_dict[key] = val
+
+            sleep(1.0)
